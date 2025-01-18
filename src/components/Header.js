@@ -7,10 +7,11 @@ const Header = () => {
                 <h1 className="text-xl font-bold">Job Listing</h1>
                 <nav>
                     <a href="#" className="text-white hover:underline mx-2">Home</a>
-                    <a href="#" className="text-white hover:underline mx-2">Jobs</a>
+                    <a href="/job" className="text-white hover:underline mx-2">Jobs</a>
                     <a href="#" className="text-white hover:underline mx-2">Contact</a>
                 </nav>
             </div>
+            
         </header>
     );
 };

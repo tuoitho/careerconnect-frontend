@@ -1,6 +1,7 @@
 import React from 'react';
 import { Search, Briefcase, Building2, MapPin, ChevronRight } from 'lucide-react';
 import Header from '../components/Header';
+import JobCategories from '../components/JobCategories';
 
 const Home = () => {
     const featuredJobs = [
@@ -52,7 +53,7 @@ const Home = () => {
                     </div>
                 </div>
             </div>
-
+            <JobCategories />
             {/* Featured Jobs */}
             <div className="container mx-auto px-4 py-12">
                 <h2 className="text-2xl font-bold mb-8 text-black">Featured Jobs</h2>
