@@ -9,14 +9,16 @@ export const authService = {
         username,
         password
       });
-      
       // Lưu tokens
-      apiService.setAuthToken(response.accessToken);
+      localStorage.setItem('authToken', response.accessToken);
       localStorage.setItem('refreshToken', response.refreshToken);
       toast.success('Đăng nhập thành công!');
       return response;
     } catch (error) {
       toast.error('Đăng nhập thất bại: ' + error.message);
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('refreshToken');
+      throw error;
     }
   },
 

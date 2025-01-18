@@ -1,35 +1,47 @@
-import React, { createContext, useState, useContext } from 'react';
-import { authApi } from '../api/authApi'; // Import authApi vào đây
+import React, { createContext, useState } from "react";
+import { authService } from "../api/authService";
 
-const AuthContext = createContext(null);
+// Tạo AuthContext
+const AuthContext = createContext();
 
+// Tạo Provider
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const storedUser = localStorage.getItem("user");
+  const [user, setUser] = useState(storedUser ? storedUser : null);
+  const [isAuthenticated, setIsAuthenticated] = useState(!!storedUser); // Kiểm tra nếu có user trong localStorage
 
-  const login = async (credentials) => {
-    const response = await authApi.login(credentials);
-    console.log('Login successful:', response);
-    // setUser(response); // Lưu user vào state sau khi đăng nhập thành công
-    localStorage.setItem('user', JSON.stringify(response));
+  const login = async (userData) => {
+    try {
+      const resp=await authService.login(userData.username, userData.password);
+      setUser(resp.username);
+      setIsAuthenticated(true);
+      localStorage.setItem("user",resp.username ); // Lưu thông tin vào localStorage
+      console.log("userData", resp.username);
+    } catch (error) {
+      console.log("error", error);
+    }
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('user');
+    setIsAuthenticated(false);
+    localStorage.removeItem("user"); // Xóa thông tin khỏi localStorage
   };
-  console.log('Current user2:', user); // Kiểm tra xem user có đúng không
+
+  // Khi ứng dụng load, nếu có user trong localStorage, set lại state user và isAuthenticated
+  //  useEffect(() => {
+  //   if (storedUser) {
+  //     setUser(JSON.parse(storedUser));
+  //     setIsAuthenticated(true);
+  //   }
+  // }, []);
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
+// Export mặc định AuthContext
+export default AuthContext;
