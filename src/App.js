@@ -6,6 +6,7 @@ import LoginPage from "./pages/LoginPage";
 import Home from "./pages/Home";
 import JobCategories from "./components/JobCategories";
 import NotFound from "./pages/NotFound";
+import Footer from "./components/Footer";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Router>
+        <Footer />
         <ToastContainer />
       </AuthProvider>
     </React.StrictMode>
