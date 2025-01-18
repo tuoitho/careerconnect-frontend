@@ -8,23 +8,23 @@ const Header = () => {
     const [showDropdown, setShowDropdown] = useState(false);
 
     return (
-        <header className="bg-black text-white p-4">
-            <div className="container mx-auto flex items-center justify-between">
-                <div className="flex items-center gap-8 px-8">
-                    <Link to="/" className="text-2xl font-bold">Career Connect</Link>
+        <header className="bg-black text-white py-2">
+            <div className="max-w-7xl mx-auto flex items-center justify-between px-4">
+                <div className="flex items-center gap-6">
+                    <Link to="/" className="text-xl font-bold">Career Connect</Link>
                     
-                    <nav className="flex items-center gap-6">
-                        <Link to="/" className="text-lg text-white hover:text-green-400">Home</Link>
-                        <Link to="/jobs" className="text-lg text-white hover:text-green-400">Jobs</Link>
-                        <Link to="/freelance" className="text-lg text-white hover:text-green-400">Freelance</Link>
-                        <Link to="/career-guide" className="text-lg text-white hover:text-green-400">
-                            <Book className="inline mr-1" size={20} />
+                    <nav className="flex items-center gap-4">
+                        <Link to="/" className="text-sm text-white hover:text-green-400">Home</Link>
+                        <Link to="/jobs" className="text-sm text-white hover:text-green-400">Jobs</Link>
+                        <Link to="/freelance" className="text-sm text-white hover:text-green-400">Freelance</Link>
+                        <Link to="/career-guide" className="text-sm text-white hover:text-green-400">
+                            <Book className="inline mr-1" size={16} />
                             Cẩm nang nghề nghiệp
                         </Link>
                     </nav>
                 </div>
 
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3">
                     {isAuthenticated ? (
                         <div className="flex items-center gap-4">
                             <div className="relative">
