@@ -1,17 +1,91 @@
-import React from 'react';
+import React, { useContext, useState } from 'react';
+import { Link } from 'react-router-dom';
+import AuthContext from '../context/AuthContext';
+import { Bell, User, Briefcase, FileText, Book } from 'lucide-react';
 
 const Header = () => {
+    const { user, isAuthenticated, logout } = useContext(AuthContext);
+    const [showDropdown, setShowDropdown] = useState(false);
+
     return (
         <header className="bg-black text-white p-4">
-            <div className="container mx-auto flex justify-between items-center">
-                <h1 className="text-xl font-bold">Job Listing</h1>
-                <nav>
-                    <a href="#" className="text-white hover:underline mx-2">Home</a>
-                    <a href="/job" className="text-white hover:underline mx-2">Jobs</a>
-                    <a href="#" className="text-white hover:underline mx-2">Contact</a>
-                </nav>
+            <div className="container mx-auto flex items-center justify-between">
+                <div className="flex items-center gap-8 px-8">
+                    <Link to="/" className="text-2xl font-bold">Career Connect</Link>
+                    
+                    <nav className="flex items-center gap-6">
+                        <Link to="/" className="text-lg text-white hover:text-green-400">Home</Link>
+                        <Link to="/jobs" className="text-lg text-white hover:text-green-400">Jobs</Link>
+                        <Link to="/freelance" className="text-lg text-white hover:text-green-400">Freelance</Link>
+                        <Link to="/career-guide" className="text-lg text-white hover:text-green-400">
+                            <Book className="inline mr-1" size={20} />
+                            Cẩm nang nghề nghiệp
+                        </Link>
+                    </nav>
+                </div>
+
+                <div className="flex items-center gap-4">
+                    {isAuthenticated ? (
+                        <div className="flex items-center gap-4">
+                            <div className="relative">
+                                <button 
+                                    className="text-white hover:text-green-400"
+                                    onClick={() => setShowDropdown(!showDropdown)}
+                                >
+                                    <span className="text-green-400 mr-2">Xin chào, {user}</span>
+                                    <User className="inline" size={18} />
+                                </button>
+                                
+                                {showDropdown && (
+                                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl py-2 z-50">
+                                        <Link to="/profile" className="block px-4 py-2 text-gray-800 hover:bg-green-50">
+                                            <User className="inline mr-2" size={16} />
+                                            Hồ sơ cá nhân
+                                        </Link>
+                                        <Link to="/applied-jobs" className="block px-4 py-2 text-gray-800 hover:bg-green-50">
+                                            <Briefcase className="inline mr-2" size={16} />
+                                            Việc làm đã ứng tuyển
+                                        </Link>
+                                        <Link to="/manage-cv" className="block px-4 py-2 text-gray-800 hover:bg-green-50">
+                                            <FileText className="inline mr-2" size={16} />
+                                            Quản lý CV
+                                        </Link>
+                                    </div>
+                                )}
+                            </div>
+                            
+                            <Link to="/notifications" className="relative">
+                                <Bell className="text-white hover:text-green-400" size={18} />
+                                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                                    3
+                                </span>
+                            </Link>
+
+                            <button 
+                                onClick={logout}
+                                className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg"
+                            >
+                                Đăng xuất
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="flex items-center gap-2">
+                            <Link 
+                                to="/login"
+                                className="bg-green-500 hover:bg-green-600 px-4 py-2 rounded-lg"
+                            >
+                                Đăng nhập
+                            </Link>
+                            <Link 
+                                to="/register"
+                                className="border border-green-500 text-green-500 hover:bg-green-500 hover:text-white px-4 py-2 rounded-lg"
+                            >
+                                Đăng ký
+                            </Link>
+                        </div>
+                    )}
+                </div>
             </div>
-            
         </header>
     );
 };
