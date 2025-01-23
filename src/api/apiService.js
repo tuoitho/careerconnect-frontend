@@ -1,12 +1,13 @@
 // apiService.js
-import axios from 'axios';
-
+import axios from "axios";
+import { toast } from "react-toastify";
+// "http://localhost:1111"||
 class ApiService {
   constructor() {
     this.instance = axios.create({
-      baseURL: process.env.REACT_APP_API_URL || 'https://reqres.in',
+      baseURL: process.env.REACT_APP_API_URL || "https://reqres.in",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       timeout: 10000,
     });
@@ -19,11 +20,11 @@ class ApiService {
     this.instance.interceptors.request.use(
       (config) => {
         config.metadata = { startTime: new Date() };
-        
+
         // Kiểm tra nếu endpoint không yêu cầu Authorization
-        const excludedEndpoints = ['/auth/login'];
+        const excludedEndpoints = ["/auth/login"];
         if (!excludedEndpoints.includes(config.url)) {
-          const token = localStorage.getItem('authToken');
+          const token = localStorage.getItem("authToken");
           if (token) {
             config.headers.Authorization = `Bearer ${token}`;
           }
@@ -32,6 +33,7 @@ class ApiService {
         return config;
       },
       (error) => {
+        console.error("Request failed tai request interceptor:", error);
         return Promise.reject(error);
       }
     );
@@ -42,40 +44,54 @@ class ApiService {
         return response.data;
       },
       async (error) => {
-        console.log('Response error:', error.response?.data);
         const originalRequest = error.config;
 
         if (error.response?.status === 401 && !originalRequest._retry) {
           originalRequest._retry = true;
 
           try {
-            const refreshToken = localStorage.getItem('refreshToken');
+            const refreshToken = localStorage.getItem("refreshToken");
             const response = await this.refreshAuthToken(refreshToken);
-            
-            localStorage.setItem('authToken', response.token);
+
+            localStorage.setItem("authToken", response.token);
             originalRequest.headers.Authorization = `Bearer ${response.token}`;
-            
+
             return this.instance(originalRequest);
           } catch (refreshError) {
             this.clearAuthToken();
-            window.location.href = '/login';
+            window.location.href = "/login";
             return Promise.reject(refreshError);
           }
         }
-
-        return Promise.reject(error);
+        this.handleError(error);
       }
     );
+  }
+  // Hàm xử lý lỗi
+  handleError(error) {
+    console.error("Request failed:", error.response.data);
+    let errorMessage = "Có lỗi xảy ra. Vui lòng thử lại sau.";  
+
+    if (error.response) {
+      const { status, data } = error.response;
+      errorMessage = data.message || `HTTP Error ${status}`;
+    } else if (error.request) {
+      errorMessage = "Network error: Please check your internet connection.";
+    } else {
+      errorMessage = error.message || "Unknown error occurred.";
+    }
+    // Hiển thị thông báo lỗi (nếu dùng thư viện như toast)
+    toast.error(errorMessage);
   }
 
   // Auth methods
   setAuthToken(token) {
-    localStorage.setItem('authToken', token);
+    localStorage.setItem("authToken", token);
   }
 
   clearAuthToken() {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('refreshToken');
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("refreshToken");
   }
 
   // HTTP methods
@@ -96,7 +112,7 @@ class ApiService {
   }
 
   async refreshAuthToken(refreshToken) {
-    return this.instance.post('/auth/refresh', { refreshToken });
+    return this.instance.post("/auth/refresh", { refreshToken });
   }
 }
 

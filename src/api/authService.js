@@ -15,7 +15,6 @@ export const authService = {
       toast.success('Đăng nhập thành công!');
       return response;
     } catch (error) {
-      toast.error('Đăng nhập thất bại: ' + error.message);
       localStorage.removeItem('authToken');
       localStorage.removeItem('refreshToken');
       throw error;

@@ -7,6 +7,7 @@ import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 import Layout from "./components/Layout";
 import Registration from "./pages/Registration";
+import LoadingSpinner from "./components/LoadingSpinner";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
               <Route path="*" element={<NotFound />} />
             </Routes>
             <ToastContainer />
+            {/* <LoadingSpinner /> */}
           </Layout>
         </Router>
       </AuthProvider>

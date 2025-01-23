@@ -2,18 +2,53 @@ import { useState } from 'react'
 import { FiMail, FiLock, FiUser } from 'react-icons/fi'
 import  AuthContext  from '../context/AuthContext'
 import { useContext } from 'react'
+import { useNavigate } from 'react-router-dom'
+import LoadingSpinner from '../components/LoadingSpinner';
+import { useEffect } from 'react';
+
 function Login() {
+  
   const [formData, setFormData] = useState({
     username: '',
     password: ''
   })
+  const { user, isAuthenticated, logout } = useContext(AuthContext);
+
+  const navigate = useNavigate()
   const { login, error } = useContext(AuthContext);
-  const handleSubmit = (e) => {
+  const [isLoading, setIsLoading] = useState(false);
+  useEffect(() => {
+    if (isAuthenticated) {
+      console.log('User is authenticated, redirecting to /');
+      navigate('/');
+    }
+  }, [isAuthenticated, navigate]);
+  const handleSubmit = async (e) => {
     e.preventDefault()
     console.log('Login attempt with:', formData)
-    
-    login(formData)
-    // Call the login function from the AuthContext
+    setIsLoading(true);
+    // try {
+    //   const response = await login(formData)
+    //   console.log('Login successful:', response)   
+    //   if (response) {
+    //     setIsLoading(false);
+    //     navigate('/dashboard')
+    //   }   
+      
+    // } catch (error) {
+    //   // ...error handling...
+    // } finally {
+    //   setIsLoading(false);
+      
+    // }
+    login(formData).then((response) => {
+      setIsLoading(false);
+      if (response) {
+        navigate('/')
+      }
+    }).finally(() => {
+      setIsLoading(false);
+    })
 
   }
 
@@ -103,9 +138,12 @@ function Login() {
 
           <button
             type="submit"
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors duration-200"
+            disabled={isLoading}
+            className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors duration-200 ${
+              isLoading ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
           >
-            Sign in
+            {isLoading ? 'Signing in...' : 'Sign in'}
           </button>
 
           <div className="text-center text-sm">
