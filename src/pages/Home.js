@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { Search, Briefcase, Building2, MapPin, ChevronRight } from 'lucide-react';
 import Header from '../components/Header';
 import JobCategories from '../components/JobCategories';
+import HowItWorks from '../components/HowItWorks';
+import { Link } from 'react-router-dom';
+import {  UserPlus } from 'lucide-react';
 
 const Home = () => {
     const [searchQuery, setSearchQuery] = useState('');
@@ -37,7 +40,31 @@ const Home = () => {
     return (
         <div className="min-h-screen bg-white">
             <Header />
-            {/* Hero Section */}
+
+            {/* Recruitment Buttons */}
+            <div className="bg-gradient-to-r from-black via-gray-900 to-black py-6">
+    <div className="container mx-auto px-4 max-w-4xl flex justify-center gap-6">
+        <Link 
+            to="/post-job" 
+            className="group bg-gradient-to-r from-green-500 to-green-600 text-white px-8 py-3 rounded-lg 
+                       text-sm font-medium transition-all duration-300 transform hover:scale-105 
+                       hover:shadow-lg flex items-center gap-2"
+        >
+            <Briefcase size={18} />
+            <span>Đăng tuyển</span>
+        </Link>
+        <Link 
+            to="/apply" 
+            className="group border-2 border-white text-white px-8 py-3 rounded-lg text-sm 
+                       font-medium transition-all duration-300 transform hover:scale-105 
+                       hover:shadow-lg hover:bg-white hover:text-black flex items-center gap-2"
+        >
+            <UserPlus size={18} />
+            <span>Ứng tuyển</span>
+        </Link>
+    </div>
+</div>
+
             <div className="bg-black text-white py-12">
                 <div className="container mx-auto px-4 max-w-4xl">
                     <h1 className="text-4xl font-bold mb-6 text-center">Find Your Dream Job</h1>
@@ -72,9 +99,13 @@ const Home = () => {
                 </div>
             </div>
             <JobCategories />
+            {/* <HowItWorks /> */}
             {/* Featured Jobs */}
             {/* Thêm padding cho container */}
-            <div className="container mx-auto px-8 py-12">
+            {/* <div className="max-w-7xl mx-auto flex items-center justify-between px-4"> */}
+            <div className="border-t">
+
+            <div className="container mx-auto px-8 py-12 max-w-7xl mx-auto flex items-center justify-between px-4 ">
                 <h2 className="text-2xl font-bold mb-8 text-black">Featured Jobs</h2>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {featuredJobs.map(job => (
@@ -98,6 +129,7 @@ const Home = () => {
                         </div>
                     ))}
                 </div>
+            </div>
             </div>
         </div>
     );

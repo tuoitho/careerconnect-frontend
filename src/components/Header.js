@@ -8,7 +8,7 @@ const Header = () => {
     const [showDropdown, setShowDropdown] = useState(false);
 
     return (
-        <header className="bg-black text-white py-2">
+        <header className="fixed top-0 left-0 right-0 bg-black text-white py-2 z-50 shadow-md">
             <div className="max-w-7xl mx-auto flex items-center justify-between px-4">
                 <div className="flex items-center gap-6">
                     <Link to="/" className="text-xl font-bold">Career Connect</Link>
