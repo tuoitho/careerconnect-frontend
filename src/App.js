@@ -11,6 +11,7 @@ import NotFound from "./pages/NotFound";
 import Registration from "./pages/Registration";
 import Unauthorized from './pages/Unauthorized';
 import RecruiterHome from './pages/RecruiterHome';
+import ManageCompany from "./pages/ManageCompany";
 
 function App() {
   return (
@@ -20,13 +21,14 @@ function App() {
           <Routes>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<Registration />} />
-            
+
             {/* Recruiter Routes */}
             <Route path="/recruiter/*" element={
               <ProtectedRoute allowedRoles={['recruiter']}>
                 <RecruiterLayout>
                   <Routes>
                     <Route path="/" element={<RecruiterHome />} />
+                    <Route path="/manage-company" element={<ManageCompany />} />
                     {/* <Route path="dashboard" element={<RecruiterDashboard />} />
                     <Route path="jobs" element={<JobPostingSection />} /> */}
                     {/* Add more recruiter routes */}

@@ -1,5 +1,6 @@
 import React from 'react';
 
+
 const LoadingSpinner = () => {
   return (
     <div className="fixed inset-0 bg-white/50 flex items-center justify-center z-50">

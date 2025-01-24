@@ -72,7 +72,7 @@ const Header = () => {
               </div>
 
               {isOpen && (
-                <div 
+                <div
                   className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
                   role="menu"
                 >
@@ -85,7 +85,7 @@ const Header = () => {
                     Profile
                   </Link>
                   <Link
-                    to="/manage-company"
+                    to="/recruiter/manage-company"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
                     role="menuitem"
                   >
