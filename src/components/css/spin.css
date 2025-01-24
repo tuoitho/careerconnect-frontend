@@ -1,0 +1,38 @@
+@keyframes spin-fast {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  
+  .animate-spin-fast {
+    animation: spin-fast 0.8s linear infinite;
+  }
+  
+  @keyframes spin-slow {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(-360deg);
+    }
+  }
+  
+  .animate-spin-slow {
+    animation: spin-slow 1.5s linear infinite;
+  }
+  
+  @keyframes text-pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.6;
+    }
+  }
+  
+  .animate-text-pulse {
+    animation: text-pulse 2s ease-in-out infinite;
+  }

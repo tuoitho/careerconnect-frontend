@@ -145,6 +145,7 @@ function Login() {
           >
             {isLoading ? 'Signing in...' : 'Sign in'}
           </button>
+          {isLoading && <LoadingSpinner />}
 
           <div className="text-center text-sm">
             <span className="text-gray-600">Don't have an account? </span>
