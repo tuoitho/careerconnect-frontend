@@ -9,6 +9,9 @@ export const authService = {
         username,
         password
       });
+      if (!response) {
+        throw new Error('Login failed: Invalid response from <server>')
+      }
       // Lưu tokens
       localStorage.setItem('authToken', response.accessToken);
       localStorage.setItem('refreshToken', response.refreshToken);
@@ -17,7 +20,8 @@ export const authService = {
     } catch (error) {
       localStorage.removeItem('authToken');
       localStorage.removeItem('refreshToken');
-      throw error;
+      console.error('err in login:', error);
+      // throw error;
     }
   },
 

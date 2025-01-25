@@ -27,13 +27,14 @@ class ApiService {
           const token = localStorage.getItem("authToken");
           if (token) {
             config.headers.Authorization = `Bearer ${token}`;
-          }
+          } 
+          // else {
+          //   return Promise.reject(new Error("Token not found"));
+          // }
         }
-
         return config;
       },
       (error) => {
-        console.error("Request failed tai request interceptor:", error);
         return Promise.reject(error);
       }
     );
@@ -45,15 +46,14 @@ class ApiService {
       },
       async (error) => {
         const originalRequest = error.config;
-
         if (error.response?.status === 401 && !originalRequest._retry) {
           originalRequest._retry = true;
-
+          
           try {
             const refreshToken = localStorage.getItem("refreshToken");
             const response = await this.refreshAuthToken(refreshToken);
 
-            localStorage.setItem("authToken", response.token);
+            localStorage.setItem("authToken", response.accessToken);
             originalRequest.headers.Authorization = `Bearer ${response.token}`;
 
             return this.instance(originalRequest);
@@ -63,26 +63,39 @@ class ApiService {
             return Promise.reject(refreshError);
           }
         }
-        this.handleError(error);
+          // Xử lý lỗi khác không phải lỗi 401
+        if (error.response) {
+          // Lỗi từ phía server
+          toast.error(error.response.data.message);
+        } else if (error.request) {
+          // Không nhận được phản hồi từ server
+          toast.error("Network error: Please check your internet connection.");
+        } else {
+          // Lỗi khác
+          console.log("di vao day2",error);
+          toast.error("Unknown error occurred.");
+        }
+        // return Promise.reject(error);
+    
       }
+  
     );
   }
-  // Hàm xử lý lỗi
-  handleError(error) {
-    console.error("Request failed:", error.response.data);
-    let errorMessage = "Có lỗi xảy ra. Vui lòng thử lại sau.";  
+  // handleError(error) {
+  //   console.error("Request failed:", error.response.data);
+  //   let errorMessage = "Có lỗi xảy ra. Vui lòng thử lại sau.";
 
-    if (error.response) {
-      const { status, data } = error.response;
-      errorMessage = data.message || `HTTP Error ${status}`;
-    } else if (error.request) {
-      errorMessage = "Network error: Please check your internet connection.";
-    } else {
-      errorMessage = error.message || "Unknown error occurred.";
-    }
-    // Hiển thị thông báo lỗi (nếu dùng thư viện như toast)
-    toast.error(errorMessage);
-  }
+  //   if (error.response) {
+  //     const { status, data } = error.response;
+  //     errorMessage = data.message || `HTTP Error ${status}`;
+  //   } else if (error.request) {
+  //     errorMessage = "Network error: Please check your internet connection.";
+  //   } else {
+  //     errorMessage = error.message || "Unknown error occurred.";
+  //   }
+  //   // Hiển thị thông báo lỗi (nếu dùng thư viện như toast)
+  //   toast.error(errorMessage);
+  // }
 
   // Auth methods
   setAuthToken(token) {
@@ -112,7 +125,13 @@ class ApiService {
   }
 
   async refreshAuthToken(refreshToken) {
-    return this.instance.post("/auth/refresh", { refreshToken });
+    // return this.instance.post("/refresh", { refreshToken });
+    // neu truyen dang param
+    return this.instance.post("/refresh", null, {
+      params: {
+        refreshToken,
+      },
+    });
   }
 }
 

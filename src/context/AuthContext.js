@@ -10,17 +10,17 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(storedUser ? storedUser : null);
   const [isAuthenticated, setIsAuthenticated] = useState(!!storedUser); // Kiểm tra nếu có user trong localStorage
   const login = async (userData) => {
-    try {
-      const resp=await authService.login(userData.username, userData.password);
+    
+      const resp = await authService.login(userData.username, userData.password);
+      if (!resp) {
+        return;
+      }
       setUser(resp.username);
       setIsAuthenticated(true);
-      localStorage.setItem("user",resp.username ); // Lưu thông tin vào localStorage
+      localStorage.setItem("user", resp.username); // Lưu thông tin vào localStorage
       return resp;
-      //di den
-    } catch (error) {
-      // console.log("error", error);
-    }
   };
+  
 
   const logout = () => {
     setUser(null);

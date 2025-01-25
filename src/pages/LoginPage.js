@@ -5,7 +5,6 @@ import { useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import LoadingSpinner from '../components/LoadingSpinner';
 import { useEffect } from 'react';
-
 function Login() {
   
   const [formData, setFormData] = useState({
@@ -27,26 +26,13 @@ function Login() {
     e.preventDefault()
     console.log('Login attempt with:', formData)
     setIsLoading(true);
-    // try {
-    //   const response = await login(formData)
-    //   console.log('Login successful:', response)   
-    //   if (response) {
-    //     setIsLoading(false);
-    //     navigate('/dashboard')
-    //   }   
-      
-    // } catch (error) {
-    //   // ...error handling...
-    // } finally {
-    //   setIsLoading(false);
-      
-    // }
+
     login(formData).then((response) => {
-      setIsLoading(false);
       if (response) {
         navigate('/')
       }
-    }).finally(() => {
+    })
+    .finally(() => {
       setIsLoading(false);
     })
 
