@@ -34,7 +34,9 @@ const ManageCompany = () => {
       .then((response) => {
         setCompany(response.result);
       })
-      .catch((error) => {})
+      .catch((error) => {
+        
+      })
       .finally(() => {
         setLoading(false);
       });

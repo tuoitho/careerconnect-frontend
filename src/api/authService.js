@@ -13,6 +13,7 @@ export const authService = {
         throw new Error('Login failed: Invalid response from <server>')
       }
       // Lưu tokens
+      localStorage.setItem("user", response.username); 
       localStorage.setItem('authToken', response.accessToken);
       localStorage.setItem('refreshToken', response.refreshToken);
       toast.success('Đăng nhập thành công!');
