@@ -38,6 +38,14 @@ export const companyService = {
             toast.error("Lỗi tại getInvitation:", error.message);
         }
     },
+    getInvitations: async (page = 0, size = 2) => {
+        try {
+            return await apiService.get(`/recruiter/invitation?page=${page}&size=${size}`);
+        } catch (error) {
+            toast.error("Lỗi tại getInvitations:", error.message);
+        }
+    },
+
     acceptInvitation: async (token) => {
         try {
             return await apiService.post(`/recruiter/company/accept`, null, {

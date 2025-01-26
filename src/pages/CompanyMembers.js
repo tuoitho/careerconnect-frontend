@@ -9,15 +9,23 @@ const CompanyMembers = () => {
   const [members, setMembers] = useState([]);
   const [currentPage, setCurrentPage] = useState(0); 
   const [totalPages, setTotalPages] = useState(0);
+
+  // Invitations pagination
   const [invitations, setInvitations] = useState([]);
+  const [invitationCurrentPage, setInvitationCurrentPage] = useState(0);
+  const [invitationTotalPages, setInvitationTotalPages] = useState(0);
+
   const [loading, setLoading] = useState(true);
   const [inviteEmail, setInviteEmail] = useState("");
   const [sending, setSending] = useState(false);
 
   useEffect(() => {
     fetchMembers();
-    // fetchInvitations();
   }, [currentPage]);
+
+  useEffect(() => {
+    fetchInvitations();
+  }, [invitationCurrentPage]);
 
   const handlePageChange = (newPage) => {
     if (newPage >= 0 && newPage < totalPages) {
@@ -25,9 +33,16 @@ const CompanyMembers = () => {
     }
   };
 
+  const handleInvitationPageChange = (newPage) => {
+    if (newPage >= 0 && newPage < invitationTotalPages) {
+      setInvitationCurrentPage(newPage);
+    }
+  };
+
   const fetchMembers = async () => {
     try {
-      const response = await companyService.getCompanyMembers(currentPage,2);
+      // pageSize set to 2 as an example
+      const response = await companyService.getCompanyMembers(currentPage, 2);
       if (response) {
         toast.success(response.message);
         setMembers(response.result.data);
@@ -43,8 +58,14 @@ const CompanyMembers = () => {
 
   const fetchInvitations = async () => {
     try {
-      const response = await companyService.getInvitations();
-      setInvitations(response.result);
+      // pageSize set to 2 as an example
+      const response = await companyService.getInvitations(invitationCurrentPage, 2);
+      if (response) {
+        toast.success(response.message);
+        setInvitations(response.result.data);
+        setInvitationCurrentPage(response.result.currentPage);
+        setInvitationTotalPages(response.result.totalPages);
+      }
     } catch (error) {
       toast.error("Failed to fetch invitations");
     }
@@ -54,13 +75,11 @@ const CompanyMembers = () => {
     e.preventDefault();
     setSending(true);
     try {
-      const response =
       await companyService.inviteMember(inviteEmail);
-      if (response) {
-        toast.success(response.message);
-        setInviteEmail("");
-        fetchInvitations();
-      }
+      toast.success("Invitation sent successfully");
+      setInviteEmail("");
+      // Refresh invitations after sending
+      fetchInvitations();
     } catch (error) {
       toast.error("Failed to send invitation");
     } finally {
@@ -118,8 +137,8 @@ const CompanyMembers = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {members.map((member) => (
-              <tr key={member.id}>
+            {members.map((member, index) => (
+              <tr key={member.index}>
                 <td className="px-6 py-4 whitespace-nowrap">{member.name}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{member.email}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{member.role}</td>
@@ -137,7 +156,7 @@ const CompanyMembers = () => {
         </table>
       </div>
 
-      {/* Pagination Controls */}
+      {/* Pagination Controls for Members */}
       <div className="mt-4 flex items-center justify-between">
         <button
           onClick={() => handlePageChange(currentPage - 1)}
@@ -166,7 +185,7 @@ const CompanyMembers = () => {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sent Date</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Expiry Date</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
               </tr>
             </thead>
@@ -175,7 +194,7 @@ const CompanyMembers = () => {
                 <tr key={invitation.id}>
                   <td className="px-6 py-4 whitespace-nowrap">{invitation.email}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {new Date(invitation.createdAt).toLocaleDateString()}
+                    {new Date(invitation.expiryDate).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
@@ -192,6 +211,27 @@ const CompanyMembers = () => {
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* Pagination Controls for Invitations */}
+        <div className="mt-4 flex items-center justify-between">
+          <button
+            onClick={() => handleInvitationPageChange(invitationCurrentPage - 1)}
+            disabled={invitationCurrentPage === 0}
+            className="px-3 py-2 border rounded mr-2 disabled:opacity-50"
+          >
+            Previous
+          </button>
+          <span>
+            Page {invitationCurrentPage + 1} of {invitationTotalPages}
+          </span>
+          <button
+            onClick={() => handleInvitationPageChange(invitationCurrentPage + 1)}
+            disabled={invitationCurrentPage === invitationTotalPages - 1}
+            className="px-3 py-2 border rounded ml-2 disabled:opacity-50"
+          >
+            Next
+          </button>
         </div>
       </div>
     </div>
