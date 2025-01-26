@@ -14,6 +14,7 @@ import RecruiterHome from './pages/RecruiterHome';
 import ManageCompany from "./pages/ManageCompany";
 import RegisterCompany from "./pages/RegisterCompany";
 import InvitationPage from './pages/InvitationPage';
+import CompanyMembers from './pages/CompanyMembers';
 
 function App() {
   return (
@@ -33,7 +34,7 @@ function App() {
                     <Route path="/manage-company" element={<ManageCompany />} />
                     <Route path="/manage-company/register" element={<RegisterCompany/>} />
                     <Route path="/invitation/:token" element={<InvitationPage /> } />
-
+                    <Route   path="/company/members" element={<CompanyMembers />} />
                     {/* <Route path="dashboard" element={<RecruiterDashboard />} />
                     <Route path="jobs" element={<JobPostingSection />} /> */}
                     {/* Add more recruiter routes */}

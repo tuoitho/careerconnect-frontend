@@ -49,5 +49,12 @@ export const companyService = {
         catch (error) {
             toast.error("Lỗi tại acceptInvitation:", error.message);
         }
-    }
+    },
+    getCompanyMembers: async (page, size) => {
+        try {
+            return await apiService.get(`/recruiter/company/member?page=${page}&size=${size}`);
+        } catch (error) {
+            toast.error("Lỗi tại getCompanyMembers:", error.message);
+        }
+    },
 }
