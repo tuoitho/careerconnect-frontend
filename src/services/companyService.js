@@ -31,4 +31,23 @@ export const companyService = {
             toast.error("Lỗi tại updateCompany:", error.message);
         }
     },
+    getInvitation: async (token) => {
+        try {
+            return await apiService.get(`/recruiter/invitation/${token}`);
+        } catch (error) {
+            toast.error("Lỗi tại getInvitation:", error.message);
+        }
+    },
+    acceptInvitation: async (token) => {
+        try {
+            return await apiService.post(`/recruiter/company/accept`, null, {
+                params: {
+                    token: token
+                }
+            });
+        }
+        catch (error) {
+            toast.error("Lỗi tại acceptInvitation:", error.message);
+        }
+    }
 }
