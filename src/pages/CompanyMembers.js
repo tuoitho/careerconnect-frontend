@@ -54,10 +54,13 @@ const CompanyMembers = () => {
     e.preventDefault();
     setSending(true);
     try {
+      const response =
       await companyService.inviteMember(inviteEmail);
-      toast.success("Invitation sent successfully");
-      setInviteEmail("");
-      fetchInvitations();
+      if (response) {
+        toast.success(response.message);
+        setInviteEmail("");
+        fetchInvitations();
+      }
     } catch (error) {
       toast.error("Failed to send invitation");
     } finally {

@@ -57,4 +57,11 @@ export const companyService = {
             toast.error("Lỗi tại getCompanyMembers:", error.message);
         }
     },
+    inviteMember: async (email) => {
+        try {
+            return await apiService.post(`/recruiter/company/addmember`, {email: email});
+        } catch (error) {
+            toast.error("Lỗi tại inviteMember:", error.message);
+        }
+    },
 }
