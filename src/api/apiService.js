@@ -5,7 +5,8 @@ import { toast } from "react-toastify";
 class ApiService {
   constructor() {
     this.instance = axios.create({
-      baseURL: process.env.REACT_APP_API_URL || "https://reqres.in",
+      // baseURL: process.env.REACT_APP_API_URL || "https://reqres.in",
+      baseURL: import.meta.env.VITE_API_URL || "https://reqres.in",
       headers: {
         "Content-Type": "application/json",
       },
