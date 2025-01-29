@@ -9,17 +9,23 @@ interface CompanyData {
 }
 
 interface ApiResponse<T> {
-  success: boolean;
+  code: number;
   message: string;
   data: T;
 }
 
 export const companyService = {
-  createCompany: async (companyData: CompanyData): Promise<ApiResponse<any> | void> => {
+  createCompany: async (
+    companyData: CompanyData
+  ): Promise<ApiResponse<any> | void> => {
     try {
-      return await apiService.post<ApiResponse<any>>(`/recruiter/company`, companyData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      return await apiService.post<ApiResponse<any>>(
+        `/recruiter/company`,
+        companyData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
     } catch (error: any) {
       toast.error(`Lỗi tại createCompany: ${error.message}`);
     }
@@ -27,7 +33,9 @@ export const companyService = {
 
   getCompany: async (): Promise<ApiResponse<any> | void> => {
     try {
-      const response = await apiService.get<ApiResponse<any>>(`/recruiter/company`);
+      const response = await apiService.get<ApiResponse<any>>(
+        `/recruiter/company`
+      );
       console.log(response);
       return response;
     } catch (error: any) {
@@ -35,11 +43,17 @@ export const companyService = {
     }
   },
 
-  updateCompany: async (companyData: CompanyData): Promise<ApiResponse<any> | void> => {
+  updateCompany: async (
+    companyData: CompanyData
+  ): Promise<ApiResponse<any> | void> => {
     try {
-      return await apiService.put<ApiResponse<any>>(`/recruiter/company`, companyData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      return await apiService.put<ApiResponse<any>>(
+        `/recruiter/company`,
+        companyData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
     } catch (error: any) {
       toast.error(`Lỗi tại updateCompany: ${error.message}`);
     }
@@ -47,15 +61,22 @@ export const companyService = {
 
   getInvitation: async (token: string): Promise<ApiResponse<any> | void> => {
     try {
-      return await apiService.get<ApiResponse<any>>(`/recruiter/invitation/${token}`);
+      return await apiService.get<ApiResponse<any>>(
+        `/recruiter/invitation/${token}`
+      );
     } catch (error: any) {
       toast.error(`Lỗi tại getInvitation: ${error.message}`);
     }
   },
 
-  getInvitations: async (page: number = 0, size: number = 2): Promise<ApiResponse<any> | void> => {
+  getInvitations: async (
+    page: number = 0,
+    size: number = 2
+  ): Promise<ApiResponse<any> | void> => {
     try {
-      return await apiService.get<ApiResponse<any>>(`/recruiter/invitation?page=${page}&size=${size}`);
+      return await apiService.get<ApiResponse<any>>(
+        `/recruiter/invitation?page=${page}&size=${size}`
+      );
     } catch (error: any) {
       toast.error(`Lỗi tại getInvitations: ${error.message}`);
     }
@@ -63,17 +84,26 @@ export const companyService = {
 
   acceptInvitation: async (token: string): Promise<ApiResponse<any> | void> => {
     try {
-      return await apiService.post<ApiResponse<any>>(`/recruiter/company/accept`, null, {
-        params: { token },
-      });
+      return await apiService.post<ApiResponse<any>>(
+        `/recruiter/company/accept`,
+        null,
+        {
+          params: { token },
+        }
+      );
     } catch (error: any) {
       toast.error(`Lỗi tại acceptInvitation: ${error.message}`);
     }
   },
 
-  getCompanyMembers: async (page: number, size: number): Promise<ApiResponse<any> | void> => {
+  getCompanyMembers: async (
+    page: number,
+    size: number
+  ): Promise<ApiResponse<any> | void> => {
     try {
-      return await apiService.get<ApiResponse<any>>(`/recruiter/company/member?page=${page}&size=${size}`);
+      return await apiService.get<ApiResponse<any>>(
+        `/recruiter/company/member?page=${page}&size=${size}`
+      );
     } catch (error: any) {
       toast.error(`Lỗi tại getCompanyMembers: ${error.message}`);
     }
@@ -81,7 +111,10 @@ export const companyService = {
 
   inviteMember: async (email: string): Promise<ApiResponse<any> | void> => {
     try {
-      return await apiService.post<ApiResponse<any>>(`/recruiter/company/addmember`, { email });
+      return await apiService.post<ApiResponse<any>>(
+        `/recruiter/company/addmember`,
+        { email }
+      );
     } catch (error: any) {
       toast.error(`Lỗi tại inviteMember: ${error.message}`);
     }

@@ -10,7 +10,7 @@ interface UserData {
 
 // Định nghĩa kiểu trả về của API (ví dụ: thông tin user sau khi đăng ký)
 interface ApiResponse {
-  success: boolean;
+  code: number;
   message: string;
   data: any; // Dữ liệu trả về sau khi đăng ký thành công
 }
