@@ -45,7 +45,6 @@ const CompanyMembers = () => {
       // pageSize set to 2 as an example
       const response = await companyService.getCompanyMembers(currentPage, 2);
       if (response) {
-        toast.success(response.message);
         setMembers(response.result.data);
         setCurrentPage(response.result.currentPage);
         setTotalPages(response.result.totalPages);
@@ -62,7 +61,6 @@ const CompanyMembers = () => {
       // pageSize set to 2 as an example
       const response = await companyService.getInvitations(invitationCurrentPage, 2);
       if (response) {
-        toast.success(response.message);
         setInvitations(response.result.data);
         setInvitationCurrentPage(response.result.currentPage);
         setInvitationTotalPages(response.result.totalPages);
