@@ -3,7 +3,9 @@ import { AuthProvider } from "./context/AuthContext";
 import "./index.css";
 import App from "./App";
 
-const root = ReactDOM.createRoot(document.getElementById("root"));
+const root = ReactDOM.createRoot(
+  document.getElementById("root") as HTMLElement // Ép kiểu rõ ràng cho phần tử HTML
+);
 root.render(
   <AuthProvider>
     <App />

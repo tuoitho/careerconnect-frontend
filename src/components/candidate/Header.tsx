@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
-import AuthContext from '../context/AuthContext';
+import AuthContext from '../../context/AuthContext';
 import { Bell, User, Briefcase, FileText, Book } from 'lucide-react';
 
 const Header = () => {
@@ -12,7 +12,7 @@ const Header = () => {
             <div className="max-w-7xl mx-auto flex items-center justify-between px-4">
                 <div className="flex items-center gap-6">
                     <Link to="/" className="text-xl font-bold">Career Connect</Link>
-                    
+
                     <nav className="flex items-center gap-4">
                         <Link to="/" className="text-sm text-white hover:text-green-400">Home</Link>
                         <Link to="/jobs" className="text-sm text-white hover:text-green-400">Jobs</Link>
@@ -28,14 +28,14 @@ const Header = () => {
                     {isAuthenticated ? (
                         <div className="flex items-center gap-4">
                             <div className="relative">
-                                <button 
+                                <button
                                     className="text-white hover:text-green-400"
                                     onClick={() => setShowDropdown(!showDropdown)}
                                 >
                                     <span className="text-green-400 mr-2">Xin chào, {user}</span>
                                     <User className="inline" size={18} />
                                 </button>
-                                
+
                                 {showDropdown && (
                                     <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl py-2 z-50">
                                         <Link to="/profile" className="block px-4 py-2 text-gray-800 hover:bg-green-50">
@@ -53,7 +53,7 @@ const Header = () => {
                                     </div>
                                 )}
                             </div>
-                            
+
                             <Link to="/notifications" className="relative">
                                 <Bell className="text-white hover:text-green-400" size={18} />
                                 <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
@@ -61,7 +61,7 @@ const Header = () => {
                                 </span>
                             </Link>
 
-                            <button 
+                            <button
                                 onClick={logout}
                                 className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg"
                             >
@@ -70,13 +70,13 @@ const Header = () => {
                         </div>
                     ) : (
                         <div className="flex items-center gap-2">
-                            <Link 
+                            <Link
                                 to="/login"
                                 className="bg-green-500 hover:bg-green-600 px-4 py-2 rounded-lg"
                             >
                                 Đăng nhập
                             </Link>
-                            <Link 
+                            <Link
                                 to="/register"
                                 className="border border-green-500 text-green-500 hover:bg-green-500 hover:text-white px-4 py-2 rounded-lg"
                             >

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Search, Briefcase, Building2, MapPin, ChevronRight } from 'lucide-react';
-import Header from '../components/Header';
-import JobCategories from '../components/JobCategories';
-import HowItWorks from '../components/HowItWorks';
+import Header from '../../components/candidate/Header';
+import JobCategories from '../../components/candidate/JobCategories';
+import HowItWorks from '../../components/candidate/HowItWorks';
 import { Link } from 'react-router-dom';
 import {  UserPlus } from 'lucide-react';
 
@@ -38,25 +38,25 @@ const Home = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen bg-white pt-14">
             <Header />
 
             {/* Recruitment Buttons */}
             <div className="bg-gradient-to-r from-black via-gray-900 to-black py-6">
     <div className="container mx-auto px-4 max-w-4xl flex justify-center gap-6">
-        <Link 
-            to="/post-job" 
-            className="group bg-gradient-to-r from-green-500 to-green-600 text-white px-8 py-3 rounded-lg 
-                       text-sm font-medium transition-all duration-300 transform hover:scale-105 
+        <Link
+            to="/post-job"
+            className="group bg-gradient-to-r from-green-500 to-green-600 text-white px-8 py-3 rounded-lg
+                       text-sm font-medium transition-all duration-300 transform hover:scale-105
                        hover:shadow-lg flex items-center gap-2"
         >
             <Briefcase size={18} />
             <span>Đăng tuyển</span>
         </Link>
-        <Link 
-            to="/apply" 
-            className="group border-2 border-white text-white px-8 py-3 rounded-lg text-sm 
-                       font-medium transition-all duration-300 transform hover:scale-105 
+        <Link
+            to="/apply"
+            className="group border-2 border-white text-white px-8 py-3 rounded-lg text-sm
+                       font-medium transition-all duration-300 transform hover:scale-105
                        hover:shadow-lg hover:bg-white hover:text-black flex items-center gap-2"
         >
             <UserPlus size={18} />
@@ -71,8 +71,8 @@ const Home = () => {
                     <div className="flex gap-2 bg-white p-3 rounded-lg items-center">
                         <div className="flex-1 flex items-center gap-2 border-r border-gray-300 pr-2">
                             <Search className="text-gray-400" size={20} />
-                            <input 
-                                type="text" 
+                            <input
+                                type="text"
                                 placeholder="Job title or keyword"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -81,7 +81,7 @@ const Home = () => {
                         </div>
                         <div className="flex items-center gap-2 px-2">
                             <MapPin className="text-gray-400" size={20} />
-                            <select 
+                            <select
                                 value={location}
                                 onChange={(e) => setLocation(e.target.value)}
                                 className="w-48 focus:outline-none text-black text-sm bg-transparent"

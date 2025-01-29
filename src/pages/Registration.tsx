@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { registerUser } from "../services/userService";
-import LoadingSpinner from "../components/LoadingSpinner";
+import LoadingSpinner from "../components/candidate/LoadingSpinner";
 import { toast } from "react-toastify";
 
 const Registration = () => {
@@ -44,7 +44,7 @@ const Registration = () => {
 
     if (Object.keys(validationErrors).length === 0) {
       setIsLoading(true);
-      
+
       registerUser(formData)
         .then((response) => {
           toast.success(response.message); // Hiển thị thông báo thành công

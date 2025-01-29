@@ -3,10 +3,10 @@ import { FiMail, FiLock, FiUser } from 'react-icons/fi'
 import  AuthContext  from '../context/AuthContext'
 import { useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
-import LoadingSpinner from '../components/LoadingSpinner';
+import LoadingSpinner from '../components/candidate/LoadingSpinner';
 import { useEffect } from 'react';
 function Login() {
-  
+
   const [formData, setFormData] = useState({
     username: '',
     password: ''
@@ -56,7 +56,7 @@ function Login() {
           <h2 className="text-3xl font-bold text-gray-900">Welcome Back</h2>
           <p className="mt-2 text-sm text-gray-600">Please sign in to your account</p>
         </div>
-        
+
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           <div className="space-y-4">
             <div>

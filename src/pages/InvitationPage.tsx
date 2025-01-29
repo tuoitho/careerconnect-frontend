@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { companyService } from "../services/companyService";
 import { toast } from "react-toastify";
-import LoadingSpinner from "../components/LoadingSpinner";
+import LoadingSpinner from "../components/candidate/LoadingSpinner";
 
 const InvitationPage = () => {
   const { token } = useParams();

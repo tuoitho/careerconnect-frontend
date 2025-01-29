@@ -2,13 +2,18 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { companyService } from "../services/companyService";
 import { toast } from "react-toastify";
-import LoadingSpinner from "../components/LoadingSpinner";
+import LoadingSpinner from "../components/candidate/LoadingSpinner";
 // import { FaTrash, FaUserPlus } from "react-icons/fa";
-import { FaTrash, FaUserPlus, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import {
+  FaTrash,
+  FaUserPlus,
+  FaChevronLeft,
+  FaChevronRight,
+} from "react-icons/fa";
 
 const CompanyMembers = () => {
   const [members, setMembers] = useState([]);
-  const [currentPage, setCurrentPage] = useState(0); 
+  const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
   // Invitations pagination
@@ -45,7 +50,7 @@ const CompanyMembers = () => {
       // pageSize set to 2 as an example
       const response = await companyService.getCompanyMembers(currentPage, 2);
       if (response) {
-        toast.success(response.message);
+        // toast.success(response.message);
         setMembers(response.result.data);
         setCurrentPage(response.result.currentPage);
         setTotalPages(response.result.totalPages);
@@ -60,9 +65,12 @@ const CompanyMembers = () => {
   const fetchInvitations = async () => {
     try {
       // pageSize set to 2 as an example
-      const response = await companyService.getInvitations(invitationCurrentPage, 2);
+      const response = await companyService.getInvitations(
+        invitationCurrentPage,
+        2
+      );
       if (response) {
-        toast.success(response.message);
+        // toast.success(response.message);
         setInvitations(response.result.data);
         setInvitationCurrentPage(response.result.currentPage);
         setInvitationTotalPages(response.result.totalPages);
@@ -76,8 +84,8 @@ const CompanyMembers = () => {
     e.preventDefault();
     setSending(true);
     try {
-      await companyService.inviteMember(inviteEmail);
-      toast.success("Invitation sent successfully");
+      const response = await companyService.inviteMember(inviteEmail);
+      toast.success(response.message);
       setInviteEmail("");
       // Refresh invitations after sending
       fetchInvitations();
@@ -108,10 +116,15 @@ const CompanyMembers = () => {
         {/* Invite Section */}
         <div className="w-full md:w-1/2 lg:w-1/3">
           <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">Invite New Member</h2>
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">
+              Invite New Member
+            </h2>
             <form onSubmit={handleInvite} className="space-y-4">
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   Email address
                 </label>
                 <input
@@ -140,24 +153,41 @@ const CompanyMembers = () => {
         <div className="flex-1">
           <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
             <div className="px-6 py-4 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-800">Company Members</h2>
+              <h2 className="text-lg font-semibold text-gray-800">
+                Company Members
+              </h2>
             </div>
-            
+
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Name</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Email</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Role</th>
-                    <th className="px-6 py-3 text-right text-sm font-semibold text-gray-600">Actions</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">
+                      Name
+                    </th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">
+                      Email
+                    </th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">
+                      Role
+                    </th>
+                    <th className="px-6 py-3 text-right text-sm font-semibold text-gray-600">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {members.map((member) => (
-                    <tr key={member.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4 text-sm text-gray-800">{member.name}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{member.email}</td>
+                  {members.map((member, index) => (
+                    <tr
+                      key={index}
+                      className="hover:bg-gray-50 transition-colors"
+                    >
+                      <td className="px-6 py-4 text-sm text-gray-800">
+                        {member.name}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-600">
+                        {member.email}
+                      </td>
                       <td className="px-6 py-4">
                         <span className="px-3 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
                           {member.role}
@@ -190,7 +220,8 @@ const CompanyMembers = () => {
                   Previous
                 </button>
                 <span className="text-sm text-gray-700">
-                  Page <span className="font-semibold">{currentPage + 1}</span> of {totalPages}
+                  Page <span className="font-semibold">{currentPage + 1}</span>{" "}
+                  of {totalPages}
                 </span>
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
@@ -209,22 +240,35 @@ const CompanyMembers = () => {
       {/* Pending Invitations Section */}
       <div className="bg-white rounded-xl shadow-lg border border-gray-100">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-800">Pending Invitations</h2>
+          <h2 className="text-lg font-semibold text-gray-800">
+            Pending Invitations
+          </h2>
         </div>
-        
+
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Email</th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Expiry Date</th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Status</th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">
+                  Email
+                </th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">
+                  Expiry Date
+                </th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">
+                  Status
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
               {invitations.map((invitation) => (
-                <tr key={invitation.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4 text-sm text-gray-800">{invitation.email}</td>
+                <tr
+                  key={invitation.id}
+                  className="hover:bg-gray-50 transition-colors"
+                >
+                  <td className="px-6 py-4 text-sm text-gray-800">
+                    {invitation.email}
+                  </td>
                   <td className="px-6 py-4 text-sm text-gray-600">
                     {new Date(invitation.expiryDate).toLocaleDateString()}
                   </td>
@@ -249,7 +293,9 @@ const CompanyMembers = () => {
         <div className="px-6 py-4 border-t border-gray-200">
           <div className="flex items-center justify-between">
             <button
-              onClick={() => handleInvitationPageChange(invitationCurrentPage - 1)}
+              onClick={() =>
+                handleInvitationPageChange(invitationCurrentPage - 1)
+              }
               disabled={invitationCurrentPage === 0}
               className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:hover:bg-transparent"
             >
@@ -257,10 +303,14 @@ const CompanyMembers = () => {
               Previous
             </button>
             <span className="text-sm text-gray-700">
-              Page <span className="font-semibold">{invitationCurrentPage + 1}</span> of {invitationTotalPages}
+              Page{" "}
+              <span className="font-semibold">{invitationCurrentPage + 1}</span>{" "}
+              of {invitationTotalPages}
             </span>
             <button
-              onClick={() => handleInvitationPageChange(invitationCurrentPage + 1)}
+              onClick={() =>
+                handleInvitationPageChange(invitationCurrentPage + 1)
+              }
               disabled={invitationCurrentPage === invitationTotalPages - 1}
               className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:hover:bg-transparent"
             >
