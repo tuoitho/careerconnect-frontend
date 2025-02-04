@@ -14,6 +14,7 @@ import {
   FaToggleOn,
 } from "react-icons/fa";
 import Sidebar from "../components/recruiter/Sidebar";
+import { jobService } from "../services/jobService";
 
 const PostJob = () => {
   // Danh sách các loại công việc
@@ -57,7 +58,8 @@ const PostJob = () => {
     try {
       // Gửi dữ liệu lên backend
       console.log(data);
-      toast.success("Job posted successfully!");
+      const response = await jobService.createJob(data);
+      toast.success(response.message);
     } catch (error) {
       toast.error("Failed to post job. Please try again.");
     }
