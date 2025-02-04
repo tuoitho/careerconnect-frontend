@@ -14,8 +14,9 @@ import InvitationPage from "../pages/InvitationPage";
 import CompanyMembers from "../pages/CompanyMembers";
 import MC from "../pages/ManageCompany";
 import PostJob from "../pages/PostJob";
+import RecuiterProfile from "../pages/RecruiterProfile";
 
-const AppRoutes = () => {
+const   AppRoutes = () => {
   return (
     <Routes>
       {/* Public Routes */}
@@ -30,6 +31,7 @@ const AppRoutes = () => {
           <ProtectedRoute allowedRoles={["recruiter"]}>
             <RecruiterLayout>
               <Routes>
+                <Route path="/profile" element={<RecuiterProfile />} />
                 <Route path="/" element={<RecruiterHome />} />
                 <Route path="/company" element={<MC />} />
                 <Route
@@ -53,7 +55,6 @@ const AppRoutes = () => {
       />
 
       {/* User Routes */}
-      <Route path="/" element={<Home />} />
       <Route
         path="/*"
         element={

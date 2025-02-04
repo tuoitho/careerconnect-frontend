@@ -19,7 +19,7 @@ const Header = () => {
   }, []);
 
   return (
-    <header className="bg-white shadow-sm">
+    <header className="bg-white shadow-sm fixed inset-x-0 top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">
@@ -77,7 +77,7 @@ const Header = () => {
                   role="menu"
                 >
                   <Link
-                    to="/profile"
+                    to="/recruiter/profile"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
                     role="menuitem"
                   >
@@ -85,7 +85,7 @@ const Header = () => {
                     Profile
                   </Link>
                   <Link
-                    to="/recruiter/manage-company"
+                    to="/recruiter/company"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
                     role="menuitem"
                   >
