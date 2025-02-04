@@ -1,25 +1,67 @@
-import React from "react"
-import { useForm } from "react-hook-form"
-import { toast } from "react-toastify"
-import { FaBuilding, FaBriefcase, FaMoneyBillWave, FaMapMarkerAlt, FaClock, FaList } from "react-icons/fa"
-import Sidebar from "../components/recruiter/Sidebar"
+import React from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
+import {
+  FaBuilding,
+  FaBriefcase,
+  FaMoneyBillWave,
+  FaMapMarkerAlt,
+  FaClock,
+  FaList,
+  FaCalendarAlt,
+  FaChartLine,
+  FaTag,
+  FaToggleOn,
+} from "react-icons/fa";
+import Sidebar from "../components/recruiter/Sidebar";
 
 const PostJob = () => {
+  // Danh sách các loại công việc
+  const jobTypes = [
+    { value: "FULL_TIME", label: "Full-time" },
+    { value: "PART_TIME", label: "Part-time" },
+    { value: "CONTRACT", label: "Contract" },
+    { value: "INTERNSHIP", label: "Internship" },
+    { value: "TEMPORARY", label: "Temporary" },
+    { value: "VOLUNTEER", label: "Volunteer" },
+    { value: "FREELANCE", label: "Freelance" },
+  ];
+
+  // Danh sách các mức kinh nghiệm
+  const experienceLevels = [
+    { value: "ENTRY_LEVEL", label: "Entry Level" },
+    { value: "MID_LEVEL", label: "Mid Level" },
+    { value: "SENIOR_LEVEL", label: "Senior Level" },
+    { value: "EXECUTIVE", label: "Executive" },
+    { value: "NO_EXPERIENCE", label: "No Experience" },
+    { value: "INTERN", label: "Intern" },
+    { value: "FRESHER", label: "Fresher" },
+  ];
+
+  // Danh sách các danh mục công việc
+  const jobCategories = [
+    { value: "IT", label: "Information Technology" },
+    { value: "FINANCE", label: "Finance" },
+    { value: "HEALTHCARE", label: "Healthcare" },
+    { value: "EDUCATION", label: "Education" },
+    { value: "ENGINEERING", label: "Engineering" },
+  ];
+
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm()
+  } = useForm();
 
   const onSubmit = async (data) => {
     try {
-      // Here you would typically send the data to your backend
-      console.log(data)
-      toast.success("Job posted successfully!")
+      // Gửi dữ liệu lên backend
+      console.log(data);
+      toast.success("Job posted successfully!");
     } catch (error) {
-      toast.error("Failed to post job. Please try again.")
+      toast.error("Failed to post job. Please try again.");
     }
-  }
+  };
 
   return (
     <div className="flex bg-gray-100 min-h-screen">
@@ -28,106 +70,27 @@ const PostJob = () => {
         <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-6">
           <h1 className="text-3xl font-bold text-gray-800 mb-6">Post a New Job</h1>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="title">
-                  Job Title*
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <FaBriefcase className="text-gray-400" />
-                  </div>
-                  <input
-                    {...register("title", { required: "Job title is required" })}
-                    id="title"
-                    type="text"
-                    className="pl-10 w-full p-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="e.g. Software Engineer"
-                  />
+            {/* Job Title */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="title">
+                Job Title*
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FaBriefcase className="text-gray-400" />
                 </div>
-                {errors.title && <p className="mt-1 text-sm text-red-600">{errors.title.message}</p>}
+                <input
+                  {...register("title", { required: "Job title is required" })}
+                  id="title"
+                  type="text"
+                  className="pl-10 w-full p-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="e.g. Software Engineer"
+                />
               </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="company">
-                  Company Name*
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <FaBuilding className="text-gray-400" />
-                  </div>
-                  <input
-                    {...register("company", { required: "Company name is required" })}
-                    id="company"
-                    type="text"
-                    className="pl-10 w-full p-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="e.g. Acme Inc."
-                  />
-                </div>
-                {errors.company && <p className="mt-1 text-sm text-red-600">{errors.company.message}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="location">
-                  Location*
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <FaMapMarkerAlt className="text-gray-400" />
-                  </div>
-                  <input
-                    {...register("location", { required: "Location is required" })}
-                    id="location"
-                    type="text"
-                    className="pl-10 w-full p-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="e.g. New York, NY"
-                  />
-                </div>
-                {errors.location && <p className="mt-1 text-sm text-red-600">{errors.location.message}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="salary">
-                  Salary Range
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <FaMoneyBillWave className="text-gray-400" />
-                  </div>
-                  <input
-                    {...register("salary")}
-                    id="salary"
-                    type="text"
-                    className="pl-10 w-full p-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="e.g. $50,000 - $80,000"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="jobType">
-                  Job Type*
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <FaClock className="text-gray-400" />
-                  </div>
-                  <select
-                    {...register("jobType", { required: "Job type is required" })}
-                    id="jobType"
-                    className="pl-10 w-full p-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
-                  >
-                    <option value="">Select job type</option>
-                    <option value="full-time">Full-time</option>
-                    <option value="part-time">Part-time</option>
-                    <option value="contract">Contract</option>
-                    <option value="internship">Internship</option>
-                  </select>
-                </div>
-                {errors.jobType && <p className="mt-1 text-sm text-red-600">{errors.jobType.message}</p>}
-              </div>
+              {errors.title && <p className="mt-1 text-sm text-red-600">{errors.title.message}</p>}
             </div>
 
+            {/* Job Description */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="description">
                 Job Description*
@@ -147,24 +110,180 @@ const PostJob = () => {
               {errors.description && <p className="mt-1 text-sm text-red-600">{errors.description.message}</p>}
             </div>
 
+            {/* Location */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="requirements">
-                Requirements
+              <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="location">
+                Location*
               </label>
               <div className="relative">
-                <div className="absolute top-3 left-3 flex items-center pointer-events-none">
-                  <FaList className="text-gray-400" />
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FaMapMarkerAlt className="text-gray-400" />
                 </div>
-                <textarea
-                  {...register("requirements")}
-                  id="requirements"
-                  rows={4}
+                <input
+                  {...register("location", { required: "Location is required" })}
+                  id="location"
+                  type="text"
                   className="pl-10 w-full p-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Enter job requirements..."
-                ></textarea>
+                  placeholder="e.g. New York, NY"
+                />
+              </div>
+              {errors.location && <p className="mt-1 text-sm text-red-600">{errors.location.message}</p>}
+            </div>
+
+            {/* Job Type */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="type">
+                Job Type*
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FaClock className="text-gray-400" />
+                </div>
+                <select
+                  {...register("type", { required: "Job type is required" })}
+                  id="type"
+                  className="pl-10 w-full p-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="">Select job type</option>
+                  {jobTypes.map((type) => (
+                    <option key={type.value} value={type.value}>
+                      {type.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {errors.type && <p className="mt-1 text-sm text-red-600">{errors.type.message}</p>}
+            </div>
+
+            {/* Salary Range */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="minSalary">
+                  Minimum Salary
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <FaMoneyBillWave className="text-gray-400" />
+                  </div>
+                  <input
+                    {...register("minSalary")}
+                    id="minSalary"
+                    type="text"
+                    className="pl-10 w-full p-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="e.g. $50,000"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="maxSalary">
+                  Maximum Salary
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <FaMoneyBillWave className="text-gray-400" />
+                  </div>
+                  <input
+                    {...register("maxSalary")}
+                    id="maxSalary"
+                    type="text"
+                    className="pl-10 w-full p-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="e.g. $80,000"
+                  />
+                </div>
               </div>
             </div>
 
+            {/* Deadline */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="deadline">
+                Application Deadline*
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FaCalendarAlt className="text-gray-400" />
+                </div>
+                <input
+                  {...register("deadline", { required: "Deadline is required" })}
+                  id="deadline"
+                  type="datetime-local"
+                  className="pl-10 w-full p-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              {errors.deadline && <p className="mt-1 text-sm text-red-600">{errors.deadline.message}</p>}
+            </div>
+
+            {/* Experience Level */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="experience">
+                Experience Level*
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FaChartLine className="text-gray-400" />
+                </div>
+                <select
+                  {...register("experience", { required: "Experience level is required" })}
+                  id="experience"
+                  className="pl-10 w-full p-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="">Select experience level</option>
+                  {experienceLevels.map((level) => (
+                    <option key={level.value} value={level.value}>
+                      {level.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {errors.experience && <p className="mt-1 text-sm text-red-600">{errors.experience.message}</p>}
+            </div>
+
+            {/* Job Category */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="category">
+                Job Category*
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FaTag className="text-gray-400" />
+                </div>
+                <select
+                  {...register("category", { required: "Job category is required" })}
+                  id="category"
+                  className="pl-10 w-full p-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="">Select job category</option>
+                  {jobCategories.map((category) => (
+                    <option key={category.value} value={category.value}>
+                      {category.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {errors.category && <p className="mt-1 text-sm text-red-600">{errors.category.message}</p>}
+            </div>
+
+            {/* Active Status */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="active">
+                Job Status
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FaToggleOn className="text-gray-400" />
+                </div>
+                <select
+                  {...register("active")}
+                  id="active"
+                  className="pl-10 w-full p-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value={true}>Active</option>
+                  <option value={false}>Inactive</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Submit Button */}
             <div className="flex justify-end">
               <button
                 type="submit"
@@ -177,7 +296,7 @@ const PostJob = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default PostJob
+export default PostJob;
