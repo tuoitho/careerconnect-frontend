@@ -16,16 +16,17 @@ export const jobService = {
             toast.error("Lỗi tại getJob:", error.message);
         }
     },
-    getJobs: async (page = 0, size = 2) => {
+    getJobs: async (page = 0, size = 3) => {
         try {
             return await apiService.get(`/recruiter/jobs?page=${page}&size=${size}`);
         } catch (error) {
             toast.error("Lỗi tại getJobs:", error.message);
         }
     },
-    updateJob: async (jobData) => {
+    updateJob: async (id, jobData) => {
         try {
-            return await apiService.put(`/recruiter/jobs`, jobData);
+            console.log(id, jobData);
+            return await apiService.put(`/recruiter/jobs/${id}`, jobData);
         } catch (error) {
             toast.error("Lỗi tại updateJob:", error.message);
         }
