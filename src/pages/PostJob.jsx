@@ -15,6 +15,7 @@ import {
   FaChartLine,
   FaTag,
   FaToggleOn,
+  FaToggleOff,
 } from "react-icons/fa";
 import Sidebar from "../components/recruiter/Sidebar";
 import { jobService } from "../services/jobService";
@@ -184,6 +185,8 @@ const JobManagement = () => {
                     <th className="px-6 py-3 text-left">Type</th>
                     <th className="px-6 py-3 text-left">Deadline</th>
                     <th className="px-6 py-3 text-left">Posted Date</th>
+                    <th className="px-6 py-3 text-left">Active</th>
+                    {/* New column */}
                     <th className="px-6 py-3 text-left">Actions</th>
                   </tr>
                 </thead>
@@ -199,6 +202,14 @@ const JobManagement = () => {
                       <td className="px-6 py-4">
                         {/* Hiển thị ngày đăng */}
                         {new Date(job.created).toLocaleString()}
+                      </td>
+                      <td className="px-6 py-4">
+                        {job.active ? (
+                          <FaToggleOn className="text-green-500" />
+                        ) : (
+                          <FaToggleOff className="text-red-500" />
+                        )}
+                        {/* Show active status */}
                       </td>
                       <td className="px-6 py-4 space-x-2">
                         <button
@@ -260,7 +271,7 @@ const JobManagement = () => {
                   <strong>Type:</strong> {jobDetails.type}
                 </p>
                 <p>
-                  <strong>Deadline:</strong>{" "}
+                  <strong>Deadline:</strong>
                   {new Date(jobDetails.deadline).toLocaleString()}
                 </p>
                 <p>
