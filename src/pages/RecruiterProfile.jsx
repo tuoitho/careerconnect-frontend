@@ -1,23 +1,25 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
+import { recruiterService } from "../services/recruiterService";
 
 const ProfilePage = () => {
-  const [formData, setFormData] = useState({
+  const [data, setData] = useState({
     fullname: "",
     contact: "",
     email: "",
   });
+  
 
   // Giả sử có hàm fetchData để lấy thông tin người dùng từ API
   useEffect(() => {
     const fetchData = async () => {
       try {
         // API call để lấy dữ liệu (Thay API URL thật vào đây)
-        const response = await fetch("/api/recruiter/profile");
-        const data = await response.json();
-        setFormData(data);
+        const response = await recruiterService.getRecruiterProfile();
+        console.log(response);
+        setData(response.result);
       } catch (error) {
-        toast.error("Không thể tải thông tin hồ sơ.");
+        toast.error(error.message);
       }
     };
     fetchData();
@@ -26,7 +28,7 @@ const ProfilePage = () => {
   // Xử lý thay đổi thông tin trong form
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
+    setData((prevData) => ({
       ...prevData,
       [name]: value,
     }));
@@ -38,21 +40,10 @@ const ProfilePage = () => {
 
     try {
       // API call để cập nhật thông tin người dùng
-      const response = await fetch("/api/recruiter/profile", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        throw new Error("Không thể cập nhật hồ sơ.");
-      }
-
-      toast.success("Cập nhật hồ sơ thành công!");
+      const response = await recruiterService.updateRecruiterProfile(data);
+      toast.success(response.message);
     } catch (error) {
-      toast.error(error.message || "Có lỗi xảy ra!");
+      toast.error(error.message);
     }
   };
 
@@ -72,7 +63,7 @@ const ProfilePage = () => {
                   type="text"
                   id="fullname"
                   name="fullname"
-                  value={formData.fullname}
+                  value={data?.fullname}
                   onChange={handleChange}
                   className="w-full p-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Nhập họ và tên"
@@ -90,7 +81,7 @@ const ProfilePage = () => {
                   type="text"
                   id="contact"
                   name="contact"
-                  value={formData.contact}
+                  value={data?.contact}
                   onChange={handleChange}
                   className="w-full p-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Nhập thông tin liên hệ"
@@ -108,7 +99,7 @@ const ProfilePage = () => {
                   type="email"
                   id="email"
                   name="email"
-                  value={formData.email}
+                  value={data?.email}
                   onChange={handleChange}
                   className="w-full p-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Nhập email"

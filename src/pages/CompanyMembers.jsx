@@ -44,13 +44,12 @@ const CompanyMembers = () => {
     try {
       // pageSize set to 2 as an example
       const response = await companyService.getCompanyMembers(currentPage, 2);
-      if (response) {
         setMembers(response.result.data);
         setCurrentPage(response.result.currentPage);
         setTotalPages(response.result.totalPages);
-      }
+      
     } catch (error) {
-      toast.error("Failed to fetch members");
+      toast.error(error.message);
     } finally {
       setLoading(false);
     }
@@ -60,13 +59,12 @@ const CompanyMembers = () => {
     try {
       // pageSize set to 2 as an example
       const response = await companyService.getInvitations(invitationCurrentPage, 2);
-      if (response) {
         setInvitations(response.result.data);
         setInvitationCurrentPage(response.result.currentPage);
         setInvitationTotalPages(response.result.totalPages);
-      }
+      
     } catch (error) {
-      toast.error("Failed to fetch invitations");
+      toast.error(error.message);
     }
   };
 
@@ -80,7 +78,7 @@ const CompanyMembers = () => {
       // Refresh invitations after sending
       fetchInvitations();
     } catch (error) {
-      toast.error("Failed to send invitation");
+      toast.error(error.message);
     } finally {
       setSending(false);
     }
@@ -89,11 +87,12 @@ const CompanyMembers = () => {
   const handleRemoveMember = async (memberId) => {
     if (window.confirm("Are you sure you want to remove this member?")) {
       try {
+        const response =
         await companyService.removeMember(memberId);
-        toast.success("Member removed successfully");
+        toast.success(response.message);
         fetchMembers();
       } catch (error) {
-        toast.error("Failed to remove member");
+        toast.error(error.message);
       }
     }
   };
