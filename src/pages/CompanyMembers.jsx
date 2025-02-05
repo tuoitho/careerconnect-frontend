@@ -152,8 +152,8 @@ const CompanyMembers = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {members.map((member) => (
-                    <tr key={member.id} className="hover:bg-gray-50 transition-colors">
+                  {members.map((member,idx) => (
+                    <tr key={idx} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4 text-sm text-gray-800">{member.name}</td>
                       <td className="px-6 py-4 text-sm text-gray-600">{member.email}</td>
                       <td className="px-6 py-4">
