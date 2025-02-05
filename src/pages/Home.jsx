@@ -9,8 +9,6 @@ import  AuthContext  from '../context/AuthContext';
 const Home = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [location, setLocation] = useState('');
-    const [isAuthenticated] = useContext(AuthContext);
-
 
 
     const featuredJobs = [

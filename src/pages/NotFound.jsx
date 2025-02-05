@@ -1,19 +1,51 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-
+import React from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { DEFAULT_ROUTES } from "../route/defaultroutes";
+import AuthContext from "../context/AuthContext";
+import { useContext } from "react";
 const NotFound = () => {
+  const { user } = useContext(AuthContext);
   const navigate = useNavigate();
-
+  const location = useLocation();
+  const role = user?.role.toLowerCase();
+  const handleHomeClick = () => {
+    // Điều hướng về trang mặc định theo role
+    if (role && DEFAULT_ROUTES[role]) {
+      navigate(DEFAULT_ROUTES[role]);
+    } else {
+      navigate("/login"); // Fallback nếu không có role hoặc role không hợp lệ
+    }
+  };
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center px-4">
-      <div className="text-center">
-        <h1 className="text-9xl font-bold text-white">404</h1>
-        <p className="text-2xl text-gray-400 mb-8">Page not found</p>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="text-center p-8 bg-white rounded-lg shadow-md max-w-md">
+        <div className="mb-6">
+          <svg
+            className="mx-auto h-16 w-16 text-gray-500"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M9 12h6m-3 -3v6m-7 4h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2z"
+            />
+          </svg>
+        </div>
+
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">
+          Page Not Found
+        </h1>
+
+        <p className="text-gray-600 mb-8">Sorry, page not found.</p>
+
         <button
-          onClick={() => navigate('/')}
-          className="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
+          onClick={() => handleHomeClick()}
+          className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors duration-200"
         >
-          Go Home
+          Return to Home
         </button>
       </div>
     </div>

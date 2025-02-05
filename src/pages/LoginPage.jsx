@@ -22,8 +22,8 @@ function Login() {
     if (isAuthenticated) {
       if (user.role.toLowerCase() === "recruiter") {
         navigate("/recruiter");
-      } else if (user.role === "candidate") {
-        navigate("/candidate");
+      } else if (user.role.toLowerCase() === "candidate") {
+        navigate("/");
       } else {
         navigate("/"); // Mặc định
       }

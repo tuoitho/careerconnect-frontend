@@ -25,28 +25,17 @@ const   AppRoutes = () => {
       <Route path="/unauthorized" element={<Unauthorized />} />
 
       {/* Recruiter Routes */}
-      <Route
-        path="/recruiter/*"
-        element={
+      <Route        path="/recruiter/*"        element={
           <ProtectedRoute allowedRoles={["recruiter"]}>
             <RecruiterLayout>
               <Routes>
                 <Route path="/profile" element={<RecuiterProfile />} />
                 <Route path="/" element={<RecruiterHome />} />
                 <Route path="/company" element={<MC />} />
-                <Route
-                  path="/manage-company/register"
-                  element={<RegisterCompany />}
-                />
-                <Route
-                  path="/invitation/:token"
-                  element={<InvitationPage />}
-                />
+                <Route path="/manage-company/register" element={<RegisterCompany />}                />
+                <Route                  path="/invitation/:token"                  element={<InvitationPage />}                />
                 <Route path="/company/members" element={<CompanyMembers />} />
-                {/* /recruiter/company/jobs */}
-
                 <Route path="/company/jobs" element={<PostJob />} />
-
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </RecruiterLayout>
@@ -56,9 +45,9 @@ const   AppRoutes = () => {
 
       {/* User Routes */}
       <Route
-        path="/*"
+        path="/"
         element={
-          <ProtectedRoute allowedRoles={["user"]}>
+          <ProtectedRoute allowedRoles={["candidate"]}>
             <Layout>
               <Routes>
                 <Route path="/" element={<Home />} />
@@ -71,16 +60,7 @@ const   AppRoutes = () => {
       />
 
       {/* Catch-all route for 404 */}
-      <Route path="*" element={<NotFound />} />
-
-      <Route 
-        path="/" 
-        element={
-          <ProtectedRoute allowedRoles={['admin', 'recruiter', 'candidate']}>
-            <Navigate to={(user) => DEFAULT_ROUTES[user.role.toLowerCase()]} replace />
-          </ProtectedRoute>
-        } 
-      />
+      <Route path="/*" element={<NotFound />} />
     </Routes>
   );
 };
