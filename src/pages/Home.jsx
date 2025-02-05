@@ -1,14 +1,17 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Search, Briefcase, Building2, MapPin, ChevronRight } from 'lucide-react';
 import Header from '../components/Header';
 import JobCategories from '../components/JobCategories';
 import HowItWorks from '../components/HowItWorks';
 import { Link } from 'react-router-dom';
 import {  UserPlus } from 'lucide-react';
-
+import  AuthContext  from '../context/AuthContext';
 const Home = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [location, setLocation] = useState('');
+    const [isAuthenticated] = useContext(AuthContext);
+
+
 
     const featuredJobs = [
         {

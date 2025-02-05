@@ -1,50 +1,57 @@
-import { useState } from 'react'
-import { FiMail, FiLock, FiUser } from 'react-icons/fi'
-import  AuthContext  from '../context/AuthContext'
-import { useContext } from 'react'
-import { useNavigate } from 'react-router-dom'
-import LoadingSpinner from '../components/LoadingSpinner';
-import { useEffect } from 'react';
+import { useState } from "react";
+import { FiMail, FiLock, FiUser } from "react-icons/fi";
+import AuthContext from "../context/AuthContext";
+import { useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import LoadingSpinner from "../components/LoadingSpinner";
+import { useEffect } from "react";
+import { toast } from "react-toastify";
 function Login() {
-  
   const [formData, setFormData] = useState({
-    username: '',
-    password: ''
-  })
+    username: "",
+    password: "",
+  });
   const { user, isAuthenticated, logout } = useContext(AuthContext);
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const { login, error } = useContext(AuthContext);
   const [isLoading, setIsLoading] = useState(false);
+  console.log(isAuthenticated);
   useEffect(() => {
+    console.log(isAuthenticated);
     if (isAuthenticated) {
-      console.log('User is authenticated, redirecting to /');
-      navigate('/');
-    }
-  }, [isAuthenticated, navigate]);
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    console.log('Login attempt with:', formData)
-    setIsLoading(true);
-
-    login(formData).then((response) => {
-      if (response) {
-        navigate('/')
+      if (user.role.toLowerCase() === "recruiter") {
+        navigate("/recruiter");
+      } else if (user.role === "candidate") {
+        navigate("/candidate");
+      } else {
+        navigate("/"); // Mặc định
       }
-    })
-    .finally(() => {
-      setIsLoading(false);
-    })
-
-  }
+    }
+  }, [isAuthenticated]);
+  
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    login(formData)
+      .then((response) => {
+        toast.success("Login successful");
+      })
+      .catch((error) => {
+        toast.error(error.message);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
 
   const handleChange = (e) => {
-    const { name, value } = e.target
-    setFormData(prev => ({
+    const { name, value } = e.target;
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
-    }))
-  }
+      [name]: value,
+    }));
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
@@ -54,14 +61,19 @@ function Login() {
             <FiUser className="h-10 w-10 text-primary-600" />
           </div>
           <h2 className="text-3xl font-bold text-gray-900">Welcome Back</h2>
-          <p className="mt-2 text-sm text-gray-600">Please sign in to your account</p>
+          <p className="mt-2 text-sm text-gray-600">
+            Please sign in to your account
+          </p>
         </div>
-        
+
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           <div className="space-y-4">
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-              username
+              <label
+                htmlFor="username"
+                className="block text-sm font-medium text-gray-700"
+              >
+                username
               </label>
               <div className="mt-1 relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -81,7 +93,10 @@ function Login() {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Password
               </label>
               <div className="mt-1 relative">
@@ -110,13 +125,19 @@ function Login() {
                 type="checkbox"
                 className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
               />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
+              <label
+                htmlFor="remember-me"
+                className="ml-2 block text-sm text-gray-700"
+              >
                 Remember me
               </label>
             </div>
 
             <div className="text-sm">
-              <a href="#" className="font-medium text-primary-600 hover:text-primary-500">
+              <a
+                href="#"
+                className="font-medium text-primary-600 hover:text-primary-500"
+              >
                 Forgot your password?
               </a>
             </div>
@@ -126,10 +147,10 @@ function Login() {
             type="submit"
             disabled={isLoading}
             className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors duration-200 ${
-              isLoading ? 'opacity-50 cursor-not-allowed' : ''
+              isLoading ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
-            {isLoading ? 'Signing in...' : 'Sign in'}
+            {isLoading ? "Signing in..." : "Sign in"}
           </button>
           {isLoading && <LoadingSpinner />}
 
@@ -142,7 +163,7 @@ function Login() {
         </form>
       </div>
     </div>
-  )
+  );
 }
 
-export default Login
+export default Login;

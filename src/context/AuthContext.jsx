@@ -6,33 +6,39 @@ const AuthContext = createContext();
 
 // Tạo Provider
 export const AuthProvider = ({ children }) => {
-  const storedUser = localStorage.getItem("user");
-  const [user, setUser] = useState(storedUser ? storedUser : null);
-  const [isAuthenticated, setIsAuthenticated] = useState(!!storedUser); // Kiểm tra nếu có user trong localStorage
-  const login = async (userData) => {
-      const resp = await authService.login(userData.username, userData.password);
-      if (!resp) {
-        return;
-      }
-      setUser(resp.username);
+  // const storedUser = localStorage.getItem("user");
+  // const [user, setUser] = useState(storedUser ? storedUser : null);
+  const [user, setUser] = useState(() => {
+    const savedUser = localStorage.getItem("user");
+    return savedUser ? JSON.parse(savedUser) : null;
+  });  
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return !!localStorage.getItem("user");
+  });
+   const login = async (userData) => {
+    try {
+      const response = await authService.login(userData.username, userData.password);
+      setUser(response.user);
       setIsAuthenticated(true);      
-      return resp;
+      localStorage.setItem("user", JSON.stringify(response.user)); 
+      localStorage.setItem('authToken', response.accessToken);
+      localStorage.setItem('refreshToken', response.refreshToken);
+      return response;
+    }
+    catch (error) {
+      //tiếp tục throw error để component gọi hàm này xử lý
+      throw error;
+    }
   };
   
 
   const logout = () => {
     setUser(null);
     setIsAuthenticated(false);
-    localStorage.removeItem("user"); // Xóa thông tin khỏi localStorage
+    localStorage.removeItem("user");
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('refreshToken');
   };
-
-  // Khi ứng dụng load, nếu có user trong localStorage, set lại state user và isAuthenticated
-  //  useEffect(() => {
-  //   if (storedUser) {
-  //     setUser(JSON.parse(storedUser));
-  //     setIsAuthenticated(true);
-  //   }
-  // }, []);
 
   return (
     <AuthContext.Provider value={{ user, isAuthenticated, login, logout }}>

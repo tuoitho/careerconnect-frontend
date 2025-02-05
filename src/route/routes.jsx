@@ -15,7 +15,7 @@ import CompanyMembers from "../pages/CompanyMembers";
 import MC from "../pages/ManageCompany";
 import PostJob from "../pages/PostJob";
 import RecuiterProfile from "../pages/RecruiterProfile";
-
+import { Navigate } from "react-router-dom";
 const   AppRoutes = () => {
   return (
     <Routes>
@@ -72,6 +72,15 @@ const   AppRoutes = () => {
 
       {/* Catch-all route for 404 */}
       <Route path="*" element={<NotFound />} />
+
+      <Route 
+        path="/" 
+        element={
+          <ProtectedRoute allowedRoles={['admin', 'recruiter', 'candidate']}>
+            <Navigate to={(user) => DEFAULT_ROUTES[user.role.toLowerCase()]} replace />
+          </ProtectedRoute>
+        } 
+      />
     </Routes>
   );
 };

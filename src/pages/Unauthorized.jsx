@@ -1,9 +1,21 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-
+import { useNavigate ,useLocation } from 'react-router-dom';
+import { DEFAULT_ROUTES } from '../route/defaultroutes';
+import AuthContext from '../context/AuthContext';
+import { useContext } from 'react';
 const Unauthorized = () => {
+  const { user } = useContext(AuthContext);
   const navigate = useNavigate();
-
+  const location = useLocation();
+  const role = user?.role.toLowerCase();
+  const handleHomeClick = () => {
+    // Điều hướng về trang mặc định theo role
+    if (role && DEFAULT_ROUTES[role]) {
+      navigate(DEFAULT_ROUTES[role]);
+    } else {
+      navigate('/login'); // Fallback nếu không có role hoặc role không hợp lệ
+    }
+  };
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="text-center p-8 bg-white rounded-lg shadow-md max-w-md">
@@ -32,7 +44,7 @@ const Unauthorized = () => {
         </p>
         
         <button
-          onClick={() => navigate('/')}
+          onClick={() => handleHomeClick()}
           className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors duration-200"
         >
           Return to Home

@@ -1,11 +1,13 @@
-import React, { useContext, useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { use, useContext, useState } from 'react';
+import { Link, Navigate } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
 import { Bell, User, Briefcase, FileText, Book } from 'lucide-react';
-
+import { useNavigate } from "react-router-dom";
+import { useEffect } from 'react';
 const Header = () => {
     const { user, isAuthenticated, logout } = useContext(AuthContext);
     const [showDropdown, setShowDropdown] = useState(false);
+
 
     return (
         <header className="fixed top-0 left-0 right-0 bg-black text-white py-2 z-50 shadow-md">
@@ -32,7 +34,7 @@ const Header = () => {
                                     className="text-white hover:text-green-400"
                                     onClick={() => setShowDropdown(!showDropdown)}
                                 >
-                                    <span className="text-green-400 mr-2">Xin chào, {user}</span>
+                                    <span className="text-green-400 mr-2">Xin chào, {user.username}</span>
                                     <User className="inline" size={18} />
                                 </button>
                                 

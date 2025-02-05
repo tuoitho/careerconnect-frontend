@@ -67,17 +67,16 @@ class ApiService {
           // Xử lý lỗi khác không phải lỗi 401
         if (error.response) {
           // Lỗi từ phía server
-          toast.error(error.response.data.message);
+          // ném ra để bắt ở component
+          return Promise.reject(error.response.data);
+          // toast.error(error.response.data.message);
         } else if (error.request) {
           // Không nhận được phản hồi từ server
           toast.error("Network error: Please check your internet connection.");
         } else {
           // Lỗi khác
-          console.log("di vao day2",error);
           toast.error("Unknown error occurred.");
         }
-        // return Promise.reject(error);
-    
       }
   
     );

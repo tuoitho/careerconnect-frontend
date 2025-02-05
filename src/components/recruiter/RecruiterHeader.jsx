@@ -1,10 +1,12 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef,useContext  } from 'react';
 import { Link } from 'react-router-dom';
 import { FaBell, FaComment, FaUser, FaBuilding, FaSignOutAlt } from 'react-icons/fa';
+import AuthContext from '../../context/AuthContext'; // Import AuthContext
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const { logout } = useContext(AuthContext); // Lấy hàm logout từ context
 
   // Handle click outside dropdown
   useEffect(() => {
@@ -18,6 +20,10 @@ const Header = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Xử lý logout
+  const handleLogout = () => {
+    logout(); // Gọi hàm logout từ context
+  };
   return (
     <header className="bg-white shadow-sm fixed inset-x-0 top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -92,14 +98,14 @@ const Header = () => {
                     <FaBuilding className="mr-2" />
                     Manage Company
                   </Link>
-                  <Link
-                    to="/logout"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
-                    role="menuitem"
-                  >
-                    <FaSignOutAlt className="mr-2" />
-                    Log out
-                  </Link>
+                  <button
+                onClick={handleLogout}
+                className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                role="menuitem"
+              >
+                <FaSignOutAlt className="mr-2" />
+                Log out
+              </button>
                 </div>
               )}
             </div>
