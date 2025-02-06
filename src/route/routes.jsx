@@ -16,6 +16,7 @@ import MC from "../pages/ManageCompany";
 import PostJob from "../pages/PostJob";
 import RecuiterProfile from "../pages/RecruiterProfile";
 import { Navigate } from "react-router-dom";
+import PostedJobDetail from "../pages/PostedJobDetail";
 const   AppRoutes = () => {
   return (
     <Routes>
@@ -36,6 +37,8 @@ const   AppRoutes = () => {
                 <Route                  path="/invitation/:token"                  element={<InvitationPage />}                />
                 <Route path="/company/members" element={<CompanyMembers />} />
                 <Route path="/company/jobs" element={<PostJob />} />
+                <Route path="/company/jobs/:jobId" element={<PostedJobDetail />} />
+
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </RecruiterLayout>

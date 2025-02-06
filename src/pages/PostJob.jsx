@@ -20,6 +20,7 @@ import {
 import Sidebar from "../components/recruiter/Sidebar";
 import { jobService } from "../services/jobService";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { useNavigate } from 'react-router-dom';
 
 const JobManagement = () => {
   // Các state để quản lý danh sách job và các modal
@@ -155,6 +156,14 @@ const JobManagement = () => {
     }
   };
 
+  const navigate = useNavigate();
+
+  const goToDetails = (job) => {
+    // Instead of opening a modal, navigate to a new route
+    navigate(`/recruiter/company/jobs/${job.jobId}`);
+  };
+  
+
   return (
     <div className="flex bg-gray-100 min-h-screen">
       <Sidebar />
@@ -227,7 +236,7 @@ const JobManagement = () => {
                           <FaTrash />
                         </button>
                         <button
-                          onClick={() => openDetailsModal(job)}
+                          onClick={() => goToDetails(job)}
                           className="text-green-500 hover:text-green-700"
                           title="Details"
                         >

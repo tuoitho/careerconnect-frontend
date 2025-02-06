@@ -4,9 +4,8 @@ export const jobService = {
     createJob: async (jobData) => {
         return await apiService.post(`/recruiter/jobs`, jobData);
     },
-    getJob: async (id) => {
+    getPostedJobDetail: async (id) => {
         return await apiService.get(`/recruiter/jobs/${id}`);
-
     },
     getJobs: async (page = 0, size = 3) => {
          return await apiService.get(`/recruiter/jobs?page=${page}&size=${size}`);
