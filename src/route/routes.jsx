@@ -17,6 +17,7 @@ import PostJob from "../pages/PostJob";
 import RecuiterProfile from "../pages/RecruiterProfile";
 import { Navigate } from "react-router-dom";
 import PostedJobDetail from "../pages/PostedJobDetail";
+import CandidateProfile from "../pages/CandidateProfile";
 const   AppRoutes = () => {
   return (
     <Routes>
@@ -26,7 +27,7 @@ const   AppRoutes = () => {
       <Route path="/unauthorized" element={<Unauthorized />} />
 
       {/* Recruiter Routes */}
-      <Route        path="/recruiter/*"        element={
+      <Route path="/recruiter/*"        element={
           <ProtectedRoute allowedRoles={["recruiter"]}>
             <RecruiterLayout>
               <Routes>
@@ -47,13 +48,12 @@ const   AppRoutes = () => {
       />
 
       {/* User Routes */}
-      <Route
-        path="/"
-        element={
+      <Route        path="/*"        element={
           <ProtectedRoute allowedRoles={["candidate"]}>
             <Layout>
               <Routes>
                 <Route path="/" element={<Home />} />
+                <Route path="/profile" element={<CandidateProfile />} />
                 <Route path="*" element={<NotFound />} />
                 {/* Add more user routes */}
               </Routes>
