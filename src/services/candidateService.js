@@ -5,6 +5,18 @@ export const candidateService = {
         return await apiService.get(`/candidate/profile`);
     },
     updateCandidatProfile: async (candidateProfile) => {
-        return await apiService.put(`/candidate/profile`, candidateProfile);
+        return await apiService.put(`/candidate/profile`, candidateProfile,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
     },
+    uploadCV: async (formData) => {
+        return await apiService.post(`/candidate/profile/upload-cv`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+    }
 }

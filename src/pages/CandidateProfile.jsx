@@ -57,6 +57,20 @@ function CandidateProfile() {
   });
 
   const [newSkill, setNewSkill] = useState("");
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [preview, setPreview] = useState(null);
+  const [newCVName, setNewCVName] = useState("");
+  const [newCVFile, setNewCVFile] = useState(null);
+
+  useEffect(() => {
+    if (!selectedFile) {
+      setPreview(null);
+      return;
+    }
+    const objectUrl = URL.createObjectURL(selectedFile);
+    setPreview(objectUrl);
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [selectedFile]);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -74,15 +88,70 @@ function CandidateProfile() {
   }, []);
 
   const handleSave = async () => {
-    // Here you would typically make an API call to save the profile
     try {
-      const response = await candidateService.updateCandidatProfile(profile);
-      console.log(response);
+      const formData = new FormData();
+      formData.append(
+        "profile",
+        JSON.stringify({
+          fullname: profile.fullname,
+          phone: profile.phone,
+          email: profile.email,
+          bio: profile.bio,
+          skills: profile.skills,
+          educations: profile.educations,
+          experiences: profile.experiences,
+          cvs: profile.cvs,
+        })
+      );
+
+      // Append avatar if a file is selected
+      if (selectedFile) {
+        formData.append("avatar", selectedFile);
+      }
+
+      const response = await candidateService.updateCandidatProfile(formData);
       toast.success(response.message);
     } catch (error) {
       toast.error(error.message);
     } finally {
-      setIsEditing(null);
+      setIsEditing(false);
+    }
+  };
+
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setSelectedFile(e.target.files[0]);
+    }
+  };
+
+  const handleCVFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setNewCVFile(e.target.files[0]);
+    }
+  };
+
+  const handleUploadCV = async () => {
+    try {
+      if (!newCVName.trim() || !newCVFile) {
+        toast.info("Please enter a CV title and select a file.");
+        return;
+      }
+      const formData = new FormData();
+      formData.append("file", newCVFile);
+      formData.append("cvName", newCVName);
+
+      const response = await candidateService.uploadCV(formData);
+      toast.success(response.message);
+      //reload
+      setProfile((prev) => ({
+        ...prev,
+        cvs: [...prev.cvs, response.result],
+      }));
+
+      setNewCVName("");
+      setNewCVFile(null);
+    } catch (error) {
+      toast.error(error.message);
     }
   };
 
@@ -105,7 +174,6 @@ function CandidateProfile() {
 
   const addEducation = () => {
     const newEducation = {
-      educationId: Date.now(),
       school: "",
       major: "",
       degree: "",
@@ -139,7 +207,6 @@ function CandidateProfile() {
 
   const addExperience = () => {
     const newExperience = {
-      experienceId: Date.now(),
       companyName: "",
       position: "",
       startDate: "",
@@ -197,14 +264,20 @@ function CandidateProfile() {
           <div className="flex items-start space-x-6">
             <div className="flex-shrink-0">
               <img
-                src={profile.avatar}
+                src={preview || profile.avatar}
                 alt={profile.fullname}
                 className="h-24 w-24 rounded-full object-cover"
               />
               {isEditing && (
-                <button className="mt-2 text-sm text-primary-600 hover:text-primary-700">
+                <label className="mt-2 text-sm text-primary-600 hover:text-primary-700 cursor-pointer">
                   Change Photo
-                </button>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleFileChange}
+                  />
+                </label>
               )}
             </div>
             <div className="flex-1 grid grid-cols-1 gap-4">
@@ -626,10 +699,30 @@ function CandidateProfile() {
               </div>
             ))}
             {isEditing && (
-              <button className="w-full py-4 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-gray-400 hover:text-gray-700 flex items-center justify-center">
-                <FiPlus className="h-5 w-5 mr-2" />
-                Upload New CV
-              </button>
+              <>
+          
+                <div className="mt-2 flex flex-col space-y-2">
+                  <input
+                    type="text"
+                    placeholder="Enter CV Title"
+                    value={newCVName}
+                    onChange={(e) => setNewCVName(e.target.value)}
+                    className="rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500"
+                  />
+                  <input
+                    type="file"
+                    accept="application/pdf"
+                    onChange={handleCVFileChange}
+                    className="rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500"
+                  />
+                  <button
+                    onClick={handleUploadCV}
+                    className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+                  >
+                    Upload
+                  </button>
+                </div>
+              </>
             )}
           </div>
         </div>
