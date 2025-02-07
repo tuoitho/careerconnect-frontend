@@ -155,6 +155,19 @@ function CandidateProfile() {
     }
   };
 
+  const handleDeleteCV = async (cvId) => {
+    try {
+      const response = await candidateService.deleteCV(cvId);
+      toast.success(response.message);
+      //reload
+      setProfile((prev) => ({
+        ...prev,
+        cvs: prev.cvs.filter((cv) => cv.cvId !== cvId),
+      }));
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
   const addSkill = () => {
     if (newSkill.trim() && !profile.skills.includes(newSkill.trim())) {
       setProfile((prev) => ({
@@ -691,7 +704,7 @@ function CandidateProfile() {
                     </span>
                   )}
                   {isEditing && (
-                    <button className="text-red-600 hover:text-red-700">
+                    <button className="text-red-600 hover:text-red-700" onClick={() => handleDeleteCV(cv.cvId)}>
                       <FiTrash2 className="h-5 w-5" />
                     </button>
                   )}

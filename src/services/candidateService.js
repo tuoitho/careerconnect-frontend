@@ -18,5 +18,8 @@ export const candidateService = {
                 'Content-Type': 'multipart/form-data'
             }
         });
-    }
+    },
+    deleteCV: async (cvId) => {
+        return await apiService.delete(`/candidate/profile/delete-cv/${cvId}`);
+    },
 }
