@@ -1,6 +1,7 @@
 // apiService.js
 import axios from "axios";
 import { toast } from "react-toastify";
+
 // "http://localhost:1111"||
 class ApiService {
   constructor() {
@@ -29,9 +30,6 @@ class ApiService {
           if (token) {
             config.headers.Authorization = `Bearer ${token}`;
           } 
-          // else {
-          //   return Promise.reject(new Error("Token not found"));
-          // }
         }
         return config;
       },
@@ -51,9 +49,8 @@ class ApiService {
           originalRequest._retry = true;
           
           try {
-            const refreshToken = localStorage.getItem("refreshToken");
-            const response = await this.refreshAuthToken(refreshToken);
-
+            //lấy từ cookie ở backend rồi
+            const response = await this.refreshAuthToken();
             localStorage.setItem("authToken", response.accessToken);
             originalRequest.headers.Authorization = `Bearer ${response.token}`;
 
@@ -104,7 +101,6 @@ class ApiService {
 
   clearAuthToken() {
     localStorage.removeItem("authToken");
-    localStorage.removeItem("refreshToken");
   }
 
   // HTTP methods
@@ -124,14 +120,11 @@ class ApiService {
     return this.instance.delete(url, config);
   }
 
-  async refreshAuthToken(refreshToken) {
-    // return this.instance.post("/refresh", { refreshToken });
-    // neu truyen dang param
-    return this.instance.post("/refresh", null, {
-      params: {
-        refreshToken,
-      },
-    });
+  async refreshAuthToken() {
+    return this.instance.post("/refresh", {} , {
+        withCredentials: true,
+      }
+    );
   }
 }
 

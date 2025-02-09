@@ -28,6 +28,8 @@ export const authService = {
       return await apiService.post("/auth/login", {
         username,
         password,
+      }, {
+        withCredentials: true
       });
     } catch (error) {
       //tiếp tục throw error để component gọi hàm này xử lý

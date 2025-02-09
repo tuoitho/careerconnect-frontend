@@ -72,18 +72,18 @@ function CandidateProfile() {
     return () => URL.revokeObjectURL(objectUrl);
   }, [selectedFile]);
 
+  const fetchProfile = async () => {
+    try {
+      const data = await candidateService.getCandidatrProfile();
+      console.log(data);
+      setProfile(data.result);
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+      setApiError("Failed to load profile. Please try again later."); // Set error message
+    } finally {
+    }
+  };
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const data = await candidateService.getCandidatrProfile();
-        setProfile(data.result);
-      } catch (error) {
-        console.error("Error fetching profile:", error);
-        setApiError("Failed to load profile. Please try again later."); // Set error message
-      } finally {
-      }
-    };
-
     fetchProfile();
   }, []);
 
@@ -639,7 +639,7 @@ function CandidateProfile() {
                     </label>
                     <input
                       type="month"
-                      value={experience.endDate}
+                      value={experience.endDate === "Present" ? "" : experience.endDate}
                       onChange={(e) =>
                         updateExperience(
                           experience.experienceId,

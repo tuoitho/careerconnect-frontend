@@ -6,8 +6,6 @@ const AuthContext = createContext();
 
 // Tạo Provider
 export const AuthProvider = ({ children }) => {
-  // const storedUser = localStorage.getItem("user");
-  // const [user, setUser] = useState(storedUser ? storedUser : null);
   const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem("user");
     return savedUser ? JSON.parse(savedUser) : null;
@@ -22,7 +20,6 @@ export const AuthProvider = ({ children }) => {
       setIsAuthenticated(true);      
       localStorage.setItem("user", JSON.stringify(response.user)); 
       localStorage.setItem('authToken', response.accessToken);
-      localStorage.setItem('refreshToken', response.refreshToken);
       return response;
     }
     catch (error) {
@@ -37,7 +34,6 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(false);
     localStorage.removeItem("user");
     localStorage.removeItem('authToken');
-    localStorage.removeItem('refreshToken');
   };
 
   return (
