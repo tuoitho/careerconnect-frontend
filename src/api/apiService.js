@@ -69,10 +69,12 @@ class ApiService {
           // toast.error(error.response.data.message);
         } else if (error.request) {
           // Không nhận được phản hồi từ server
-          toast.error("Network error: Please check your internet connection.");
+          // return Promise.reject(error);
+          return Promise.reject({ message: "Lỗi kết nối internet" });
         } else {
           // Lỗi khác
           toast.error("Unknown error occurred.");
+          return Promise.reject(error);
         }
       }
   

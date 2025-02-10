@@ -18,6 +18,7 @@ import RecuiterProfile from "../pages/RecruiterProfile";
 import { Navigate } from "react-router-dom";
 import PostedJobDetail from "../pages/PostedJobDetail";
 import CandidateProfile from "../pages/CandidateProfile";
+import CompanyPage from "../pages/CompanyPage";
 const   AppRoutes = () => {
   return (
     <Routes>
@@ -47,12 +48,15 @@ const   AppRoutes = () => {
         }
       />
 
+
+
       {/* User Routes */}
       <Route        path="/*"        element={
           <ProtectedRoute allowedRoles={["candidate"]}>
             <Layout>
               <Routes>
                 <Route path="/" element={<Home />} />
+                <Route path="/company/:companyId" element={<CompanyPage />} />
                 <Route path="/profile" element={<CandidateProfile />} />
                 <Route path="*" element={<NotFound />} />
                 {/* Add more user routes */}
