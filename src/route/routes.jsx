@@ -19,6 +19,7 @@ import { Navigate } from "react-router-dom";
 import PostedJobDetail from "../pages/PostedJobDetail";
 import CandidateProfile from "../pages/CandidateProfile";
 import CompanyPage from "../pages/CompanyPage";
+import JobDetail from "../pages/CompanyJobDetail";
 const   AppRoutes = () => {
   return (
     <Routes>
@@ -57,6 +58,7 @@ const   AppRoutes = () => {
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/company/:companyId" element={<CompanyPage />} />
+                <Route path="/job/:id" element={<JobDetail />} />  
                 <Route path="/profile" element={<CandidateProfile />} />
                 <Route path="*" element={<NotFound />} />
                 {/* Add more user routes */}

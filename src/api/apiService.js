@@ -123,7 +123,7 @@ class ApiService {
   }
 
   async refreshAuthToken() {
-    return this.instance.post("/refresh", {} , {
+    return this.instance.post("/refresh-token", {} , {
         withCredentials: true,
       }
     );

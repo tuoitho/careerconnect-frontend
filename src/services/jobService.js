@@ -18,5 +18,11 @@ export const jobService = {
     },
     getJobByCompany: async (companyId) => {
         return await apiService.get(`/recruiter/jobs/company/${companyId}`); 
-    }
+    },
+    getCompanyJobs: async (companyId, page = 0, size = 4) => {
+        return await apiService.get(`/company/jobs?companyId=${companyId}&page=${page}&size=${size}`);
+    },
+    getCompanyJobDetail: async (id) => {
+        return await apiService.get(`/company/jobs/${id}`);
+    },
 }
