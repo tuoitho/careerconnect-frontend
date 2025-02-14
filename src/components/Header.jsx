@@ -4,10 +4,19 @@ import AuthContext from '../context/AuthContext';
 import { Bell, User, Briefcase, FileText, Book } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 import { useEffect } from 'react';
+import { DEFAULT_ROUTES } from '../route/defaultroutes';
 const Header = () => {
     const { user, isAuthenticated, logout } = useContext(AuthContext);
     const [showDropdown, setShowDropdown] = useState(false);
+    const navigate = useNavigate();
 
+    if (isAuthenticated) {
+        const role = user.role.toLowerCase();
+        const defaultUrl = DEFAULT_ROUTES[role];
+        useEffect(() => {
+           navigate(defaultUrl);
+        }, []);
+    }
 
     return (
         <header className="fixed top-0 left-0 right-0 bg-black text-white py-2 z-50 shadow-md">
@@ -40,7 +49,7 @@ const Header = () => {
                                 
                                 {showDropdown && (
                                     <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl py-2 z-50">
-                                        <Link to="/profile" className="block px-4 py-2 text-gray-800 hover:bg-green-50">
+                                        <Link to="/candidate/profile" className="block px-4 py-2 text-gray-800 hover:bg-green-50">
                                             <User className="inline mr-2" size={16} />
                                             Hồ sơ cá nhân
                                         </Link>

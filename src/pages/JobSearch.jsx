@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { FiSearch, FiMapPin, FiBriefcase } from "react-icons/fi";
 import { jobService } from "../services/jobService";
 import { MapPin, Search } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";

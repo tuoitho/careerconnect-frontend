@@ -5,7 +5,7 @@ import { useContext } from 'react';
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, isAuthenticated } = useContext(AuthContext);
   const location = useLocation();
-
+  
   if (!isAuthenticated) {
     return <Navigate to="/login" />;
   }
