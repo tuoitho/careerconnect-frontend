@@ -74,7 +74,7 @@ const Home = () => {
             <div className="bg-gradient-to-r from-black via-gray-900 to-black py-6">  
                 <div className="container mx-auto px-4 max-w-4xl flex justify-center gap-6">  
                     <Link   
-                        to="/post-job"   
+                        to="/"   
                         className="group bg-gradient-to-r from-green-500 to-green-600 text-white px-8 py-3 rounded-lg   
                                    text-sm font-medium transition-all duration-300 transform hover:scale-105   
                                    hover:shadow-lg flex items-center gap-2"  
@@ -83,7 +83,7 @@ const Home = () => {
                         <span>Đăng tuyển</span>  
                     </Link>  
                     <Link   
-                        to="/apply"   
+                        to="/job/search"   
                         className="group border-2 border-white text-white px-8 py-3 rounded-lg text-sm   
                                    font-medium transition-all duration-300 transform hover:scale-105   
                                    hover:shadow-lg hover:bg-white hover:text-black flex items-center gap-2"  

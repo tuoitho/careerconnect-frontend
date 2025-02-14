@@ -42,6 +42,10 @@ function JobSearch() {
       }, 300)
     );
   };
+  const handleJobClick = (jobId) => {
+    navigate(`/job/${jobId}`);
+    setShowSearchResults(false); // Đóng dropdown sau khi click
+  };
   // Hàm fetch dữ liệu gợi ý tìm kiếm
   const fetchSearchSuggestions = async (term) => {
     try {
@@ -175,6 +179,7 @@ function JobSearch() {
                     {searchSuggestions.map((job) => (
                       <div
                         key={job.jobId}
+                        onClick={() => handleJobClick(job.jobId)}
                         className="p-4 h-[88px] hover:bg-green-50 transition-colors duration-150 cursor-pointer group flex items-start space-x-4"
                       >
                         <div className="w-12 h-12 rounded-lg border border-green-100 bg-white flex-shrink-0 overflow-hidden">
