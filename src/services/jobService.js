@@ -28,4 +28,7 @@ export const jobService = {
     applyJob: async (applyJobdata) => {
         return await apiService.post(`/job/apply`, applyJobdata);
     },
+    searchJobs: async (params) => {
+        return await apiService.get(`/company/jobs/search`, { params });
+    }
 }
