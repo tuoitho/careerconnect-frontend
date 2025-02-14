@@ -20,6 +20,7 @@ import PostedJobDetail from "../pages/PostedJobDetail";
 import CandidateProfile from "../pages/CandidateProfile";
 import CompanyPage from "../pages/CompanyPage";
 import JobDetail from "../pages/CompanyJobDetail";
+import JobSearch from "../pages/JobSearch";
 const   AppRoutes = () => {
   return (
     <Routes>
@@ -59,6 +60,7 @@ const   AppRoutes = () => {
                 <Route path="/" element={<Home />} />
                 <Route path="/company/:companyId" element={<CompanyPage />} />
                 <Route path="/job/:id" element={<JobDetail />} />  
+                <Route path="/job/search" element={<JobSearch />} />
                 <Route path="/profile" element={<CandidateProfile />} />
                 <Route path="*" element={<NotFound />} />
                 {/* Add more user routes */}
