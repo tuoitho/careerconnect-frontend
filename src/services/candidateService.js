@@ -2,10 +2,10 @@ import apiService from "../api/apiService";
 
 export const candidateService = {
     getCandidatrProfile: async () => {
-        return await apiService.get(`/candidate/myprofile`);
+        return await apiService.get(`/candidate/profile/me`);
     },
     updateCandidatProfile: async (candidateProfile) => {
-        return await apiService.put(`/candidate/myprofile`, candidateProfile,
+        return await apiService.put(`/candidate/profile/me`, candidateProfile,
             {
                 headers: {
                     'Content-Type': 'multipart/form-data'
@@ -13,7 +13,7 @@ export const candidateService = {
             });
     },
     uploadCV: async (formData) => {
-        return await apiService.post(`/candidate/upload-cv`, formData, {
+        return await apiService.post(`/candidate/profile/cv`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
