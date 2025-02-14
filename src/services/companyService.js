@@ -3,15 +3,15 @@ import { toast } from "react-toastify";
 
 export const companyService = {
     createCompany: async (companyData) => 
-        await apiService.post(`/recruiter/mycompany`, companyData, {
+        await apiService.post(`/company/register`, companyData, {
             headers: { 'Content-Type': 'multipart/form-data' }
         }),
 
     getCompany: async () => 
-        await apiService.get(`/recruiter/mycompany`),
+        await apiService.get(`/company/mycompany`),
 
     updateCompany: async (companyData) => 
-        await apiService.put(`/recruiter/mycompany`, companyData, {
+        await apiService.put(`/company/mycompany`, companyData, {
             headers: { 'Content-Type': 'multipart/form-data' }
         }),
 
@@ -22,15 +22,15 @@ export const companyService = {
         await apiService.get(`/invitation?page=${page}&size=${size}`),
 
     acceptInvitation: async (token) => 
-        await apiService.post(`/company/accept`, null, {
+        await apiService.post(`/invitation/join`, null, {
             params: { token: token }
         }),
 
     getCompanyMembers: async (page, size) => 
-        await apiService.get(`/company/members?page=${page}&size=${size}`),
+        await apiService.get(`/company/mycompany/members?page=${page}&size=${size}`),
 
     inviteMember: async (email) => 
-        await apiService.post(`/company/addmember`, { email }),
+        await apiService.post(`/invitation/invite`, { email }),
     getCompanyById: async (id) => 
         await apiService.get(`/company/${id}`),
 

@@ -20,6 +20,6 @@ export const candidateService = {
         });
     },
     deleteCV: async (cvId) => {
-        return await apiService.delete(`/candidate/upload-cv/${cvId}`);
+        return await apiService.delete(`/candidate/profile/cv/${cvId}`);
     },
 }
