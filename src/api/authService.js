@@ -4,26 +4,6 @@ import { toast } from "react-toastify";
 export const authService = {
   // Đăng nhập
   async login(username, password) {
-    // try {
-    //   const response = await apiService.post('/auth/login', {
-    //     username,
-    //     password
-    //   });
-    //   if (!response) {
-    //     throw new Error('Login failed: Invalid response from <server>')
-    //   }
-    //   // Lưu tokens
-    //   localStorage.setItem("user", response.username);
-    //   localStorage.setItem('authToken', response.accessToken);
-    //   localStorage.setItem('refreshToken', response.refreshToken);
-    //   toast.success('Đăng nhập thành công!');
-    //   return response;
-    // } catch (error) {
-    //   localStorage.removeItem('authToken');
-    //   localStorage.removeItem('refreshToken');
-    //   console.error('err in login:', error);
-    //   // throw error;
-    // }
     try {
       return await apiService.post("/auth/login", {
         username,
