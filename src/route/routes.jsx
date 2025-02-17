@@ -112,6 +112,7 @@ import CandidateProfile from "../pages/CandidateProfile";
 import CompanyPage from "../pages/CompanyPage";
 import JobDetail from "../pages/CompanyJobDetail";
 import JobSearch from "../pages/JobSearch";
+import AppliedJobsList from "../pages/AppliedJob";
 
 
 // Routes cho các trang public có Layout
@@ -154,6 +155,7 @@ const CandidateRoutes = () => (
         <Route index element={<Home />} />
         <Route path="company/:companyId" element={<CompanyPage />} />
         <Route path="profile" element={<CandidateProfile />} />
+        <Route path="applied" element={<AppliedJobsList />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Layout>

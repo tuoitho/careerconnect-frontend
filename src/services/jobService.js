@@ -28,4 +28,7 @@ export const jobService = {
     getCompanyJobDetail: async (id) => {
         return await apiService.get(`/company/jobs/${id}`);
     },
+    getAllAppliedJobs: async (page = 0, size = 3) => {
+        return await apiService.get(`/job/applied?page=${page}&size=${size}`);
+    },
 }

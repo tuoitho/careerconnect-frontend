@@ -10,13 +10,7 @@ const Header = () => {
     const [showDropdown, setShowDropdown] = useState(false);
     const navigate = useNavigate();
 
-    if (isAuthenticated) {
-        const role = user.role.toLowerCase();
-        const defaultUrl = DEFAULT_ROUTES[role];
-        useEffect(() => {
-           navigate(defaultUrl);
-        }, []);
-    }
+
 
     return (
         <header className="fixed top-0 left-0 right-0 bg-black text-white py-2 z-50 shadow-md">
