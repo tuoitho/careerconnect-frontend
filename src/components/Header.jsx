@@ -1,16 +1,12 @@
-import React, { use, useContext, useState } from 'react';
-import { Link, Navigate } from 'react-router-dom';
+import React, { useContext, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
-import { Bell, User, Briefcase, FileText, Book } from 'lucide-react';
-import { useNavigate } from "react-router-dom";
-import { useEffect } from 'react';
-import { DEFAULT_ROUTES } from '../route/defaultroutes';
+import { Bell, User, Briefcase, FileText, Book, MessageSquare } from 'lucide-react'; // Thêm MessageSquare cho icon Chat
+
 const Header = () => {
     const { user, isAuthenticated, logout } = useContext(AuthContext);
     const [showDropdown, setShowDropdown] = useState(false);
     const navigate = useNavigate();
-
-
 
     return (
         <header className="fixed top-0 left-0 right-0 bg-black text-white py-2 z-50 shadow-md">
@@ -47,7 +43,7 @@ const Header = () => {
                                             <User className="inline mr-2" size={16} />
                                             Hồ sơ cá nhân
                                         </Link>
-                                        <Link to="/applied-jobs" className="block px-4 py-2 text-gray-800 hover:bg-green-50">
+                                        <Link to="/candidate/applied" className="block px-4 py-2 text-gray-800 hover:bg-green-50">
                                             <Briefcase className="inline mr-2" size={16} />
                                             Việc làm đã ứng tuyển
                                         </Link>
@@ -58,7 +54,12 @@ const Header = () => {
                                     </div>
                                 )}
                             </div>
-                            
+
+                            {/* Nút Chat */}
+                            <Link to="/chat" className="relative" title="Chat với nhà tuyển dụng">
+                                <MessageSquare className="text-white hover:text-green-400" size={18} />
+                            </Link>
+
                             <Link to="/notifications" className="relative">
                                 <Bell className="text-white hover:text-green-400" size={18} />
                                 <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">

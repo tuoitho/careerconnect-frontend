@@ -6,6 +6,7 @@ import HowItWorks from '../components/HowItWorks';
 import { Link, useNavigate } from 'react-router-dom';  
 import { UserPlus } from 'lucide-react';  
 import AuthContext from '../context/AuthContext';  
+import { toast } from 'react-toastify';
 
 const Home = () => {  
     const [searchQuery, setSearchQuery] = useState('');  
@@ -73,7 +74,8 @@ const Home = () => {
             {/* Recruitment Buttons */}  
             <div className="bg-gradient-to-r from-black via-gray-900 to-black py-6">  
                 <div className="container mx-auto px-4 max-w-4xl flex justify-center gap-6">  
-                    <Link   
+                    <button   
+                        onClick={() => toast.info("Vui lòng đăng nhập tài khoản nhà tuyển dụng")}
                         to="/"   
                         className="group bg-gradient-to-r from-green-500 to-green-600 text-white px-8 py-3 rounded-lg   
                                    text-sm font-medium transition-all duration-300 transform hover:scale-105   
@@ -81,7 +83,7 @@ const Home = () => {
                     >  
                         <Briefcase size={18} />  
                         <span>Đăng tuyển</span>  
-                    </Link>  
+                    </button>  
                     <Link   
                         to="/job/search"   
                         className="group border-2 border-white text-white px-8 py-3 rounded-lg text-sm   

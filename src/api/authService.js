@@ -3,12 +3,16 @@ import { toast } from "react-toastify";
 
 export const authService = {
   // Đăng nhập
-  async login(username, password) {
+  async login(username, password, tk) {
     try {
       return await apiService.post("/auth/login", {
         username,
         password,
-      }, {
+      }, 
+      {
+        params: {
+          tk: tk // Add as URL parameter
+        },
         withCredentials: true
       });
     } catch (error) {

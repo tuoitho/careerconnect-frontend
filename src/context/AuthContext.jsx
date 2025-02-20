@@ -1,5 +1,6 @@
 import React, { createContext, useState } from "react";
 import { authService } from "../api/authService";
+import { toast } from "react-toastify";
 
 // Tạo AuthContext
 const AuthContext = createContext();
@@ -13,9 +14,9 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     return !!localStorage.getItem("user");
   });
-   const login = async (userData) => {
+   const login = async (userData, tk) => {
     try {
-      const response = await authService.login(userData.username, userData.password);
+      const response = await authService.login(userData.username, userData.password,tk);
       setUser(response.user);
       setIsAuthenticated(true);      
       localStorage.setItem("user", JSON.stringify(response.user)); 
@@ -34,6 +35,7 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(false);
     localStorage.removeItem("user");
     localStorage.removeItem('authToken');
+    toast.success("Đăng xuất thành công");
   };
 
   return (
