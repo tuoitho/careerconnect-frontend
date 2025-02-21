@@ -113,6 +113,7 @@ import CompanyPage from "../pages/CompanyPage";
 import JobDetail from "../pages/CompanyJobDetail";
 import JobSearch from "../pages/JobSearch";
 import AppliedJobsList from "../pages/AppliedJob";
+import ChatPage from "../pages/ChatPage";
 
 
 // Routes cho các trang public có Layout
@@ -123,6 +124,7 @@ const GeneralRoutes = () => (
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/job/search" element={<JobSearch />} />
       <Route path="/job/:id" element={<JobDetail />} />
+      <Route path="/chat" element={<ChatPage />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   </Layout>
@@ -156,6 +158,7 @@ const CandidateRoutes = () => (
         <Route path="company/:companyId" element={<CompanyPage />} />
         <Route path="profile" element={<CandidateProfile />} />
         <Route path="applied" element={<AppliedJobsList />} />
+        <Route path="chat" element={<ChatPage />} /> {/* Thêm route cho Chat */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Layout>
