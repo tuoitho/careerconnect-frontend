@@ -10,10 +10,11 @@ import { toast } from 'react-toastify';
 const ChatPage = () => {
   const [selectedRecruiter, setSelectedRecruiter] = useState(null);
   const selectedRecruiterRef = useRef(null);
-    useEffect(() => {
+  useEffect(() => {
     selectedRecruiterRef.current = selectedRecruiter;
-    }, [selectedRecruiter]);
-    const [recruiterMessages, setRecruiterMessages] = useState({}); // Lưu tất cả tin nhắn theo recruiterId
+  }, [selectedRecruiter]);
+
+  const [recruiterMessages, setRecruiterMessages] = useState({});
   const [newMessage, setNewMessage] = useState('');
   const [messages, setMessages] = useState([]);
   const [recruiters, setRecruiters] = useState([]);
@@ -23,10 +24,6 @@ const ChatPage = () => {
   const messageAreaRef = useRef(null);
   const typingTimeoutRef = useRef(null);
   const { user, isAuthenticated } = useContext(AuthContext);
-  useEffect(() => {
-    toast.success('Đã chọn nhà tuyển dụng '+selectedRecruiter?.id );
-    
-    }, [selectedRecruiter]);
 
   useEffect(() => {
     if (!isAuthenticated || !user) return;
@@ -37,150 +34,165 @@ const ChatPage = () => {
       const token = localStorage.getItem('authToken') || 'abc';
       const headers = {
         Authorization: `Bearer ${token}`,
-        // userId: user.userId,
-        // username: user.username,
       };
       stompClient.current.connect(headers, onConnected, onError);
     };
-    
-    const fetchRecruiters = async () => {
-      try {
-        //   const response = await apiService.get('/user/recruiters');
-          const response = [
-            {
-                id: 6,
-                name: 'Candidate 1',
-            },
-            {
-                id: 7,
-                name: 'Recruiter 2',
-            }
-          ]
-          setRecruiters(response || []);
-          const allMessages = {};
-          const unreadCounts = {};
-          for (const recruiter of response) {
-            const response = await apiService.get(`/chat/history?userId2=${recruiter.id}`);
-            const chatHistory = response.result || [];
-            const formattedMessages = chatHistory.map(msg => ({
-              id: msg.id,
-              text: msg.content,
-              senderId: msg.senderId,
-              recipientId: msg.recipientId,
-              sender: msg.senderId === user.userId ? 'user' : 'recruiter',
-              timestamp: msg.timestamp,
-              status: msg.status,
-            }));
-            allMessages[recruiter.id] = formattedMessages;
-            // Tính số tin nhắn unread (SENT)
-            unreadCounts[recruiter.id] = formattedMessages.filter(msg => (msg.status !== 'READ' )&& msg.senderId !== user.userId).length;
-            // Gửi yêu cầu cập nhật trạng thái SENT -> DELIVERED
-            const sentMessages = formattedMessages.filter(msg => msg.status === 'SENT' && msg.senderId !== user.userId);
-            sentMessages.forEach(msg => {
-                console.log('danh dau da nhan'+JSON.stringify(msg));
-                if (stompClient.current && stompClient.current.connected) {
-                    console.log('danh dau da nhan'+JSON.stringify({ messageId: msg.id }));
-                stompClient.current.send(
-                    '/app/chat.markAsDelivered',
-                    {},
-                    JSON.stringify({ messageId: msg.id })
-                );
-                }
-            });
-        }
-            setRecruiterMessages(allMessages);
-            setRecruiters(prev =>
-            prev.map(rec => ({
-                ...rec,
-                unread: unreadCounts[rec.id] || 0,
-            }))
-            );
 
-
-      } catch (error) {
-        console.error('Error fetching recruiters:', error);
-      }
-    };
-
-    fetchRecruiters();
     connectWebSocket();
-
-    return () => {
-      if (stompClient.current && stompClient.current.connected) {
-        stompClient.current.disconnect();
-        console.log('Disconnected from WebSocket');
-      }
-    };
   }, [isAuthenticated, user]);
+
+  useEffect(() => {
+    if (selectedRecruiter) {
+      toast.success(`Đã chọn nhà tuyển dụng ${selectedRecruiter.id}`);
+    }
+  }, [selectedRecruiter]);
 
   const onConnected = () => {
     setConnected(true);
-    // console.log('WebSocket connected with userId', user.userId);
-    // console.log('WebSocket connected with un', user.username);
+    console.log('WebSocket connected with userId', user.userId);
 
-    //subscribe để nhận tin nhắn private
-    stompClient.current.subscribe(`/user/queue/messages`, function(message) {
-        // console.log("Before message received:", selectedRecruiterRef.current);
-        onMessageReceived(message);
-    }
+    // Subscribe vào tin nhắn mới
+    stompClient.current.subscribe(`/user/queue/messages`, onMessageReceived);
+    console.log(`Subscribed to /user/queue/messages`);
 
-    );
+    // Subscribe vào thông báo lưu tin nhắn từ backend
+    stompClient.current.subscribe('/topic/chat.messageSaved', onMessageSaved);
+    console.log(`Subscribed to /topic/chat.messageSaved`);
+
+    fetchRecruiters();
   };
 
+  const fetchRecruiters = async () => {
+    try {
+      const response = [
+        { id: 6, name: 'Candidate 1' },
+        { id: 7, name: 'Recruiter 2' },
+      ];
+      setRecruiters(response || []);
+
+      const allMessages = {};
+      const unreadCounts = {};
+      for (const recruiter of response) {
+        const response = await apiService.get(`/chat/history?userId2=${recruiter.id}`);
+        const chatHistory = response.result || [];
+        const formattedMessages = chatHistory.map(msg => ({
+          id: msg.id,
+          text: msg.content,
+          sender: msg.senderId === user.userId ? 'user' : 'recruiter',
+          timestamp: msg.timestamp || new Date().toLocaleTimeString(),
+          status: msg.status,
+        }));
+        allMessages[recruiter.id] = formattedMessages;
+
+        unreadCounts[recruiter.id] = formattedMessages.filter(
+          msg => msg.status !== 'READ' && msg.senderId !== user.userId
+        ).length;
+
+        const sentMessages = formattedMessages.filter(
+          msg => msg.status === 'SENT' && msg.senderId !== user.userId
+        );
+        sentMessages.forEach(msg => {
+          console.log('Đánh dấu đã nhận: ' + JSON.stringify(msg));
+          if (stompClient.current && stompClient.current.connected) {
+            console.log('Gửi yêu cầu đánh dấu: ' + JSON.stringify({ messageId: msg.id }));
+            stompClient.current.send(
+              '/app/chat.markAsDelivered',
+              { Authorization: `Bearer ${localStorage.getItem('authToken') || 'abc'}` },
+              JSON.stringify({ messageId: msg.id })
+            );
+          }
+        });
+      }
+
+      setRecruiterMessages(allMessages);
+      setRecruiters(prev =>
+        prev.map(rec => ({
+          ...rec,
+          unread: unreadCounts[rec.id] || 0,
+        }))
+      );
+    //   setSelectedRecruiter(response[0]);
+      setMessages(allMessages[response[0].id] || []);
+    } catch (error) {
+      console.error('Error fetching recruiters:', error);
+    }
+  };
 
   const onMessageReceived = (payload) => {
     const receivedMessage = JSON.parse(payload.body);
-    console.log('aaaaaaaaaaaaaaaaaaaaa', receivedMessage);
-    // if (receivedMessage.type === 'TYPING') {
-    //   setTyping(true);
-    //   if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
-    //   typingTimeoutRef.current = setTimeout(() => setTyping(false), 3000);
-    //   return;
-    // }
-    // console.log(selectedRecruiterRef.current);
-    if (receivedMessage.type === 'CHAT' && selectedRecruiterRef.current && selectedRecruiterRef.current.id === receivedMessage.senderId) {
-      
-        const tempId = receivedMessage.tempId;
-        setMessages(prev => [
+    console.log('Received message:', receivedMessage);
+
+    if (receivedMessage.type === 'CHAT') {
+      const tempId = receivedMessage.tempId || Date.now();
+      const senderId = receivedMessage.senderId;
+      const messageData = {
+        id: tempId, // Dùng tempId tạm thời
+        text: receivedMessage.content,
+        sender: receivedMessage.senderId === user.userId ? 'user' : 'recruiter',
+        timestamp: receivedMessage.timestamp || new Date().toLocaleTimeString(),
+        status: receivedMessage.status || 'SENT',
+      };
+
+      setRecruiterMessages(prev => ({
         ...prev,
-        {
-          id: tempId, 
-          text: receivedMessage.content,
-          sender: receivedMessage.senderId === user.userId ? 'user' : 'recruiter',
-          timestamp: receivedMessage.timestamp || new Date().toLocaleTimeString(),
-        },
-      ]);
-      // Nghe phản hồi từ backend sau khi lưu message
-        stompClient.current.subscribe('/topic/chat.messageSaved', (response) => {
-            const savedMessage = JSON.parse(response.body);
-            console.log('danh dau '+JSON.stringify({ messageId: savedMessage.id }));
-            if (savedMessage.tempId === tempId) {
-            stompClient.current.send(
-                '/app/chat.markAsRead',
-                {},
-                JSON.stringify({ messageId: savedMessage.id })
-            );
+        [senderId]: [
+          ...(prev[senderId] || []),
+          messageData,
+        ],
+      }));
+
+      if (selectedRecruiterRef.current && selectedRecruiterRef.current.id === senderId) {
+        setMessages(prev => [
+          ...prev,
+          messageData,
+        ]);
+      } else {
+        setRecruiters(prev =>
+          prev.map(rec => {
+            if (rec.id === senderId) {
+              return { ...rec, unread: (rec.unread || 0) + 1 };
             }
-        });
-    //   stompClient.current.send(
-    //     '/app/chat.markAsRead',
-    //     JSON.stringify({ messageId: receivedMessage.id })
-    //   );
+            return rec;
+          })
+        );
+      }
+    }
+  };
+
+  const onMessageSaved = (payload) => {
+    const savedMessage = JSON.parse(payload.body);
+    console.log('Message saved:', savedMessage);
+
+    const { id, tempId, senderId, recipientId, content, status } = savedMessage;
+    const messageData = {
+      id, // ID thực từ backend
+      text: content,
+      sender: senderId === user.userId ? 'user' : 'recruiter',
+      timestamp: new Date().toLocaleTimeString(),
+      status: status || 'SENT',
+    };
+
+    setRecruiterMessages(prev => ({
+      ...prev,
+      [senderId]: prev[senderId].map(msg =>
+        msg.id === tempId ? messageData : msg
+      ),
+    }));
+
+    if (selectedRecruiterRef.current && selectedRecruiterRef.current.id === senderId) {
+      setMessages(prev =>
+        prev.map(msg => (msg.id === tempId ? messageData : msg))
+      );
+
+      // Đánh dấu đã đọc khi tin nhắn được lưu và đang ở tab hiện tại
+      stompClient.current.send(
+        '/app/chat.markAsRead',
+        { Authorization: `Bearer ${localStorage.getItem('authToken') || 'abc'}` },
+        JSON.stringify({ messageId: id })
+      );
     }
 
-    setRecruiters(prev =>
-      prev.map(recruiter => {
-        if (recruiter.id === receivedMessage.senderId) {
-          const isSelected = selectedRecruiterRef.current && selectedRecruiterRef.current.id === recruiter.id;
-          return {
-            ...recruiter,
-            lastMessage: receivedMessage.content,
-            unread: isSelected ? 0 : (recruiter.unread || 0) + 1,
-          };
-        }
-        return recruiter;
-      })
-    );
+    toast.success(`Tin nhắn mới từ ${senderId}: ${content}`);
   };
 
   const onError = (error) => {
@@ -206,42 +218,75 @@ const ChatPage = () => {
       };
       stompClient.current.send(
         '/app/chat.send',
-        {},
+        { Authorization: `Bearer ${localStorage.getItem('authToken') || 'abc'}` },
         JSON.stringify(chatMessage)
       );
+
+      setMessages(prev => [
+        ...prev,
+        {
+          id: chatMessage.tempId,
+          text: newMessage,
+          sender: 'user',
+          timestamp: new Date().toLocaleTimeString(),
+          status: 'SENT',
+        },
+      ]);
+      setRecruiterMessages(prev => ({
+        ...prev,
+        [selectedRecruiter.id]: [
+          ...(prev[selectedRecruiter.id] || []),
+          {
+            id: chatMessage.tempId,
+            text: newMessage,
+            sender: 'user',
+            timestamp: new Date().toLocaleTimeString(),
+            status: 'SENT',
+          },
+        ],
+      }));
       setNewMessage('');
     }
-    // them vao lich su chat
-    setMessages(prev => [
-      ...prev,
-      {
-        id: Date.now(),
-        text: newMessage,
-        sender: 'user',
-        timestamp: new Date().toLocaleTimeString(),
-      },
-    ]);
   };
 
   const handleRecruiterSelect = async (recruiter) => {
     setSelectedRecruiter(recruiter);
-    toast.success('Đã chọn nhà tuyển dụng '+selectedRecruiter?.id );
-    
+
     try {
       const response = await apiService.get(`/chat/history?userId2=${recruiter.id}`);
-      const chatHistory = response.result || [{
-        id: 1,
-        content: 'Xin chào, tôi có thể giúp gì cho bạn?',
-        senderId:recruiter.id,
-        recipientId:user.userId
-      }];
+      const chatHistory = response.result || [];
       const formattedMessages = chatHistory.map(msg => ({
         id: msg.id,
         text: msg.content,
         sender: msg.senderId === user.userId ? 'user' : 'recruiter',
         timestamp: msg.timestamp || new Date().toLocaleTimeString(),
+        status: msg.status,
       }));
       setMessages(formattedMessages);
+      setRecruiterMessages(prev => ({
+        ...prev,
+        [recruiter.id]: formattedMessages,
+      }));
+
+      const unreadMessages = formattedMessages.filter(
+        msg => msg.status !== 'READ' && msg.senderId !== user.userId
+      );
+      unreadMessages.forEach(msg => {
+        if (stompClient.current && stompClient.current.connected) {
+          stompClient.current.send(
+            '/app/chat.markAsRead',
+            { Authorization: `Bearer ${localStorage.getItem('authToken') || 'abc'}` },
+            JSON.stringify({ messageId: msg.id })
+          );
+          setMessages(prev =>
+            prev.map(m => (m.id === msg.id ? { ...m, status: 'READ' } : m))
+          );
+          setRecruiterMessages(prev => ({
+            ...prev,
+            [recruiter.id]: prev[recruiter.id].map(m => (m.id === msg.id ? { ...m, status: 'READ' } : m)),
+          }));
+        }
+      });
 
       setRecruiters(prev =>
         prev.map(r => (r.id === recruiter.id ? { ...r, unread: 0 } : r))
@@ -249,10 +294,6 @@ const ChatPage = () => {
     } catch (error) {
       console.error('Error fetching chat history:', error);
     }
-
-    // if (connected && !stompClient.current.subscriptions[`/user/${user.userId}/queue/messages`]) {
-    //   subscribeToRecruiter(recruiter.userId);
-    // }
   };
 
   useEffect(() => {
@@ -263,13 +304,6 @@ const ChatPage = () => {
 
   const handleInputChange = (e) => {
     setNewMessage(e.target.value);
-    // if (selectedRecruiter && connected) {
-    //   stompClient.current.send(
-    //     `/app/chat.typing/${selectedRecruiter.userId}`,
-    //     {},
-    //     JSON.stringify({ userId: user.userId })
-    //   );
-    // }
   };
 
   return (
@@ -365,15 +399,6 @@ const ChatPage = () => {
                           {message.timestamp}
                         </p>
                       </div>
-                        {/* {message.sender === 'user' && (
-                            <span
-                            className={`text-xs ml-2 ${
-                                message.seen ? 'text-green-500' : 'text-gray-500'
-                            }`}
-                            >
-                            {message.seen ? 'Đã xem' : 'Đã gửi'}
-                            </span>
-                        )} */}
                     </div>
                   ))
                 )}
