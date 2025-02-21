@@ -13,7 +13,7 @@ const ChatPage = () => {
     useEffect(() => {
     selectedRecruiterRef.current = selectedRecruiter;
     }, [selectedRecruiter]);
-
+    const [recruiterMessages, setRecruiterMessages] = useState({}); // Lưu tất cả tin nhắn theo recruiterId
   const [newMessage, setNewMessage] = useState('');
   const [messages, setMessages] = useState([]);
   const [recruiters, setRecruiters] = useState([]);
@@ -57,7 +57,46 @@ const ChatPage = () => {
             }
           ]
           setRecruiters(response || []);
-          setSelectedRecruiter(response[0]);
+          const allMessages = {};
+          const unreadCounts = {};
+          for (const recruiter of response) {
+            const response = await apiService.get(`/chat/history?userId2=${recruiter.id}`);
+            const chatHistory = response.result || [];
+            const formattedMessages = chatHistory.map(msg => ({
+              id: msg.id,
+              text: msg.content,
+              senderId: msg.senderId,
+              recipientId: msg.recipientId,
+              sender: msg.senderId === user.userId ? 'user' : 'recruiter',
+              timestamp: msg.timestamp,
+              status: msg.status,
+            }));
+            allMessages[recruiter.id] = formattedMessages;
+            // Tính số tin nhắn unread (SENT)
+            unreadCounts[recruiter.id] = formattedMessages.filter(msg => (msg.status !== 'READ' )&& msg.senderId !== user.userId).length;
+            // Gửi yêu cầu cập nhật trạng thái SENT -> DELIVERED
+            const sentMessages = formattedMessages.filter(msg => msg.status === 'SENT' && msg.senderId !== user.userId);
+            sentMessages.forEach(msg => {
+                console.log('danh dau da nhan'+JSON.stringify(msg));
+                if (stompClient.current && stompClient.current.connected) {
+                    console.log('danh dau da nhan'+JSON.stringify({ messageId: msg.id }));
+                stompClient.current.send(
+                    '/app/chat.markAsDelivered',
+                    {},
+                    JSON.stringify({ messageId: msg.id })
+                );
+                }
+            });
+        }
+            setRecruiterMessages(allMessages);
+            setRecruiters(prev =>
+            prev.map(rec => ({
+                ...rec,
+                unread: unreadCounts[rec.id] || 0,
+            }))
+            );
+
+
       } catch (error) {
         console.error('Error fetching recruiters:', error);
       }
@@ -100,22 +139,33 @@ const ChatPage = () => {
     // }
     // console.log(selectedRecruiterRef.current);
     if (receivedMessage.type === 'CHAT' && selectedRecruiterRef.current && selectedRecruiterRef.current.id === receivedMessage.senderId) {
-        toast.success('Bạn có tin nhắn mới'+JSON.stringify(receivedMessage));
-      setMessages(prev => [
+      
+        const tempId = receivedMessage.tempId;
+        setMessages(prev => [
         ...prev,
         {
-          id: receivedMessage.id || Date.now(), // Fallback nếu backend không trả id
+          id: tempId, 
           text: receivedMessage.content,
           sender: receivedMessage.senderId === user.userId ? 'user' : 'recruiter',
           timestamp: receivedMessage.timestamp || new Date().toLocaleTimeString(),
         },
       ]);
-
-      stompClient.current.send(
-        '/app/chat.markAsRead',
-        {},
-        JSON.stringify({ messageId: receivedMessage.id })
-      );
+      // Nghe phản hồi từ backend sau khi lưu message
+        stompClient.current.subscribe('/topic/chat.messageSaved', (response) => {
+            const savedMessage = JSON.parse(response.body);
+            console.log('danh dau '+JSON.stringify({ messageId: savedMessage.id }));
+            if (savedMessage.tempId === tempId) {
+            stompClient.current.send(
+                '/app/chat.markAsRead',
+                {},
+                JSON.stringify({ messageId: savedMessage.id })
+            );
+            }
+        });
+    //   stompClient.current.send(
+    //     '/app/chat.markAsRead',
+    //     JSON.stringify({ messageId: receivedMessage.id })
+    //   );
     }
 
     setRecruiters(prev =>
@@ -148,6 +198,7 @@ const ChatPage = () => {
     e.preventDefault();
     if (newMessage.trim() && selectedRecruiter && connected) {
       const chatMessage = {
+        tempId: Date.now(),
         senderId: user.userId,
         recipientId: selectedRecruiter.id,
         content: newMessage,
@@ -177,17 +228,17 @@ const ChatPage = () => {
     toast.success('Đã chọn nhà tuyển dụng '+selectedRecruiter?.id );
     
     try {
-        const response = []
-    //   const response = await apiService.get(`/api/chat/history?userId=${recruiter.id}`);
-      const chatHistory = response.data || [{
+      const response = await apiService.get(`/chat/history?userId2=${recruiter.id}`);
+      const chatHistory = response.result || [{
         id: 1,
         content: 'Xin chào, tôi có thể giúp gì cho bạn?',
-        sender: { userId: recruiter.id },
+        senderId:recruiter.id,
+        recipientId:user.userId
       }];
       const formattedMessages = chatHistory.map(msg => ({
         id: msg.id,
         text: msg.content,
-        sender: msg.sender.userId === user.userId ? 'user' : 'recruiter',
+        sender: msg.senderId === user.userId ? 'user' : 'recruiter',
         timestamp: msg.timestamp || new Date().toLocaleTimeString(),
       }));
       setMessages(formattedMessages);
@@ -314,6 +365,15 @@ const ChatPage = () => {
                           {message.timestamp}
                         </p>
                       </div>
+                        {/* {message.sender === 'user' && (
+                            <span
+                            className={`text-xs ml-2 ${
+                                message.seen ? 'text-green-500' : 'text-gray-500'
+                            }`}
+                            >
+                            {message.seen ? 'Đã xem' : 'Đã gửi'}
+                            </span>
+                        )} */}
                     </div>
                   ))
                 )}
