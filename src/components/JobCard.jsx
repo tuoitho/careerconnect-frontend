@@ -18,7 +18,7 @@ const JobCard = ({ job }) => {
   
   const handleApplyClick = (e) => {
     e.stopPropagation(); // Prevent triggering the card click
-    navigate(`/candidate/job/${job.jobId}`); // Navigate to job details with focus on apply
+    navigate(`/job/${job.jobId}`); // Navigate to job details with focus on apply
   }
 
   return (  
