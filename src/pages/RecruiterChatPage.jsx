@@ -7,17 +7,17 @@ import Header from '../components/Header';
 import AuthContext from '../context/AuthContext';
 import { toast } from 'react-toastify';
 
-const ChatPage = () => {
-  const [selectedRecruiter, setSelectedRecruiter] = useState(null);
-  const selectedRecruiterRef = useRef(null);
+const RecruiterChatPage = () => {
+  const [selectedCandidate, setSelectedCandidate] = useState(null);
+  const selectedCandidateRef = useRef(null);
   useEffect(() => {
-    selectedRecruiterRef.current = selectedRecruiter;
-  }, [selectedRecruiter]);
+    selectedCandidateRef.current = selectedCandidate;
+  }, [selectedCandidate]);
 
-  const [recruiterMessages, setRecruiterMessages] = useState({});
+  const [candidateMessages, setCandidateMessages] = useState({});
   const [newMessage, setNewMessage] = useState('');
   const [messages, setMessages] = useState([]);
-  const [recruiters, setRecruiters] = useState([]);
+  const [candidates, setCandidates] = useState([]);
   const [connected, setConnected] = useState(false);
   const [typing, setTyping] = useState(false);
   const stompClient = useRef(null);
@@ -42,10 +42,10 @@ const ChatPage = () => {
   }, [isAuthenticated, user]);
 
   useEffect(() => {
-    if (selectedRecruiter) {
-      // toast.success(`Đã chọn nhà tuyển dụng ${selectedRecruiter.id}`);
+    if (selectedCandidate) {
+      // toast.success(`Đã chọn ứng viên ${selectedCandidate.id}`);
     }
-  }, [selectedRecruiter]);
+  }, [selectedCandidate]);
 
   const onConnected = () => {
     setConnected(true);
@@ -57,31 +57,30 @@ const ChatPage = () => {
     stompClient.current.subscribe('/topic/chat.messageSaved', onMessageSaved);
     // console.log(`Subscribed to /topic/chat.messageSaved`);
 
-    fetchRecruiters();
+    fetchCandidates();
   };
 
-  const fetchRecruiters = async () => {
+  const fetchCandidates = async () => {
     try {
-
-      const response= await apiService.get('/chat/recruiter-contacts');
-      const recruiters = response.result || [];
-      setRecruiters(recruiters);
+      const response = await apiService.get('/chat/candidate-contacts'); // API cho danh sách ứng viên
+      const candidates = response.result || [];
+      setCandidates(candidates|| []);
 
       const allMessages = {};
       const unreadCounts = {};
-      for (const recruiter of recruiters) {
-        const response = await apiService.get(`/chat/history?userId2=${recruiter.id}`);
+      for (const candidate of candidates) {
+        const response = await apiService.get(`/chat/history?userId2=${candidate.id}`);
         const chatHistory = response.result || [];
         const formattedMessages = chatHistory.map(msg => ({
           id: msg.id,
           text: msg.content,
-          sender: msg.senderId === user.userId ? 'user' : 'recruiter',
+          sender: msg.senderId === user.userId ? 'recruiter' : 'candidate',
           timestamp: msg.timestamp || new Date().toLocaleTimeString(),
           status: msg.status,
         }));
-        allMessages[recruiter.id] = formattedMessages;
+        allMessages[candidate.id] = formattedMessages;
 
-        unreadCounts[recruiter.id] = chatHistory.filter(
+        unreadCounts[candidate.id] = chatHistory.filter(
           msg => msg.status !== 'READ' && msg.senderId !== user.userId
         ).length;
 
@@ -90,16 +89,16 @@ const ChatPage = () => {
         );
       }
 
-      setRecruiterMessages(allMessages);
-      setRecruiters(prev =>
-        prev.map(rec => ({
-          ...rec,
-          unread: unreadCounts[rec.id] || 0,
+      setCandidateMessages(allMessages);
+      setCandidates(prev =>
+        prev.map(can => ({
+          ...can,
+          unread: unreadCounts[can.id] || 0,
         }))
       );
-      setMessages(allMessages[recruiters[0].id] || []);
+      setMessages(allMessages[response[0]?.id] || []);
     } catch (error) {
-      console.error('Error fetching recruiters:', error);
+      console.error('Error fetching candidates:', error);
     }
   };
 
@@ -113,12 +112,12 @@ const ChatPage = () => {
       const messageData = {
         id: tempId,
         text: receivedMessage.content,
-        sender: receivedMessage.senderId === user.userId ? 'user' : 'recruiter',
+        sender: receivedMessage.senderId === user.userId ? 'recruiter' : 'candidate',
         timestamp: receivedMessage.timestamp || new Date().toLocaleTimeString(),
         status: receivedMessage.status || 'SENT',
       };
 
-      setRecruiterMessages(prev => ({
+      setCandidateMessages(prev => ({
         ...prev,
         [senderId]: [
           ...(prev[senderId] || []),
@@ -126,14 +125,12 @@ const ChatPage = () => {
         ],
       }));
 
-
-      if (selectedRecruiterRef.current && selectedRecruiterRef.current.id === senderId) {
+      if (selectedCandidateRef.current && selectedCandidateRef.current.id === senderId) {
         setMessages(prev => [
           ...prev,
           messageData,
         ]);
         if (senderId !== user.userId) {
-          // Đánh dấu đã đọc khi người nhận mở tin nhắn
           stompClient.current.send(
             '/app/chat.markAsRead',
             { Authorization: `Bearer ${localStorage.getItem('authToken') || 'abc'}` },
@@ -141,12 +138,12 @@ const ChatPage = () => {
           );
         }
       } else {
-        setRecruiters(prev =>
-          prev.map(rec => {
-            if (rec.id === senderId) {
-              return { ...rec, unread: (rec.unread || 0) + 1 };
+        setCandidates(prev =>
+          prev.map(can => {
+            if (can.id === senderId) {
+              return { ...can, unread: (can.unread || 0) + 1 };
             }
-            return rec;
+            return can;
           })
         );
       }
@@ -161,33 +158,31 @@ const ChatPage = () => {
     const messageData = {
       id,
       text: content,
-      sender: senderId === user.userId ? 'user' : 'recruiter',
+      sender: senderId === user.userId ? 'recruiter' : 'candidate',
       timestamp: new Date().toLocaleTimeString(),
       status: status || 'SENT',
     };
 
-    // setRecruiterMessages(prev => ({
+    // setCandidateMessages(prev => ({
     //   ...prev,
     //   [senderId]: prev[senderId].map(msg =>
     //     msg.id === tempId ? messageData : msg
     //   ),
     // }));
+    setCandidateMessages(prev => ({
+        ...prev,
+        [senderId]: [
+          ...(prev[senderId] || []),
+          messageData,
+        ],
+      }));
 
-    setRecruiterMessages(prev => ({
-      ...prev,
-      [senderId]: [
-        ...(prev[senderId] || []),
-        messageData,
-      ],
-    }));
-
-    if (selectedRecruiterRef.current && selectedRecruiterRef.current.id === senderId) {
+    if (selectedCandidateRef.current && selectedCandidateRef.current.id === senderId) {
       setMessages(prev =>
         prev.map(msg => (msg.id === tempId ? messageData : msg))
       );
 
       if (senderId !== user.userId) {
-        // Đánh dấu đã đọc khi người nhận đang xem
         console.log('Đánh dấu đã đọc: ' + JSON.stringify({ messageId: id }));
         stompClient.current.send(
           '/app/chat.markAsRead',
@@ -213,11 +208,11 @@ const ChatPage = () => {
 
   const handleSendMessage = (e) => {
     e.preventDefault();
-    if (newMessage.trim() && selectedRecruiter && connected) {
+    if (newMessage.trim() && selectedCandidate && connected) {
       const chatMessage = {
         tempId: Date.now(),
         senderId: user.userId,
-        recipientId: selectedRecruiter.id,
+        recipientId: selectedCandidate.id,
         content: newMessage,
         type: 'CHAT',
       };
@@ -232,19 +227,19 @@ const ChatPage = () => {
         {
           id: chatMessage.tempId,
           text: newMessage,
-          sender: 'user',
+          sender: 'recruiter',
           timestamp: new Date().toLocaleTimeString(),
           status: 'SENT',
         },
       ]);
-      setRecruiterMessages(prev => ({
+      setCandidateMessages(prev => ({
         ...prev,
-        [selectedRecruiter.id]: [
-          ...(prev[selectedRecruiter.id] || []),
+        [selectedCandidate.id]: [
+          ...(prev[selectedCandidate.id] || []),
           {
             id: chatMessage.tempId,
             text: newMessage,
-            sender: 'user',
+            sender: 'recruiter',
             timestamp: new Date().toLocaleTimeString(),
             status: 'SENT',
           },
@@ -254,23 +249,23 @@ const ChatPage = () => {
     }
   };
 
-  const handleRecruiterSelect = async (recruiter) => {
-    setSelectedRecruiter(recruiter);
+  const handleCandidateSelect = async (candidate) => {
+    setSelectedCandidate(candidate);
 
     try {
-      const response = await apiService.get(`/chat/history?userId2=${recruiter.id}`);
+      const response = await apiService.get(`/chat/history?userId2=${candidate.id}`);
       const chatHistory = response.result || [];
       const formattedMessages = chatHistory.map(msg => ({
         id: msg.id,
         text: msg.content,
-        sender: msg.senderId === user.userId ? 'user' : 'recruiter',
+        sender: msg.senderId === user.userId ? 'recruiter' : 'candidate',
         timestamp: msg.timestamp || new Date().toLocaleTimeString(),
         status: msg.status,
       }));
       setMessages(formattedMessages);
-      setRecruiterMessages(prev => ({
+      setCandidateMessages(prev => ({
         ...prev,
-        [recruiter.id]: formattedMessages,
+        [candidate.id]: formattedMessages,
       }));
 
       const unreadMessages = chatHistory.filter(
@@ -286,15 +281,15 @@ const ChatPage = () => {
           setMessages(prev =>
             prev.map(m => (m.id === msg.id ? { ...m, status: 'READ' } : m))
           );
-          setRecruiterMessages(prev => ({
+          setCandidateMessages(prev => ({
             ...prev,
-            [recruiter.id]: prev[recruiter.id].map(m => (m.id === msg.id ? { ...m, status: 'READ' } : m)),
+            [candidate.id]: prev[candidate.id].map(m => (m.id === msg.id ? { ...m, status: 'READ' } : m)),
           }));
         }
       });
 
-      setRecruiters(prev =>
-        prev.map(r => (r.id === recruiter.id ? { ...r, unread: 0 } : r))
+      setCandidates(prev =>
+        prev.map(c => (c.id === candidate.id ? { ...c, unread: 0 } : c))
       );
     } catch (error) {
       console.error('Error fetching chat history:', error);
@@ -315,38 +310,38 @@ const ChatPage = () => {
     <div className="max-w-7xl mx-auto py-10 px-4 h-screen">
       <h1 className="text-2xl font-bold mb-6 flex items-center gap-2">
         <MessageSquare className="text-blue-500" />
-        Trò chuyện với Nhà tuyển dụng
+        Trò chuyện với Ứng viên
         {!connected && <span className="text-sm text-red-500 ml-2">(Đang kết nối lại...)</span>}
       </h1>
 
       <div className="flex bg-white rounded-xl shadow-lg h-[calc(100vh-160px)]">
         <div className="w-1/3 border-r p-4 overflow-y-auto">
-          <h2 className="text-lg font-semibold mb-4">Nhà tuyển dụng ({recruiters.length})</h2>
-          {recruiters.map(recruiter => (
+          <h2 className="text-lg font-semibold mb-4">Ứng viên ({candidates.length})</h2>
+          {candidates.map(candidate => (
             <div
-              key={recruiter.id}
-              onClick={() => handleRecruiterSelect(recruiter)}
+              key={candidate.id}
+              onClick={() => handleCandidateSelect(candidate)}
               className={`flex items-center p-3 rounded-lg cursor-pointer hover:bg-gray-50 ${
-                selectedRecruiter?.id === recruiter.id ? 'bg-blue-50 border border-blue-200' : ''
+                selectedCandidate?.id === candidate.id ? 'bg-blue-50 border border-blue-200' : ''
               }`}
             >
               <div className="relative">
                 <img
-                  src={recruiter.avatar || '/api/placeholder/40/40'}
+                  src={candidate.avatar || '/api/placeholder/40/40'}
                   alt="avatar"
                   className="w-10 h-10 rounded-full object-cover mr-3"
                 />
-                {recruiter.active && (
+                {candidate.active && (
                   <span className="absolute bottom-0 right-2 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></span>
                 )}
               </div>
               <div className="flex-1">
-                <h3 className="font-medium">{recruiter.name}</h3>
-                <p className="text-sm text-gray-500 truncate">{recruiter.lastMessage}</p>
+                <h3 className="font-medium">{candidate.name}</h3>
+                <p className="text-sm text-gray-500 truncate">{candidate.lastMessage}</p>
               </div>
-              {recruiter.unread > 0 && (
+              {candidate.unread > 0 && (
                 <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
-                  {recruiter.unread}
+                  {candidate.unread}
                 </span>
               )}
             </div>
@@ -354,24 +349,24 @@ const ChatPage = () => {
         </div>
 
         <div className="flex-1 flex flex-col">
-          {selectedRecruiter ? (
+          {selectedCandidate ? (
             <>
               <div className="p-4 border-b flex items-center">
                 <button
                   className="md:hidden mr-2 text-gray-600"
-                  onClick={() => setSelectedRecruiter(null)}
+                  onClick={() => setSelectedCandidate(null)}
                 >
                   <ChevronLeft />
                 </button>
                 <img
-                  src={selectedRecruiter.avatar || '/api/placeholder/40/40'}
+                  src={selectedCandidate.avatar || '/api/placeholder/40/40'}
                   alt="avatar"
                   className="w-8 h-8 rounded-full mr-3"
                 />
                 <div>
-                  <h3 className="font-semibold">{selectedRecruiter.name}</h3>
+                  <h3 className="font-semibold">{selectedCandidate.name}</h3>
                   <p className="text-sm text-gray-500">
-                    {selectedRecruiter.active ? 'Đang hoạt động' : 'Không hoạt động'}
+                    {selectedCandidate.active ? 'Đang hoạt động' : 'Không hoạt động'}
                     {typing && ' • Đang nhập...'}
                   </p>
                 </div>
@@ -380,17 +375,17 @@ const ChatPage = () => {
               <div ref={messageAreaRef} className="flex-1 overflow-y-auto p-4 bg-gray-50">
                 {messages.length === 0 ? (
                   <div className="text-center text-gray-500 mt-10">
-                    Bắt đầu cuộc trò chuyện với {selectedRecruiter.name}
+                    Bắt đầu cuộc trò chuyện với {selectedCandidate.name}
                   </div>
                 ) : (
                   messages.map(message => (
                     <div
                       key={message.id}
-                      className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'} mb-4`}
+                      className={`flex ${message.sender === 'recruiter' ? 'justify-end' : 'justify-start'} mb-4`}
                     >
                       <div
                         className={`max-w-[70%] rounded-lg p-3 ${
-                          message.sender === 'user'
+                          message.sender === 'recruiter'
                             ? 'bg-blue-500 text-white'
                             : 'bg-white border border-gray-200'
                         }`}
@@ -398,11 +393,11 @@ const ChatPage = () => {
                         <p>{message.text}</p>
                         <div
                           className={`flex items-center justify-end gap-2 text-xs mt-1 ${
-                            message.sender === 'user' ? 'text-blue-100' : 'text-gray-500'
+                            message.sender === 'recruiter' ? 'text-blue-100' : 'text-gray-500'
                           }`}
                         >
                           <span>{message.timestamp}</span>
-                          {message.sender === 'user' && (
+                          {message.sender === 'recruiter' && (
                             <span className="text-xs">
                               {message.status === 'SENT' && 'Đã gửi'}
                               {message.status === 'DELIVERED' && 'Đã nhận'}
@@ -442,7 +437,7 @@ const ChatPage = () => {
             <div className="flex-1 flex items-center justify-center text-gray-500">
               <div className="text-center">
                 <MessageSquare className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                Vui lòng chọn nhà tuyển dụng để bắt đầu trò chuyện
+                Vui lòng chọn ứng viên để bắt đầu trò chuyện
               </div>
             </div>
           )}
@@ -452,4 +447,4 @@ const ChatPage = () => {
   );
 };
 
-export default ChatPage;
+export default RecruiterChatPage;
