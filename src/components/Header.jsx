@@ -47,18 +47,18 @@ const Header = () => {
                                             <Briefcase className="inline mr-2" size={16} />
                                             Việc làm đã ứng tuyển
                                         </Link>
-                                        <Link to="/manage-cv" className="block px-4 py-2 text-gray-800 hover:bg-green-50">
+                                        {/* <Link to="/manage-cv" className="block px-4 py-2 text-gray-800 hover:bg-green-50">
                                             <FileText className="inline mr-2" size={16} />
                                             Quản lý CV
-                                        </Link>
+                                        </Link> */}
                                     </div>
                                 )}
                             </div>
 
                             {/* Nút Chat */}
-                            <Link to="/chat" className="relative" title="Chat với nhà tuyển dụng">
+                            <a href="/candidate/chat" target="_blank"  className="relative" title="Chat với nhà tuyển dụng">
                                 <MessageSquare className="text-white hover:text-green-400" size={18} />
-                            </Link>
+                            </a>
 
                             <Link to="/notifications" className="relative">
                                 <Bell className="text-white hover:text-green-400" size={18} />

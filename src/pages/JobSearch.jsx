@@ -59,7 +59,9 @@ function JobSearch() {
       setError(err.message);
     }
   };
-
+  useEffect(() => {
+    fetchJobs();
+  }, [ currentPage]);
   // Update fetchJobs to use the URL parameters
   const fetchJobs = async () => {
     try {
