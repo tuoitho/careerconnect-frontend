@@ -30,7 +30,10 @@ const CompanyJobs = ({ companyId }) => {
       
       <div className="flex flex-col gap-2">  
         {jobs.map((job) => (
-          <JobCard key={job.jobId} job={job} className="p-2" />
+          <JobCard key={job.jobId} job={job} className="p-2"
+          
+          
+          />
         ))}
       </div>
 
