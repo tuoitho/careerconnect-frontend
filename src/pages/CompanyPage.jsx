@@ -61,48 +61,90 @@ const CompanyPage = () => {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-12 bg-gray-50 relative">
-      <div className="flex items-center mb-12">
-        <img
-          src={companyData.logo || "/placeholder.svg"}
-          alt={companyData.name}
-          className="w-48 h-48 rounded-full shadow-lg mr-12"
-          style={{
-            border: "5px solid #f59e0b",
-            boxShadow: "0 0 0 15px rgba(245, 157, 11, 0.1)",
-            animation: "logoGlow 2s infinite",
-          }}
-        />
+      <div className="flex items-center mb-8 transition-all duration-700 ease-in-out">
+        <div className="logo-container mr-8">
+          <img
+            src={companyData.logo || "/placeholder.svg"}
+            alt={companyData.name}
+            className={`company-logo rounded-full ${
+              isTabTopRight ? "small" : "large"
+            }`}
+          />
+        </div>
         <h1 className="text-4xl font-bold text-gray-800">{companyData.name}</h1>
       </div>
 
-      {/* Thêm animation cho logo */}
+      {/* Animation Styles */}
       <style jsx global>{`
         @keyframes logoGlow {
           0%, 100% {
-            box-shadow: 0 0 0 15px rgba(245, 157, 11, 0.1);
+            box-shadow: 0 0 0 10px rgba(245, 157, 11, 0.1);
           }
           50% {
-            box-shadow: 0 0 0 20px rgba(245, 157, 11, 0.2);
+            box-shadow: 0 0 0 15px rgba(245, 157, 11, 0.2);
           }
         }
         @keyframes fadeIn {
-          from {
+          0% {
             opacity: 0;
-            transform: translateY(10px);
+            transform: translateY(20px);
           }
-          to {
+          100% {
             opacity: 1;
             transform: translateY(0);
           }
         }
+        .logo-container {
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 15px; /* Reduced space for the glow effect */
+          transition: padding 0.7s ease-in-out;
+        }
+        .company-logo {
+          border: 3px solid #f59e0b;
+          box-shadow: 0 0 0 10px rgba(245, 157, 11, 0.1);
+          animation: logoGlow 2s infinite;
+          transition: width 0.7s ease-in-out, height 0.7s ease-in-out;
+        }
+        .company-logo.large {
+          width: 120px;
+          height: 120px;
+        }
+        .company-logo.small {
+          width: 80px;
+          height: 80px;
+        }
+        .tab-container {
+          position: relative;
+          transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.7s ease-in-out;
+          z-index: 10;
+        }
+        .tab-container.initial {
+          transform: translateY(0) translateX(0) scale(1);
+          opacity: 1;
+          margin-bottom: 1.5rem;
+        }
+        .tab-container.top-right {
+          transform: translateY(-120px) translateX(50%) scale(0.95);
+          opacity: 0.95;
+        }
+        .content-container {
+          transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .content-container.initial {
+          transform: translateY(0);
+        }
+        .content-container.shift-up {
+          transform: translateY(-80px);
+        }
       `}</style>
 
-      {/* Thanh tab với hiệu ứng mượt */}
+      {/* Tabs */}
       <div
-        className={`flex flex-wrap gap-2 transition-all duration-500 ease-in-out transform ${
-          isTabTopRight
-            ? "absolute top-12 right-4 z-10 scale-95 opacity-90 bg-white shadow-md p-2 rounded-md"
-            : "mb-8 scale-100 opacity-100"
+        className={`tab-container flex flex-wrap gap-2 ${
+          isTabTopRight ? "top-right" : "initial"
         }`}
       >
         <button
@@ -147,10 +189,12 @@ const CompanyPage = () => {
         </button>
       </div>
 
-      {/* Nội dung với fade in */}
+      {/* Content */}
       <div
-        className="bg-white rounded-lg shadow-lg p-6 transition-all duration-500 ease-in-out"
-        style={{ animation: "fadeIn 0.5s ease-in-out" }}
+        className={`content-container bg-white rounded-lg shadow-lg p-6 transition-all duration-700 ease-in-out ${
+          isTabTopRight ? "shift-up" : "initial"
+        }`}
+        style={{ animation: "fadeIn 0.7s ease-in-out" }}
       >
         {activeTab === "info" && <CompanyInfo company={companyData} />}
         {activeTab === "jobs" && <CompanyJobs companyId={companyId} />}
