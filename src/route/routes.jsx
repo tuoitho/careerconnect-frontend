@@ -116,6 +116,7 @@ import AppliedJobsList from "../pages/AppliedJob";
 import ChatPage from "../pages/ChatPage";
 import RecruiterChatPage from "../pages/RecruiterChatPage";
 import SavedJobsPage from "../pages/SavedJobsPage";
+import JobAlertSubscription from "../pages/JobAlertSubscription";
 
 
 // Routes cho các trang public có Layout
@@ -162,6 +163,7 @@ const CandidateRoutes = () => (
         <Route path="applied" element={<AppliedJobsList />} />
         <Route path="chat" element={<ChatPage />} /> {/* Thêm route cho Chat */}
         <Route path="saved" element={<SavedJobsPage />} /> {/* Thêm route cho Saved Jobs */}
+        <Route path="job-alerts" element={<JobAlertSubscription />} /> {/* Thêm route cho Job Alert Subscriptions */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Layout>

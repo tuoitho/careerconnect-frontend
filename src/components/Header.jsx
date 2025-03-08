@@ -47,10 +47,14 @@ const Header = () => {
                                             <Briefcase className="inline mr-2" size={16} />
                                             Việc làm đã ứng tuyển
                                         </Link>
-                                        {/* <Link to="/manage-cv" className="block px-4 py-2 text-gray-800 hover:bg-green-50">
+                                        <Link to="/candidate/job-alerts" className="block px-4 py-2 text-gray-800 hover:bg-green-50">
+                                            <Bell className="inline mr-2" size={16} />
+                                            Nhận thông báo việc làm
+                                        </Link>
+                                        <Link to="/candidate/saved" className="block px-4 py-2 text-gray-800 hover:bg-green-50">
                                             <FileText className="inline mr-2" size={16} />
-                                            Quản lý CV
-                                        </Link> */}
+                                            Việc làm đã lưu
+                                        </Link>
                                     </div>
                                 )}
                             </div>
