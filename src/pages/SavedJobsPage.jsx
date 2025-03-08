@@ -36,7 +36,9 @@ const SavedJobsPage = () => {
   };
 
   const handleJobClick = (jobId) => {
-    navigate(`/job/${jobId}`);
+    // navigate(`/job/${jobId}`);
+    // open link in new tab
+    window.open(`/job/${jobId}`, '_blank');
   };
 
   return (
