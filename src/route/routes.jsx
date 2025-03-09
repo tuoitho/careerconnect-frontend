@@ -118,16 +118,25 @@ import RecruiterChatPage from "../pages/RecruiterChatPage";
 import SavedJobsPage from "../pages/SavedJobsPage";
 import JobAlertSubscription from "../pages/JobAlertSubscription";
 import NotificationsPage from "../pages/NotificationsPage";
+import JobsPage from "../pages/JobsPage";
+import Freelance from "../pages/Freelance";
+import CareerGuide from "../pages/CareerGuide ";
+import BrowertJobPage from "../api/BrowertJobPage";
 
 
 // Routes cho các trang public có Layout
 const GeneralRoutes = () => (
   <Layout>
     <Routes>
+      <Route path="/BrowertJobPage" element={<BrowertJobPage />} />
       <Route path="/" element={<Home />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/job/search" element={<JobSearch />} />
       <Route path="/job/:id" element={<JobDetail />} />
+      <Route path="/job-page" element={<JobsPage />} />
+      <Route path="/freelance" element={<Freelance />} />
+      {/* career-guide */}
+      <Route path="/career-guide" element={<CareerGuide  />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   </Layout>

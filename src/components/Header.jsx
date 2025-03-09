@@ -45,7 +45,8 @@ const Header = () => {
         }
     };
 
-    const handleUserDropdownClick = () => {
+    const handleUserDropdownClick = (e) => {
+        e.stopPropagation();
         setShowDropdown(!showDropdown);
         // Close notifications if open
         if (showNotifications) {
@@ -75,7 +76,7 @@ const Header = () => {
                     
                     <nav className="flex items-center gap-4">
                         <Link to="/" className="text-sm text-white hover:text-green-400">Home</Link>
-                        <Link to="/jobs" className="text-sm text-white hover:text-green-400">Jobs</Link>
+                        <Link to="/job-page" className="text-sm text-white hover:text-green-400">Jobs</Link>
                         <Link to="/freelance" className="text-sm text-white hover:text-green-400">Freelance</Link>
                         <Link to="/career-guide" className="text-sm text-white hover:text-green-400">
                             <Book className="inline mr-1" size={16} />

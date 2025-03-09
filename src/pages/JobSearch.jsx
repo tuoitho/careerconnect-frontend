@@ -107,9 +107,11 @@ function JobSearch() {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    setCurrentPage(0); // Reset to first page on new search
+    // setCurrentPage(0); // Reset to first page on new search
     setShowSearchResults(false);
-    fetchJobs();
+    // fetchJobs();
+    // chuyển qua trang brower job và tự bấm nút search
+    navigate(`/BrowertJobPage?query=${searchTerm}`);
   };
 
   const handleFilterChange = (name, value) => {
