@@ -71,8 +71,8 @@ function JobSearch() {
         page: currentPage,
         ...filters,
       });
-      setJobs(response.result.data);
-      setTotalPages(response.result.totalPages);
+      // setJobs(response.result.data);
+      // setTotalPages(response.result.totalPages);
     } catch (err) {
       setError(err.message);
     } finally {

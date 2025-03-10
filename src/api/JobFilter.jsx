@@ -84,9 +84,9 @@ const JobFilter = ({ onFilterChange,initKeyword }) => {
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white"
           >
             <option value="">Tất cả khu vực</option>
-            <option value="tphcm">TPHCM</option>
-            <option value="hanoi">Hanoi</option>
-            <option value="danang">Danang</option>
+            <option value="hcm">HCM</option>
+            <option value="hn">HN</option>
+            <option value="dn">DN</option>
           </select>
         </div>
         

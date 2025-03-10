@@ -31,23 +31,6 @@ const BrowseJobPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const handleSearchChange = (e) => {
-    setSearchKeyword(e.target.value);
-  };
-
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    
-    const newParams = new URLSearchParams(searchParams);
-    if (searchKeyword) {
-      newParams.set("query", searchKeyword);
-    } else {
-      newParams.delete("query");
-    }
-    setSearchParams(newParams);
-    
-    setFilters(prev => ({ ...prev, keyword: searchKeyword, page: 0 }));
-  };
 
   const fetchJobs = async (newFilters) => {
     setLoading(true);
