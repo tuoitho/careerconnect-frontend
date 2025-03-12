@@ -123,6 +123,7 @@ import Freelance from "../pages/Freelance";
 import CareerGuide from "../pages/CareerGuide ";
 import BrowertJobPage from "../api/BrowertJobPage";
 import ApplicationDetail from "../pages/ApplicationDetail";
+import CandidateDetail from "../pages/CandidateDetail";
 
 
 // Routes cho các trang public có Layout
@@ -157,7 +158,10 @@ const RecruiterRoutes = () => (
         <Route path="company/members" element={<CompanyMembers />} />
         <Route path="company/jobs" element={<PostJob />} />
         <Route path="company/jobs/:jobId" element={<PostedJobDetail />} />
+        <Route path="candidate/:candidateId" element={<CandidateDetail />} />
         <Route path="/chat" element={<RecruiterChatPage />} />
+        <Route path="/chat/:candidateId" element={<RecruiterChatPage />} />
+
         <Route path="*" element={<NotFound />} />
       </Routes>
     </RecruiterLayout>

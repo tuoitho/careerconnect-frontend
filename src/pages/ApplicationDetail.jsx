@@ -30,11 +30,14 @@ const ApplicationDetail = () => {
   }, [applicationId, navigate]);
 
   const handleViewProfile = () => {
-    navigate(`/candidate/${application.candidateId}`);
+    // navigate(`/candidate/${application.candidateId}`);
+    window.open(`/recruiter/candidate/${application.candidateId}`, "_blank");
   };
 
   const handleMessageCandidate = () => {
-    navigate(`/recruiter/chat/${application.candidateId}`);
+    // navigate(`/recruiter/chat/${application.candidateId}`);
+    // open in new tab
+    window.open(`/recruiter/chat/${application.candidateId}`, "_blank");
   };
 
   if (loading) return <Loading2 />;

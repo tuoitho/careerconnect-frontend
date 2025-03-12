@@ -4,13 +4,12 @@ export const candidateService = {
     getCandidatrProfile: async () => {
         return await apiService.get(`/candidate/profile/me`);
     },
+    getCandidateDetail: async (candidateId) => {
+        return await apiService.get(`/candidate/profile/${candidateId}`);
+    },
     updateCandidatProfile: async (candidateProfile) => {
         return await apiService.put(`/candidate/profile/me`, candidateProfile,
-            {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
+        );
     },
     uploadCV: async (formData) => {
         return await apiService.post(`/candidate/profile/cv`, formData, {

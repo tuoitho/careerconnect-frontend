@@ -5,8 +5,10 @@ import Stomp from 'stompjs';
 import apiService from '../api/apiService';
 import { toast } from 'react-toastify';
 import AuthContext from '../context/AuthContext';
+import { useParams } from 'react-router-dom';
 
 const RecruiterChatPage = () => {
+  const { candidateId } = useParams();
   const [selectedCandidate, setSelectedCandidate] = useState(null);
   const selectedCandidateRef = useRef(null);
   const [candidateMessages, setCandidateMessages] = useState({});
@@ -64,15 +66,35 @@ const RecruiterChatPage = () => {
   const fetchCandidates = async () => {
     try {
       const response = await apiService.get('/chat/candidate-contacts');
-      const candidates = response.result || [];
-      setCandidates(candidates.map(can => ({
+      let candidatesList = response.result || [];
+
+      // Nếu có candidateId từ URL, kiểm tra và thêm nếu chưa có
+      if (candidateId) {
+        const targetCandidateId = parseInt(candidateId);
+        const candidateExists = candidatesList.some(can => can.id === targetCandidateId);
+        if (!candidateExists) {
+          const candidateResponse = await apiService.get(`/candidate/profile/chat/${targetCandidateId}`);
+          const newCandidate = {
+            id: candidateResponse.result.id,
+            name: candidateResponse.result.name,
+            avatar: candidateResponse.result.avatar || '/api/placeholder/40/40',
+            active: false,
+            lastMessage: '',
+            unread: 0,
+          };
+          candidatesList = [...candidatesList, newCandidate];
+        }
+      }
+
+      const formattedCandidates = candidatesList.map(can => ({
         ...can,
         active: can.active || false,
-      })));
+      }));
+      setCandidates(formattedCandidates);
 
       const allMessages = {};
       const unreadCounts = {};
-      for (const candidate of candidates) {
+      for (const candidate of formattedCandidates) {
         const response = await apiService.get(`/chat/history?userId2=${candidate.id}`);
         const chatHistory = response.result || [];
         const formattedMessages = chatHistory.map(msg => ({
@@ -94,9 +116,18 @@ const RecruiterChatPage = () => {
           unread: unreadCounts[can.id] || 0,
         }))
       );
-      setMessages(allMessages[candidates[0]?.id] || []);
+
+      if (candidateId) {
+        const targetCandidate = formattedCandidates.find(can => can.id === parseInt(candidateId));
+        if (targetCandidate) {
+          handleCandidateSelect(targetCandidate);
+        }
+      } else {
+        setMessages(allMessages[formattedCandidates[0]?.id] || []);
+      }
     } catch (error) {
       console.error('Error fetching candidates:', error);
+      toast.error('Không thể tải danh sách ứng viên.');
     }
   };
 
@@ -145,7 +176,6 @@ const RecruiterChatPage = () => {
       status: status || 'SENT',
     };
 
-    // Cập nhật candidateMessages: thay thế tin nhắn tạm thời bằng tin nhắn chính thức
     setCandidateMessages(prev => ({
       ...prev,
       [senderId]: (prev[senderId] || []).map(msg =>
@@ -153,7 +183,6 @@ const RecruiterChatPage = () => {
       ).concat((prev[senderId] || []).some(msg => msg.id === tempId) ? [] : [messageData]),
     }));
 
-    // Cập nhật messages nếu đang xem candidate đó
     if (selectedCandidateRef.current && selectedCandidateRef.current.id === senderId) {
       setMessages(prev =>
         prev.map(msg => (msg.id === tempId ? messageData : msg))
@@ -198,7 +227,6 @@ const RecruiterChatPage = () => {
         JSON.stringify(chatMessage)
       );
 
-      // Thêm tin nhắn tạm thời vào giao diện ngay lập tức
       const tempMessage = {
         id: chatMessage.tempId,
         text: newMessage,
