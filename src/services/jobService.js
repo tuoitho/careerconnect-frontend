@@ -1,6 +1,9 @@
 import apiService from "../api/apiService";
 
 export const jobService = {
+    getApplicationDetail: async (applicationId) => {
+        return await apiService.get(`/application/${applicationId}`);
+    },
     createJob: async (jobData) => {
         return await apiService.post(`/recruiter/jobs`, jobData);
     },

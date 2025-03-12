@@ -160,7 +160,9 @@ const JobManagement = () => {
 
   const goToDetails = (job) => {
     // Instead of opening a modal, navigate to a new route
-    navigate(`/recruiter/company/jobs/${job.jobId}`);
+    // navigate(`/recruiter/company/jobs/${job.jobId}`);
+    //open in new tab
+    window.open(`/recruiter/company/jobs/${job.jobId}`, "_blank");
   };
   
 

@@ -1,242 +1,143 @@
-import { useEffect } from 'react';
-import { useState } from 'react';
-import { FiBriefcase, FiMapPin, FiDollarSign, FiCalendar, FiUsers, FiCheck, FiClock } from 'react-icons/fi';
-import { jobService } from '../services/jobService';
-import { useParams } from 'react-router-dom';
+// JobDetails.jsx
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { FaBriefcase, FaMapMarkerAlt, FaClock, FaMoneyBillWave, FaCalendarAlt, FaChartLine, FaTag, FaToggleOn, FaToggleOff } from "react-icons/fa";
+import { jobService } from "../services/jobService";
+import LoadingSpinner from "../components/LoadingSpinner";
+import Sidebar from "../components/recruiter/Sidebar";
 
-function PostedJobDetail() {
-  // Normally this would come from an API, using mock data for now
-  const [jobDetail, setJobDetail] = useState({
-    jobId: 1,
-    title: "Senior React Developer",
-    description: "We are looking for an experienced React developer to join our team...",
-    location: "San Francisco, CA",
-    type: "FULL_TIME",
-    minSalary: "120000",
-    maxSalary: "150000",
-    created: "2024-02-15T09:00:00",
-    updated: "2024-02-15T09:00:00",
-    deadline: "2024-03-15T00:00:00",
-    experience: "SENIOR",
-    category: "Software Development",
-    active: true,
-    applications: [
-      {
-        applicationId: 1,
-        candidateName: "John Doe",
-        appliedAt: "2024-02-16T10:30:00",
-        processed: false
-      },
-      {
-        applicationId: 2,
-        candidateName: "Jane Smith",
-        appliedAt: "2024-02-16T11:45:00",
-        processed: true
-      }
-    ]
-  });
+const JobDetails = () => {
   const { jobId } = useParams();
+  const [job, setJob] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const fetchJobDetail = async () => {
-    try {
-      const response = await jobService.getPostedJobDetail(jobId);
-      setJobDetail(response.result);
-    } catch (error) {
-      console.error(error.message);
-    }
-  };
   useEffect(() => {
-    // This would fetch the job details from the API
-    fetchJobDetail();
-  }, []);
+    const fetchJobDetails = async () => {
+      try {
+        setLoading(true);
+        const response = await jobService.getPostedJobDetail(jobId);
+        setJob(response.result);
+      } catch (error) {
+        toast.error("Failed to load job details.");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const handleMarkProcessed = (applicationId) => {
-    setJobDetail(prev => ({
-      ...prev,
-      applications: prev.applications.map(app => 
-        app.applicationId === applicationId 
-          ? { ...app, processed: !app.processed }
-          : app
-      )
-    }));
+    fetchJobDetails();
+  }, [jobId]);
+
+  const handleApplicationClick = (applicationId) => {
+    navigate(`/recruiter/application/${applicationId}`);
   };
 
-  const handleViewApplication = (applicationId) => {
-    // This would navigate to the application detail page
-    window.location.href = `/applications/${applicationId}`;
-  };
+  if (loading) return <LoadingSpinner />;
 
-  const formatSalary = (min, max) => {
-    const formatNumber = (num) => 
-      new Intl.NumberFormat('en-US', { 
-        style: 'currency', 
-        currency: 'USD',
-        maximumFractionDigits: 0 
-      }).format(num);
-    
-    return `${formatNumber(min)} - ${formatNumber(max)}`;
-  };
-
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
+  if (!job) return <div className="text-center p-8">Job not found.</div>;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Job Details Section */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-          <div className="flex justify-between items-start">
+    <div className="flex bg-gray-100 min-h-screen">
+      <Sidebar />
+      <div className="flex-1 p-8">
+        <h1 className="text-3xl font-bold text-gray-800 mb-6">{job.title}</h1>
+        <div className="bg-white rounded-lg shadow-md p-6">
+          {/* Job Details */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-4">{jobDetail.title}</h1>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <div className="flex items-center text-gray-600">
-                  <FiMapPin className="h-5 w-5 mr-2" />
-                  <span>{jobDetail.location}</span>
-                </div>
-                <div className="flex items-center text-gray-600">
-                  <FiBriefcase className="h-5 w-5 mr-2" />
-                  <span>{jobDetail.type.replace('_', ' ')}</span>
-                </div>
-                <div className="flex items-center text-gray-600">
-                  <FiDollarSign className="h-5 w-5 mr-2" />
-                  <span>{formatSalary(jobDetail.minSalary, jobDetail.maxSalary)}</span>
-                </div>
-                <div className="flex items-center text-gray-600">
-                  <FiCalendar className="h-5 w-5 mr-2" />
-                  <span>Deadline: {formatDate(jobDetail.deadline)}</span>
-                </div>
-              </div>
-              
-              <div className="prose max-w-none">
-                <h2 className="text-xl font-semibold mb-2">Description</h2>
-                <p className="text-gray-600 mb-4">{jobDetail.description}</p>
-                
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                  <div>
-                    <h3 className="text-lg font-medium">Experience Level</h3>
-                    <p className="text-gray-600">{jobDetail.experience}</p>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-medium">Category</h3>
-                    <p className="text-gray-600">{jobDetail.category}</p>
-                  </div>
-                </div>
-              </div>
+              <p className="flex items-center text-gray-700">
+                <FaBriefcase className="mr-2 text-gray-500" /> <strong>Type:</strong> {job.type}
+              </p>
+              <p className="flex items-center text-gray-700 mt-2">
+                <FaMapMarkerAlt className="mr-2 text-gray-500" /> <strong>Location:</strong> {job.location}
+              </p>
+              <p className="flex items-center text-gray-700 mt-2">
+                <FaMoneyBillWave className="mr-2 text-gray-500" /> <strong>Salary Range:</strong> {job.minSalary} - {job.maxSalary}
+              </p>
+              <p className="flex items-center text-gray-700 mt-2">
+                <FaCalendarAlt className="mr-2 text-gray-500" /> <strong>Deadline:</strong> {new Date(job.deadline).toLocaleString()}
+              </p>
             </div>
-
-            <div className="flex flex-col items-end">
-              <span className={`px-4 py-2 rounded-full text-sm font-medium ${
-                jobDetail.active 
-                  ? 'bg-green-100 text-green-800' 
-                  : 'bg-red-100 text-red-800'
-              }`}>
-                {jobDetail.active ? 'Active' : 'Inactive'}
-              </span>
-              <div className="mt-4 text-sm text-gray-500">
-                Posted on {formatDate(jobDetail.created)}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Applications Section */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">
-              Applications ({jobDetail.applications.length})
-            </h2>
-            <div className="flex items-center gap-4">
-              <span className="text-gray-600">
-                Processed: {jobDetail.applications.filter(app => app.processed).length}
-              </span>
-              <span className="text-gray-600">
-                Pending: {jobDetail.applications.filter(app => !app.processed).length}
-              </span>
+            <div>
+              <p className="flex items-center text-gray-700">
+                <FaChartLine className="mr-2 text-gray-500" /> <strong>Experience:</strong> {job.experience}
+              </p>
+              <p className="flex items-center text-gray-700 mt-2">
+                <FaTag className="mr-2 text-gray-500" /> <strong>Category:</strong> {job.category}
+              </p>
+              <p className="flex items-center text-gray-700 mt-2">
+                <FaClock className="mr-2 text-gray-500" /> <strong>Created:</strong> {new Date(job.created).toLocaleString()}
+              </p>
+              <p className="flex items-center text-gray-700 mt-2">
+                {job.active ? (
+                  <FaToggleOn className="mr-2 text-green-500" />
+                ) : (
+                  <FaToggleOff className="mr-2 text-red-500" />
+                )}
+                <strong>Status:</strong> {job.active ? "Active" : "Inactive"}
+              </p>
             </div>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead>
-                <tr>
-                  <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Candidate
-                  </th>
-                  <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Applied Date
-                  </th>
-                  <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {jobDetail.applications.map((application) => (
-                  <tr 
-                    key={application.applicationId}
-                    className="hover:bg-gray-50 cursor-pointer"
-                  >
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
-                        {application.candidateName}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-500">
-                        {formatDate(application.appliedAt)}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                        application.processed
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {application.processed ? (
-                          <><FiCheck className="mr-1" /> Processed</>
-                        ) : (
-                          <><FiClock className="mr-1" /> Pending</>
-                        )}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button
-                        onClick={() => handleViewApplication(application.applicationId)}
-                        className="text-primary-600 hover:text-primary-900 mr-4"
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">Description</h3>
+            <p className="text-gray-700">{job.description}</p>
+          </div>
+
+          {/* Applications List */}
+          <div>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-800">Applications</h3>
+              <p className="text-gray-600">Total: {job.applications.length}</p>
+            </div>
+            {job.applications.length === 0 ? (
+              <p className="text-gray-600">No applications yet.</p>
+            ) : (
+              <div className="bg-white rounded-lg shadow-md overflow-hidden">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Application ID
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Candidate Name
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Applied At
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Status
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {job.applications.map((app) => (
+                      <tr
+                        key={app.applicationId}
+                        className="cursor-pointer hover:bg-gray-50"
+                        onClick={() => handleApplicationClick(app.applicationId)}
                       >
-                        View Details
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleMarkProcessed(application.applicationId);
-                        }}
-                        className={`${
-                          application.processed
-                            ? 'text-gray-600 hover:text-gray-900'
-                            : 'text-green-600 hover:text-green-900'
-                        }`}
-                      >
-                        {application.processed ? 'Mark Unprocessed' : 'Mark Processed'}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                        <td className="px-6 py-4 whitespace-nowrap">{app.applicationId}</td>
+                        <td className="px-6 py-4 whitespace-nowrap">{app.candidateName}</td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {new Date(app.appliedAt).toLocaleString()}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {app.processed ? "Processed" : "Pending"}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
       </div>
     </div>
   );
-}
+};
 
-export default PostedJobDetail;
+export default JobDetails;
