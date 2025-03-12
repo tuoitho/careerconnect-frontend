@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Bell, Check, CheckCheck, Briefcase, Calendar, ThumbsUp, Eye, UserCheck } from "lucide-react";
 import apiService from "../api/apiService";
+import { toast } from "react-toastify";
+import NotificationDetailModal from "../components/NotificationDetailModal";
 
 const NotificationsPage = () => {
   const [notifications, setNotifications] = useState([]);
@@ -8,35 +10,40 @@ const NotificationsPage = () => {
   const [error, setError] = useState(null);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
+  const [selectedNotification, setSelectedNotification] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const loaderRef = useRef(null);
 
   // Function to fetch notifications
-  const fetchNotifications = useCallback(async (currentPage) => {
-    if (!hasMore || loading) return;
+  const fetchNotifications = useCallback(
+    async (currentPage) => {
+      if (!hasMore || loading) return;
 
-    try {
-      setLoading(true);
-      setError(null); // Reset lỗi trước khi gọi API
-      const response = await apiService.get("/notifications", {
-        params: { page: currentPage, size: 5 },
-      });
+      try {
+        setLoading(true);
+        setError(null); // Reset error before API call
+        const response = await apiService.get("/notifications", {
+          params: { page: currentPage, size: 5 },
+        });
 
-      const newNotifications = response.result.data || [];
+        const newNotifications = response.result.data || [];
 
-      setNotifications((prev) => [...prev, ...newNotifications]);
-      setHasMore(newNotifications.length === 5); // Nếu trả về ít hơn 5, không còn dữ liệu
-    } catch (error) {
-      console.error("Error fetching notifications:", error);
-      setError("Không thể tải thêm thông báo. Vui lòng thử lại sau.");
-    } finally {
-      setLoading(false);
-    }
-  }, [hasMore, loading]);
+        setNotifications((prev) => [...prev, ...newNotifications]);
+        setHasMore(newNotifications.length === 5); // If fewer than 5, no more data
+      } catch (error) {
+        console.error("Error fetching notifications:", error);
+        setError("Không thể tải thêm thông báo. Vui lòng thử lại sau.");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [hasMore, loading]
+  );
 
   // Fetch initial data
   useEffect(() => {
-    fetchNotifications(0); // Gọi lần đầu với page 0
+    fetchNotifications(0); // Initial fetch with page 0
   }, []);
 
   // Infinite scroll observer
@@ -46,12 +53,12 @@ const NotificationsPage = () => {
         if (entries[0].isIntersecting && hasMore && !loading) {
           setPage((prevPage) => {
             const nextPage = prevPage + 1;
-            fetchNotifications(nextPage); // Gọi API với trang tiếp theo
+            fetchNotifications(nextPage); // Fetch next page
             return nextPage;
           });
         }
       },
-      { threshold: 0.1 } // Giảm threshold để kích hoạt sớm hơn
+      { threshold: 0.1 } // Trigger earlier
     );
 
     const currentLoader = loaderRef.current;
@@ -70,6 +77,7 @@ const NotificationsPage = () => {
     try {
       await apiService.put("/notifications/read-all");
       setNotifications(notifications.map((n) => ({ ...n, read: true })));
+      toast.success("Đã đánh dấu tất cả thông báo là đã đọc");
     } catch (error) {
       console.error("Error marking all as read:", error);
       setError("Không thể đánh dấu tất cả đã đọc.");
@@ -80,6 +88,13 @@ const NotificationsPage = () => {
     try {
       await apiService.put(`/notifications/${id}/read`);
       setNotifications(notifications.map((n) => (n.id === id ? { ...n, read: true } : n)));
+
+      // If the currently selected notification is being marked as read, update it
+      if (selectedNotification && selectedNotification.id === id) {
+        setSelectedNotification({ ...selectedNotification, read: true });
+      }
+
+      toast.success("Đã đánh dấu thông báo là đã đọc");
     } catch (error) {
       console.error("Error marking as read:", error);
       setError("Không thể đánh dấu đã đọc.");
@@ -88,11 +103,29 @@ const NotificationsPage = () => {
 
   const deleteNotification = async (id) => {
     try {
-      await apiService.delete(`/notifications/${id}`);
+      const response = await apiService.delete(`/notifications/${id}`);
       setNotifications(notifications.filter((n) => n.id !== id));
+
+      // If the currently selected notification is being deleted, close the modal
+      if (selectedNotification && selectedNotification.id === id) {
+        setIsModalOpen(false);
+        setSelectedNotification(null);
+      }
+
+      toast.success(response.message);
     } catch (error) {
-      console.error("Error deleting notification:", error);
+      toast.error(error.message || "Không thể xóa thông báo.");
       setError("Không thể xóa thông báo.");
+    }
+  };
+
+  const handleNotificationClick = (notification) => {
+    setSelectedNotification(notification);
+    setIsModalOpen(true);
+
+    // If notification is unread, mark it as read
+    if (!notification.read) {
+      markAsRead(notification.id);
     }
   };
 
@@ -165,7 +198,8 @@ const NotificationsPage = () => {
             {notifications.map((notification) => (
               <div
                 key={notification.id}
-                className={`p-4 hover:bg-gray-50 transition-colors ${!notification.read ? "bg-green-50" : ""}`}
+                className={`p-4 hover:bg-gray-50 transition-colors ${!notification.read ? "bg-green-50" : ""} cursor-pointer`}
+                onClick={() => handleNotificationClick(notification)}
               >
                 <div className="flex gap-4">
                   {getNotificationIcon(notification.type)}
@@ -175,12 +209,15 @@ const NotificationsPage = () => {
                       <h3 className="font-medium text-gray-800">{notification.title}</h3>
                       <span className="text-xs text-gray-500">{notification.time}</span>
                     </div>
-                    <p className="text-gray-600 mt-1">{notification.message}</p>
+                    <p className="text-gray-600 mt-1 line-clamp-2">{notification.message}</p>
 
-                    <div className="flex gap-4 mt-3">
+                    <div className="flex gap-4 mt-3" onClick={(e) => e.stopPropagation()}>
                       {!notification.read && (
                         <button
-                          onClick={() => markAsRead(notification.id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            markAsRead(notification.id);
+                          }}
                           className="text-sm text-green-500 hover:text-green-600 flex items-center"
                         >
                           <Check size={14} className="mr-1" />
@@ -188,7 +225,10 @@ const NotificationsPage = () => {
                         </button>
                       )}
                       <button
-                        onClick={() => deleteNotification(notification.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deleteNotification(notification.id);
+                        }}
                         className="text-sm text-red-500 hover:text-red-600"
                       >
                         Xóa
@@ -203,9 +243,7 @@ const NotificationsPage = () => {
 
             {/* Intersection Observer Target */}
             <div ref={loaderRef} className="p-4 flex justify-center">
-              {loading && (
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-green-500"></div>
-              )}
+              {loading && <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-green-500"></div>}
               {!loading && !hasMore && notifications.length > 0 && (
                 <p className="text-sm text-gray-500">Đã hiển thị tất cả thông báo</p>
               )}
@@ -214,6 +252,14 @@ const NotificationsPage = () => {
           </div>
         )}
       </div>
+
+      {/* Notification Detail Modal */}
+      <NotificationDetailModal
+        notification={selectedNotification}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onMarkAsRead={markAsRead}
+      />
     </div>
   );
 };
