@@ -3,13 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { companyService } from "../services/companyService";
 import { toast } from "react-toastify";
 import LoadingSpinner from "../components/LoadingSpinner";
-// import { FaTrash, FaUserPlus } from "react-icons/fa";
 import { FaTrash, FaUserPlus, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 const CompanyMembers = () => {
   const [members, setMembers] = useState([]);
   const [currentPage, setCurrentPage] = useState(0); 
   const [totalPages, setTotalPages] = useState(0);
+  const [totalMembers, setTotalMembers] = useState(0);
 
   // Invitations pagination
   const [invitations, setInvitations] = useState([]);
@@ -42,14 +42,16 @@ const CompanyMembers = () => {
 
   const fetchMembers = async () => {
     try {
-      // pageSize set to 2 as an example
       const response = await companyService.getCompanyMembers(currentPage, 2);
-        setMembers(response.result.data);
-        setCurrentPage(response.result.currentPage);
-        setTotalPages(response.result.totalPages);
       
+      if (response && response.result) {
+        setMembers(response.result.data || []);
+        setCurrentPage(response.result.currentPage || 0);
+        setTotalPages(response.result.totalPages || 0);
+        setTotalMembers(response.result.totalElements || 0);
+      }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.message || "Failed to fetch company members");
     } finally {
       setLoading(false);
     }
@@ -57,14 +59,15 @@ const CompanyMembers = () => {
 
   const fetchInvitations = async () => {
     try {
-      // pageSize set to 2 as an example
       const response = await companyService.getInvitations(invitationCurrentPage, 2);
-        setInvitations(response.result.data);
-        setInvitationCurrentPage(response.result.currentPage);
-        setInvitationTotalPages(response.result.totalPages);
       
+      if (response && response.result) {
+        setInvitations(response.result.data || []);
+        setInvitationCurrentPage(response.result.currentPage || 0);
+        setInvitationTotalPages(response.result.totalPages || 0);
+      }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.message || "Failed to fetch invitations");
     }
   };
 
@@ -78,7 +81,7 @@ const CompanyMembers = () => {
       // Refresh invitations after sending
       fetchInvitations();
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.message || "Failed to send invitation");
     } finally {
       setSending(false);
     }
@@ -87,12 +90,11 @@ const CompanyMembers = () => {
   const handleRemoveMember = async (memberId) => {
     if (window.confirm("Are you sure you want to remove this member?")) {
       try {
-        const response =
-        await companyService.removeMember(memberId);
-        toast.success(response.message);
+        const response = await companyService.removeMember(memberId);
+        toast.success(response.message || "Member removed successfully");
         fetchMembers();
       } catch (error) {
-        toast.error(error.message);
+        toast.error(error.message || "Failed to remove member");
       }
     }
   };
@@ -138,67 +140,98 @@ const CompanyMembers = () => {
           <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
             <div className="px-6 py-4 border-b border-gray-200">
               <h2 className="text-lg font-semibold text-gray-800">Company Members</h2>
+              <p className="text-sm text-gray-500 mt-1">
+                Showing {members.length} of {totalMembers} total members
+              </p>
             </div>
             
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Name</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Member</th>
                     <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Email</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Contact</th>
                     <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Role</th>
                     <th className="px-6 py-3 text-right text-sm font-semibold text-gray-600">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {members.map((member,idx) => (
-                    <tr key={idx} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4 text-sm text-gray-800">{member.name}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{member.email}</td>
-                      <td className="px-6 py-4">
-                        <span className="px-3 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
-                          {member.role}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <button
-                          onClick={() => handleRemoveMember(member.id)}
-                          className="p-2 text-red-500 hover:text-red-700 rounded-lg hover:bg-red-50 transition-colors"
-                          title="Remove member"
-                        >
-                          <FaTrash className="w-4 h-4" />
-                        </button>
+                  {members.length > 0 ? (
+                    members.map((member) => (
+                      <tr key={member.id} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-6 py-4">
+                          <div className="flex items-center">
+                            <div className="h-10 w-10 flex-shrink-0">
+                              <img
+                                className="h-10 w-10 rounded-full object-cover"
+                                src={member.avatar || "https://via.placeholder.com/100"}
+                                alt={member.fullname}
+                              />
+                            </div>
+                            <div className="ml-4">
+                              <div className="text-sm font-medium text-gray-900">{member.fullname}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-600">{member.email}</td>
+                        <td className="px-6 py-4 text-sm text-gray-600">{member.contact || "—"}</td>
+                        <td className="px-6 py-4">
+                          <span className={`px-3 py-1 text-xs font-medium rounded-full 
+                            ${member.role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'}`}>
+                            {member.role === 'admin' ? 'Administrator' : 'Member'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          {member.role !== 'admin' && (
+                            <button
+                              onClick={() => handleRemoveMember(member.id)}
+                              className="p-2 text-red-500 hover:text-red-700 rounded-lg hover:bg-red-50 transition-colors"
+                              title="Remove member"
+                            >
+                              <FaTrash className="w-4 h-4" />
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="5" className="px-6 py-4 text-center text-sm text-gray-500">
+                        No members found
                       </td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>
 
             {/* Pagination */}
-            <div className="px-6 py-4 border-t border-gray-200">
-              <div className="flex items-center justify-between">
-                <button
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 0}
-                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:hover:bg-transparent"
-                >
-                  <FaChevronLeft className="w-4 h-4" />
-                  Previous
-                </button>
-                <span className="text-sm text-gray-700">
-                  Page <span className="font-semibold">{currentPage + 1}</span> of {totalPages}
-                </span>
-                <button
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages - 1}
-                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:hover:bg-transparent"
-                >
-                  Next
-                  <FaChevronRight className="w-4 h-4" />
-                </button>
+            {totalPages > 1 && (
+              <div className="px-6 py-4 border-t border-gray-200">
+                <div className="flex items-center justify-between">
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 0}
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:hover:bg-transparent"
+                  >
+                    <FaChevronLeft className="w-4 h-4" />
+                    Previous
+                  </button>
+                  <span className="text-sm text-gray-700">
+                    Page <span className="font-semibold">{currentPage + 1}</span> of {totalPages}
+                  </span>
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages - 1}
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:hover:bg-transparent"
+                  >
+                    Next
+                    <FaChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
@@ -219,53 +252,63 @@ const CompanyMembers = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {invitations.map((invitation) => (
-                <tr key={invitation.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4 text-sm text-gray-800">{invitation.email}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600">
-                    {new Date(invitation.expiryDate).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4">
-                    <span
-                      className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                        invitation.accepted
-                          ? "bg-green-100 text-green-800"
-                          : "bg-yellow-100 text-yellow-800"
-                      }`}
-                    >
-                      {invitation.accepted ? "Accepted" : "Pending"}
-                    </span>
+              {invitations.length > 0 ? (
+                invitations.map((invitation) => (
+                  <tr key={invitation.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 text-sm text-gray-800">{invitation.email}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600">
+                      {new Date(invitation.expiryDate).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                          invitation.accepted
+                            ? "bg-green-100 text-green-800"
+                            : "bg-yellow-100 text-yellow-800"
+                        }`}
+                      >
+                        {invitation.accepted ? "Accepted" : "Pending"}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="3" className="px-6 py-4 text-center text-sm text-gray-500">
+                    No pending invitations
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
 
         {/* Pagination */}
-        <div className="px-6 py-4 border-t border-gray-200">
-          <div className="flex items-center justify-between">
-            <button
-              onClick={() => handleInvitationPageChange(invitationCurrentPage - 1)}
-              disabled={invitationCurrentPage === 0}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:hover:bg-transparent"
-            >
-              <FaChevronLeft className="w-4 h-4" />
-              Previous
-            </button>
-            <span className="text-sm text-gray-700">
-              Page <span className="font-semibold">{invitationCurrentPage + 1}</span> of {invitationTotalPages}
-            </span>
-            <button
-              onClick={() => handleInvitationPageChange(invitationCurrentPage + 1)}
-              disabled={invitationCurrentPage === invitationTotalPages - 1}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:hover:bg-transparent"
-            >
-              Next
-              <FaChevronRight className="w-4 h-4" />
-            </button>
+        {invitationTotalPages > 1 && (
+          <div className="px-6 py-4 border-t border-gray-200">
+            <div className="flex items-center justify-between">
+              <button
+                onClick={() => handleInvitationPageChange(invitationCurrentPage - 1)}
+                disabled={invitationCurrentPage === 0}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:hover:bg-transparent"
+              >
+                <FaChevronLeft className="w-4 h-4" />
+                Previous
+              </button>
+              <span className="text-sm text-gray-700">
+                Page <span className="font-semibold">{invitationCurrentPage + 1}</span> of {invitationTotalPages}
+              </span>
+              <button
+                onClick={() => handleInvitationPageChange(invitationCurrentPage + 1)}
+                disabled={invitationCurrentPage === invitationTotalPages - 1}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:hover:bg-transparent"
+              >
+                Next
+                <FaChevronRight className="w-4 h-4" />
+              </button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

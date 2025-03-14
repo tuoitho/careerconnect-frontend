@@ -49,7 +49,7 @@ function Login() {
 
   useEffect(() => {
     resetCaptcha();
-  }, [formData.username, formData.password]);
+  }, [formData.password]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
