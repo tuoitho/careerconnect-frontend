@@ -103,6 +103,7 @@ class ApiService {
 
   clearAuthToken() {
     localStorage.removeItem("authToken");
+    localStorage.removeItem("user");
   }
 
   // HTTP methods
