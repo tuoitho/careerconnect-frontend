@@ -124,12 +124,19 @@ import CareerGuide from "../pages/CareerGuide ";
 import BrowertJobPage from "../api/BrowertJobPage";
 import ApplicationDetail from "../pages/ApplicationDetail";
 import CandidateDetail from "../pages/CandidateDetail";
+import PaymentResultPage from "../api/PaymentResultPage";
+import TopUpPage from "../api/TopUpPage";
+import CoinManagementPage from "../api/CoinManagementPage";
 
 
 // Routes cho các trang public có Layout
 const GeneralRoutes = () => (
   <Layout>
     <Routes>
+      <Route path="/top-up" element={<TopUpPage />} />
+      <Route path="/payment-result" element={<PaymentResultPage />} />
+      <Route path="/coin-management" element={<CoinManagementPage />} />
+
       <Route path="/BrowertJobPage" element={<BrowertJobPage />} />
       <Route path="/" element={<Home />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
