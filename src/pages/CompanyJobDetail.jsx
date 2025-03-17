@@ -31,24 +31,20 @@ const JobDetail = () => {
   const [coverLetter, setCoverLetter] = useState("");
   const [userCVs, setUserCVs] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [applicantCount, setApplicantCount] = useState(null);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false); // State cho modal xác nhận
 
   const fetchData = async () => {
     try {
       setLoading(true);
-
-      // Fetch job details
       const jobResponse = await jobService.getCompanyJobDetail(id);
       setJobDetails(jobResponse.result);
-
-      // Fetch company info
       if (jobResponse.result?.companyId) {
         const companyResponse = await companyService.getCompanyById(
           jobResponse.result.companyId
         );
         setCompanyInfo(companyResponse.result);
       }
-
-      // Fetch user's CVs
       const cvResponse = await cvService.getUserCVs();
       setUserCVs(cvResponse.result);
     } catch (err) {
@@ -67,7 +63,6 @@ const JobDetail = () => {
       alert("Vui lòng chọn CV và viết thư giới thiệu");
       return;
     }
-
     try {
       setIsSubmitting(true);
       const response = await jobService.applyJob({
@@ -76,7 +71,7 @@ const JobDetail = () => {
         coverLetter: coverLetter.trim(),
       });
       toast.success(response.message);
-      fetchData(); // Cập nhật lại jobDetails sau khi apply
+      fetchData();
       setIsApplyModalOpen(false);
       resetForm();
     } catch (error) {
@@ -94,18 +89,33 @@ const JobDetail = () => {
   const handleSaveJob = async () => {
     try {
       if (jobDetails.saved) {
-        // Unsave job
-        const resp=await apiService.delete(`/saved-jobs/${id}`);
-        setJobDetails(prev => ({ ...prev, saved: false }));
+        const resp = await apiService.delete(`/saved-jobs/${id}`);
+        setJobDetails((prev) => ({ ...prev, saved: false }));
         toast.info(resp.message);
       } else {
-        // Save job
-        const resp=await apiService.post(`/saved-jobs/${id}`, {});
-        setJobDetails(prev => ({ ...prev, saved: true }));
+        const resp = await apiService.post(`/saved-jobs/${id}`, {});
+        setJobDetails((prev) => ({ ...prev, saved: true }));
         toast.success(resp.message);
       }
     } catch (error) {
       toast.error(error.message || "Không thể lưu tin tuyển dụng");
+    }
+  };
+
+  const handleViewApplicants = async () => {
+    setIsConfirmModalOpen(true); // Mở modal xác nhận
+  };
+
+  const confirmViewApplicants = async () => {
+    try {
+      const countResponse = await apiService.post(`/company/jobs/${id}/view-applicants`);
+      toast.success("Đã trừ 1 xu. Xem số lượng ứng viên trong giao diện.");
+      setApplicantCount(countResponse.result); // Giả sử API trả về số lượng trực tiếp
+      console.log("Applicants data:", countResponse.result);
+    } catch (error) {
+      toast.error(error.message || "Không thể xem danh sách ứng viên");
+    } finally {
+      setIsConfirmModalOpen(false); // Đóng modal sau khi xử lý
     }
   };
 
@@ -123,10 +133,7 @@ const JobDetail = () => {
     });
   };
 
-  if (loading) {
-    return <Loading2 />;
-  }
-
+  if (loading) return <Loading2 />;
   if (error) {
     return (
       <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg">
@@ -149,7 +156,6 @@ const JobDetail = () => {
             className="bg-white rounded-lg p-8 w-full max-w-2xl animate-fade-in shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Header */}
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-2xl font-semibold text-gray-800">
                 Apply for: {jobDetails?.title}
@@ -175,8 +181,6 @@ const JobDetail = () => {
                 </svg>
               </button>
             </div>
-
-            {/* CV Selection */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Select CV *
@@ -196,8 +200,6 @@ const JobDetail = () => {
                 ))}
               </select>
             </div>
-
-            {/* Cover Letter */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Cover Letter *
@@ -210,8 +212,6 @@ const JobDetail = () => {
                 disabled={isSubmitting}
               />
             </div>
-
-            {/* Action Buttons */}
             <div className="flex justify-end gap-4">
               <button
                 onClick={() => {
@@ -263,6 +263,36 @@ const JobDetail = () => {
         </div>
       )}
 
+      {/* Confirmation Modal */}
+      {isConfirmModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-xl animate-fade-in">
+            <h3 className="text-xl font-semibold text-gray-800 mb-4">
+              Xác nhận xem danh sách ứng viên
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Hành động này sẽ tiêu tốn{" "}
+              <span className="font-semibold text-green-600">1 xu</span>. Bạn có
+              muốn tiếp tục không?
+            </p>
+            <div className="flex justify-end gap-4">
+              <button
+                onClick={() => setIsConfirmModalOpen(false)}
+                className="px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg border border-gray-300 font-medium transition-colors"
+              >
+                Hủy
+              </button>
+              <button
+                onClick={confirmViewApplicants}
+                className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 font-medium transition-colors"
+              >
+                Xác nhận
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Main Content */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
@@ -299,7 +329,7 @@ const JobDetail = () => {
               </div>
               <div className="flex items-center">
                 <CalendarDays className="w-6 h-6 mr-2 text-green-500" />
-                <p className="text-gray-700">
+                <p className="text-gray*Math.floor(gray-700">
                   <span className="font-medium text-green-700">Deadline:</span>{" "}
                   {formatDate(jobDetails.deadline)}
                 </p>
@@ -322,7 +352,6 @@ const JobDetail = () => {
               </p>
             </div>
 
-            {/* Buttons */}
             <div className="flex flex-col sm:flex-row justify-between gap-4 mb-8">
               <button
                 onClick={() => setIsApplyModalOpen(true)}
@@ -355,9 +384,19 @@ const JobDetail = () => {
                 )}
               </button>
             </div>
+
+            {/* View Applicants Section */}
             <div className="flex items-center justify-end text-gray-600">
               <Users className="w-5 h-5 mr-2 text-green-500" />
-              <button className="text-green-500 hover:text-green-600">
+              {applicantCount !== null ? (
+                <span className="text-green-600 font-semibold mr-2 bg-green-100 px-2 py-1 rounded-full animate-pulse">
+                  {applicantCount} Applicants
+                </span>
+              ) : null}
+              <button
+                onClick={handleViewApplicants}
+                className="text-green-500 hover:text-green-600 font-medium"
+              >
                 View Applicants
               </button>
             </div>
@@ -376,11 +415,17 @@ const JobDetail = () => {
                   src={companyInfo.logo}
                   alt="Company logo"
                   className="w-32 h-32 rounded-full object-cover mb-4 border-4 border-green-100 cursor-pointer hover:opacity-90 transition-opacity duration-300"
-                  onClick={() => companyInfo?.companyId && navigate(`/candidate/company/${companyInfo.companyId}`)}
+                  onClick={() =>
+                    companyInfo?.companyId &&
+                    navigate(`/candidate/company/${companyInfo.companyId}`)
+                  }
                 />
                 <h3
                   className="text-lg font-semibold text-gray-800 mb-2 cursor-pointer hover:text-green-600 transition-colors duration-300"
-                  onClick={() => companyInfo?.companyId && navigate(`/candidate/company/${companyInfo.companyId}`)}
+                  onClick={() =>
+                    companyInfo?.companyId &&
+                    navigate(`/candidate/company/${companyInfo.companyId}`)
+                  }
                 >
                   {companyInfo.name}
                 </h3>
