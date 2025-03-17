@@ -27,7 +27,9 @@ const ChatPage = () => {
     if (!isAuthenticated || !user) return;
 
     const connectWebSocket = () => {
-      const socket = new SockJS('http://localhost:8088/ws-chat');
+      // const socket = new SockJS('http://localhost:8088/ws-chat');
+      // lấy từ env vite
+      const socket = new SockJS(import.meta.env.VITE_BACKEND_URL + '/ws-chat');
       stompClient.current = Stomp.over(socket);
       const token = localStorage.getItem('authToken') || 'abc';
       const headers = { Authorization: `Bearer ${token}` };
