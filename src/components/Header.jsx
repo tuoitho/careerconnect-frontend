@@ -22,29 +22,34 @@ export default function Header() {
   const [selectedNotification, setSelectedNotification] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+
   // Mock auth state from context
   const { user, isAuthenticated, logout } = useContext(AuthContext);
-
+  const fetchNotifications = async () => {
+    if (isAuthenticated) {
+      try {
+        setLoading(true);
+        const response = await apiService.get("/notifications", {
+          params: { page: 0, size: 3 },
+        });
+        setNotifications(response.result.data || []);
+      } catch (error) {
+        console.error("Failed to fetch notifications:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
   // Fetch notifications from API
   useEffect(() => {
-    const fetchNotifications = async () => {
-      if (isAuthenticated) {
-        try {
-          setLoading(true);
-          const response = await apiService.get("/notifications", {
-            params: { page: 0, size: 3 },
-          });
-          setNotifications(response.result.data || []);
-        } catch (error) {
-          console.error("Failed to fetch notifications:", error);
-        } finally {
-          setLoading(false);
-        }
-      }
-    };
-
     fetchNotifications();
   }, [isAuthenticated]);
+  // useEffect(() => {
+  //   console.log("showNotifications", showNotifications);
+  //   if (showNotifications && notifications.length === 0 ) {
+  //     fetchNotifications();
+  //   }
+  // }, [showNotifications]);
 
   const unreadCount = notifications.filter((notification) => !notification.read).length;
 
