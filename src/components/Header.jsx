@@ -1,6 +1,15 @@
 import { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom"; // Using react-router-dom's Link
-import { Bell, User, Briefcase, FileText, Book, MessageSquare, ChevronRight } from "lucide-react";
+import {
+  Bell,
+  User,
+  Briefcase,
+  FileText,
+  Book,
+  MessageSquare,
+  ChevronRight,
+  DollarSign,
+} from "lucide-react"; // Import DollarSign icon
 import NotificationDetailModal from "./NotificationDetailModal";
 import apiService from "../api/apiService";
 import AuthContext from "../context/AuthContext";
@@ -134,26 +143,30 @@ export default function Header() {
                   >
                     <Link to="/candidate/profile" className="block px-4 py-2 text-gray-800 hover:bg-green-50">
                       <User className="inline mr-2" size={16} />
-                      Hồ sơ cá nhân
+                      Hồ sơ
                     </Link>
                     <Link to="/candidate/applied" className="block px-4 py-2 text-gray-800 hover:bg-green-50">
                       <Briefcase className="inline mr-2" size={16} />
-                      Việc làm đã ứng tuyển
+                      Ứng tuyển
                     </Link>
                     <Link to="/candidate/job-alerts" className="block px-4 py-2 text-gray-800 hover:bg-green-50">
                       <Bell className="inline mr-2" size={16} />
-                      Nhận thông báo việc làm
+                      Thông báo việc làm
                     </Link>
                     <Link to="/candidate/saved" className="block px-4 py-2 text-gray-800 hover:bg-green-50">
                       <FileText className="inline mr-2" size={16} />
                       Việc làm đã lưu
+                    </Link>
+                    <Link to="/coin-management" className="block px-4 py-2 text-gray-800 hover:bg-green-50">
+                      <DollarSign className="inline mr-2" size={16} />
+                      Quản lý xu
                     </Link>
                   </div>
                 )}
               </div>
 
               {/* Chat Button */}
-              <a href="/candidate/chat" target='_blank' className="relative" title="Chat với nhà tuyển dụng">
+              <a href="/candidate/chat" target="_blank" className="relative" title="Chat với nhà tuyển dụng">
                 <MessageSquare className="text-white hover:text-green-400" size={18} />
               </a>
 
@@ -192,9 +205,6 @@ export default function Header() {
                               <span className="text-xs text-gray-500">{notification.time}</span>
                             </div>
                             <p className="text-sm text-gray-600 mt-1 line-clamp-2">{notification.message}</p>
-                            {!notification.read && (
-                              <div className="w-2 h-2 bg-green-500 rounded-full absolute top-3 right-3"></div>
-                            )}
                           </div>
                         ))
                       )}
