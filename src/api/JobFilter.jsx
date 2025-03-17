@@ -28,6 +28,16 @@ const JOB_CATEGORIES = [
   { value: 'OTHER', label: 'Other' }
 ];
 
+const JOB_TYPES = [
+  { value: 'FULL_TIME', label: 'Full-time' },
+  { value: 'PART_TIME', label: 'Part-time' },
+  { value: 'CONTRACT', label: 'Contract' },
+  { value: 'INTERNSHIP', label: 'Internship' },
+  { value: 'TEMPORARY', label: 'Temporary' },
+  { value: 'VOLUNTEER', label: 'Volunteer' },
+  { value: 'FREELANCE', label: 'Freelance' }
+];
+
 const JobFilter = ({ onFilterChange,initKeyword }) => {
   const [filters, setFilters] = useState({
     keyword: initKeyword,
@@ -95,7 +105,7 @@ const JobFilter = ({ onFilterChange,initKeyword }) => {
           <label htmlFor="jobType" className="block text-sm font-medium text-gray-700 mb-1">
             Loại công việc
           </label>
-          <select
+          {/* <select
             id="jobType"
             name="jobType"
             value={filters.jobType}
@@ -107,7 +117,21 @@ const JobFilter = ({ onFilterChange,initKeyword }) => {
             <option value="Part-time">Part-time</option>
             <option value="Remote">Remote</option>
             <option value="Freelance">Freelance</option>
-          </select>
+          </select> */}
+          <select
+            id="jobType"
+            name="jobType"
+            value={filters.jobType}
+            onChange={handleChange}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white"
+          >
+            <option value="">Tất cả loại</option>
+            {JOB_TYPES.map(type => (
+              <option key={type.value} value={type.value}>
+                {type.label}
+              </option>
+            ))}
+          </ select>
         </div>
         
         {/* Experience */}

@@ -48,7 +48,7 @@ function Login() {
   }, [isAuthenticated, user, navigate]);
 
   useEffect(() => {
-    resetCaptcha();
+    // resetCaptcha();
   }, [formData.password]);
 
   const handleSubmit = async (e) => {

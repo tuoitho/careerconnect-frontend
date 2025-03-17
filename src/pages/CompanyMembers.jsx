@@ -4,6 +4,7 @@ import { companyService } from "../services/companyService";
 import { toast } from "react-toastify";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { FaTrash, FaUserPlus, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import apiService from "../api/apiService";
 
 const CompanyMembers = () => {
   const [members, setMembers] = useState([]);
@@ -90,8 +91,8 @@ const CompanyMembers = () => {
   const handleRemoveMember = async (memberId) => {
     if (window.confirm("Are you sure you want to remove this member?")) {
       try {
-        const response = await companyService.removeMember(memberId);
-        toast.success(response.message || "Member removed successfully");
+        const response = await apiService.delete(`/company/mycompany/members/${memberId}`);
+        toast.success(response.message);
         fetchMembers();
       } catch (error) {
         toast.error(error.message || "Failed to remove member");
@@ -178,8 +179,8 @@ const CompanyMembers = () => {
                         <td className="px-6 py-4 text-sm text-gray-600">{member.contact || "—"}</td>
                         <td className="px-6 py-4">
                           <span className={`px-3 py-1 text-xs font-medium rounded-full 
-                            ${member.role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'}`}>
-                            {member.role === 'admin' ? 'Administrator' : 'Member'}
+                            ${member.role === 'representative' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'}`}>
+                            {member.role === 'representative' ? 'Representative' : 'Member'}
                           </span>
                         </td>
                         <td className="px-6 py-4 text-right">

@@ -118,9 +118,9 @@ const Home = () => {
                                 className="w-48 focus:outline-none text-black text-sm bg-transparent"  
                             >  
                                 <option value="">All Locations</option>  
-                                <option value="hanoi">Hà Nội</option>  
+                                {/* <option value="hanoi">Hà Nội</option>  
                                 <option value="hcm">Hồ Chí Minh</option>  
-                                <option value="danang">Đà Nẵng</option>  
+                                <option value="danang">Đà Nẵng</option>   */}
                             </select>  
                         </div>  
                         <button 
@@ -135,7 +135,7 @@ const Home = () => {
             {/* <HowItWorks /> */}  
 
             {/* Featured Jobs */}  
-            <div className="border-t">  
+            {/* <div className="border-t">  
                 <div className="container mx-auto px-8 py-12 max-w-7xl mx-auto flex items-center justify-between px-4">  
                     <h2 className="text-2xl font-bold mb-8 text-black">Featured Jobs</h2>  
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">  
@@ -161,7 +161,7 @@ const Home = () => {
                         ))}  
                     </div>  
                 </div>  
-            </div>  
+            </div>   */}
         </div>  
     );  
 };  

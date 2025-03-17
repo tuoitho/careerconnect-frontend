@@ -197,7 +197,7 @@ const RecruiterChatPage = () => {
       }
     }
 
-    toast.success(`Tin nhắn mới từ ${senderId}: ${content}`);
+    // toast.success(`Tin nhắn mới từ ${senderId}: ${content}`);
   };
 
   const onError = (error) => {
@@ -315,7 +315,7 @@ const RecruiterChatPage = () => {
                 )}
               </div>
               <div className="flex-1">
-                <h3 className="font-medium">{candidate.name}</h3>
+                <h3 className="font-medium">{candidate.fullname}</h3>
                 <p className="text-sm text-gray-500 truncate">{candidate.lastMessage}</p>
               </div>
               {candidate.unread > 0 && (
