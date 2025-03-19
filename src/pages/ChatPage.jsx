@@ -169,8 +169,7 @@ const ChatPage = () => {
         );
       }
     }
-
-    toast.success(`Tin nhắn mới từ ${senderId}: ${content}`);
+    // toast.success(`Tin nhắn mới từ ${senderId}: ${content}`);
   };
 
   const onError = (error) => {
@@ -289,7 +288,7 @@ const ChatPage = () => {
                 )}
               </div>
               <div className="flex-1">
-                <h3 className="font-medium">{recruiter.name}</h3>
+                <h3 className="font-medium">{recruiter.fullname}</h3>
                 <p className="text-sm text-gray-500 truncate">{recruiter.lastMessage}</p>
               </div>
               {recruiter.unread > 0 && (

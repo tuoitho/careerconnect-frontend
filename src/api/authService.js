@@ -5,16 +5,19 @@ export const authService = {
   // Đăng nhập
   async login(username, password, tk) {
     try {
-      return await apiService.post("/auth/login", {
-        username,
-        password,
-      }, 
-      {
-        params: {
-          tk: tk // Add as URL parameter
+      return await apiService.post(
+        "/auth/login",
+        {
+          username,
+          password,
         },
-        withCredentials: true
-      });
+        {
+          params: {
+            tk: tk, // Add as URL parameter
+          },
+          withCredentials: true,
+        }
+      );
     } catch (error) {
       //tiếp tục throw error để component gọi hàm này xử lý
       throw error;
@@ -24,12 +27,11 @@ export const authService = {
   // Đăng xuất
   async logout() {
     try {
-      await apiService.post("/auth/logout");
-      apiService.clearAuthToken();
-      return true;
+      return await apiService.post("/auth/logout", {}, { withCredentials: true });
     } catch (error) {
-      console.error("Logout error:", error);
-      // Vẫn xóa tokens ở client side ngay cả khi API fails
+      apiService.clearAuthToken();
+    }
+    finally {
       apiService.clearAuthToken();
     }
   },

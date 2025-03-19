@@ -1,6 +1,10 @@
 import React, { createContext, useState } from "react";
 import { authService } from "../api/authService";
 import { toast } from "react-toastify";
+import { tr } from "date-fns/locale";
+import { set } from "date-fns";
+import { Loader2 } from "lucide-react";
+import Loading2 from "../components/Loading2";
 
 // Tạo AuthContext
 const AuthContext = createContext();
@@ -14,6 +18,7 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     return !!localStorage.getItem("user");
   });
+  const [loading, setLoading] = useState(false);
    const login = async (userData, tk) => {
     try {
       const response = await authService.login(userData.username, userData.password,tk);
@@ -30,17 +35,28 @@ export const AuthProvider = ({ children }) => {
   };
   
 
-  const logout = () => {
-    setUser(null);
-    setIsAuthenticated(false);
-    localStorage.removeItem("user");
-    localStorage.removeItem('authToken');
-    toast.success("Đăng xuất thành công");
+  const logout = async () => {
+    try {
+      setLoading(true);
+      const response = await authService.logout();
+      console.log(response);
+      toast.success(response.message);
+      setUser(null);
+      setIsAuthenticated(false);
+      localStorage.removeItem("user");
+      localStorage.removeItem('authToken');
+    } catch (error) {
+      toast.error(error.response.message);
+    } finally {
+      setLoading(false);
+    }
+
   };
 
   return (
     <AuthContext.Provider value={{ user, isAuthenticated, login, logout }}>
       {children}
+      {loading && <Loading2 />}
     </AuthContext.Provider>
   );
 };

@@ -90,8 +90,8 @@
 // export default AppRoutes;
 
 
-import React from "react";
-import { Routes, Route } from "react-router-dom";
+import React, { useContext } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
 import ProtectedRoute from "../components/ProtectedRoute";
 import RecruiterLayout from "../components/recruiter/RecruiterLayout";
 import Layout from "../components/Layout";
@@ -120,13 +120,14 @@ import JobAlertSubscription from "../pages/JobAlertSubscription";
 import NotificationsPage from "../pages/NotificationsPage";
 // import JobsPage from "../pages/JobsPage";
 import Freelance from "../pages/Freelance";
-import CareerGuide from "../pages/CareerGuide ";
+import CareerGuide from "../pages/CareerGuide";
 import BrowertJobPage from "../api/BrowertJobPage";
 import ApplicationDetail from "../pages/ApplicationDetail";
 import CandidateDetail from "../pages/CandidateDetail";
 import PaymentResultPage from "../api/PaymentResultPage";
 import TopUpPage from "../api/TopUpPage";
 import CoinManagementPage from "../api/CoinManagementPage";
+import AuthContext from "../context/AuthContext";
 
 
 // Routes cho các trang public có Layout
@@ -145,7 +146,7 @@ const GeneralRoutes = () => (
       <Route path="/job-page" element={<BrowertJobPage />} />
       <Route path="/freelance" element={<Freelance />} />
       {/* career-guide */}
-      <Route path="/career-guide" element={<CareerGuide  />} />
+      <Route path="/career-guide" element={<CareerGuide/>} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   </Layout>
@@ -196,6 +197,10 @@ const CandidateRoutes = () => (
 );
 
 const AppRoutes = () => {
+  const { user, isAuthenticated } = useContext(AuthContext);
+  const role = user?.role.toLowerCase();
+
+
   return (
     <Routes>
       {/* Auth Routes (Login/Register - Không có Layout) */}
@@ -210,6 +215,19 @@ const AppRoutes = () => {
 
       {/* Candidate Routes */}
       <Route path="/candidate/*" element={<CandidateRoutes />} />
+
+      <Route
+          path="/"
+          element={
+            role
+                  ? role === 'recruiter'
+                      ? <Navigate to="/recruiter" />
+                      : role === 'admin'
+                      ? <Navigate to="/admin" />
+                      :<Layout><Home /></Layout>
+                      :<Layout><Home /></Layout>
+          }
+      />
 
       {/* Catch-all route */}
       <Route path="*" element={<NotFound />} />

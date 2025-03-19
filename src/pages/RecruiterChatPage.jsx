@@ -345,7 +345,7 @@ const RecruiterChatPage = () => {
                   className="w-8 h-8 rounded-full mr-3"
                 />
                 <div>
-                  <h3 className="font-semibold">{selectedCandidate.name}</h3>
+                  <h3 className="font-semibold">{selectedCandidate.fullname}</h3>
                   <p className="text-sm text-gray-500">
                     {selectedCandidate.active ? 'Đang hoạt động' : 'Không hoạt động'}
                     {typing && ' • Đang nhập...'}
