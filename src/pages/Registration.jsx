@@ -51,7 +51,7 @@ const Registration = () => {
         })
         .catch((error) => {
           // Lỗi đã được xử lý trong interceptor, chỉ cần log hoặc cập nhật UI
-          console.error("Registration Error:", error.message);
+          toast.error(error.message); // Hiển thị thông báo lỗi
         })
         .finally(() => {
           setIsLoading(false); // Dừng loading

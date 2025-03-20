@@ -177,7 +177,7 @@ function Login() {
 
           <div className="text-center text-sm">
             <span className="text-gray-600">Don't have an account? </span>
-            <a href="#" className="font-medium text-black hover:text-gray-700">
+            <a href="/register" className="font-medium text-black hover:text-gray-700">
               Sign up
             </a>
           </div>
