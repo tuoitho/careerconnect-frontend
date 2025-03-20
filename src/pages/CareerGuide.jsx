@@ -28,12 +28,12 @@ import JobAlertSubscription from "../pages/JobAlertSubscription";
 import NotificationsPage from "../pages/NotificationsPage";
 import Freelance from "../pages/Freelance";
 import CareerGuide from "../pages/CareerGuide";
-import BrowertJobPage from "../api/BrowertJobPage";
+import BrowertJobPage from "./BrowertJobPage.jsx";
 import ApplicationDetail from "../pages/ApplicationDetail";
 import CandidateDetail from "../pages/CandidateDetail";
-import PaymentResultPage from "../api/PaymentResultPage";
-import TopUpPage from "../api/TopUpPage";
-import CoinManagementPage from "../api/CoinManagementPage";
+import PaymentResultPage from "./PaymentResultPage.jsx";
+import TopUpPage from "./TopUpPage.jsx";
+import CoinManagementPage from "./CoinManagementPage.jsx";
 import AuthContext from "../context/AuthContext";
 
 const AppRoutes = () => {

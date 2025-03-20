@@ -1,7 +1,7 @@
 // CoinManagementPage.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import apiService from "./apiService";
+import apiService from "../api/apiService.js";
 import { toast } from "react-toastify";
 
 const CoinManagementPage = () => {

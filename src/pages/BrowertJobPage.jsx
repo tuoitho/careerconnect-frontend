@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import JobFilter from './JobFilter';
-import JobList from './JobList';
-import apiService from './apiService';
+import JobFilter from '../api/JobFilter.jsx';
+import JobList from '../api/JobList.jsx';
+import apiService from '../api/apiService.js';
 import { ChevronLeft, ChevronRight, Search } from 'lucide-react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 
 const BrowseJobPage = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  
+
   const queryFromUrl = searchParams.get("query") || '';
-  
+
   const [filters, setFilters] = useState({
     keyword: queryFromUrl,
     area: searchParams.get("location") || '',
@@ -22,9 +22,9 @@ const BrowseJobPage = () => {
     page: 0,
     size: 5
   });
-  
+
   const [searchKeyword, setSearchKeyword] = useState(queryFromUrl);
-  
+
   const [jobs, setJobs] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(0);
@@ -46,7 +46,7 @@ const BrowseJobPage = () => {
     } catch (error) {
       console.error('Error fetching jobs:', error);
       setError('Không thể tải danh sách công việc. Vui lòng thử lại sau.');
-      
+
       const startIndex = newFilters.page * newFilters.size;
       const endIndex = startIndex + newFilters.size;
       setTotalPages(Math.ceil(jobs.length / newFilters.size));
@@ -58,8 +58,8 @@ const BrowseJobPage = () => {
   useEffect(() => {
     fetchJobs(filters);
   }, [
-    filters.keyword, 
-    filters.area, 
+    filters.keyword,
+    filters.area,
     filters.jobType,
     filters.experience,
     filters.category,
@@ -73,15 +73,15 @@ const BrowseJobPage = () => {
     if (newFilters.keyword) newParams.set("query", newFilters.keyword);
     if (newFilters.area) newParams.set("location", newFilters.area);
     setSearchParams(newParams);
-    
+
     setSearchKeyword(newFilters.keyword || '');
-    
+
     setFilters({ ...newFilters, page: 0, size: 5 });
   };
 
   const handlePageChange = (newPage) => {
     setFilters((prev) => ({ ...prev, page: newPage }));
-    
+
     window.scrollTo({
       top: 0,
       behavior: 'smooth'
@@ -159,8 +159,8 @@ const BrowseJobPage = () => {
       <div className="p-4 bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-2xl font-bold text-green-600 mb-4">Tìm kiếm công việc</h1>
-          
-          
+
+
           <div className="mt-2 text-sm text-gray-600">
             {filters.keyword && <span>Kết quả cho "{filters.keyword}" - </span>}
             <span>Hiển thị {jobs.length} công việc</span>

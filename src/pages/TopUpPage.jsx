@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import apiService from "./apiService";
+import apiService from "../api/apiService.js";
 import { toast } from "react-toastify";
 import { CreditCard, DollarSign, ArrowLeft } from "lucide-react";
 
@@ -58,7 +58,7 @@ const TopUpPage = () => {
         const txnRefMatch = response.result.paymentUrl.match(/vnp_TxnRef=([^&]*)/);
         const txnRef = txnRefMatch ? txnRefMatch[1] : Date.now().toString();
         localStorage.setItem("txnRef", txnRef);
-        
+
         // Redirect to VNPay payment page
         window.location.href = response.result.paymentUrl;
       } else {
@@ -82,7 +82,7 @@ const TopUpPage = () => {
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-md mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
         <div className="bg-blue-600 p-6 text-white">
-          <button 
+          <button
             onClick={() => navigate("/coin-management")}
             className="flex items-center text-white hover:text-blue-100 transition mb-4"
           >

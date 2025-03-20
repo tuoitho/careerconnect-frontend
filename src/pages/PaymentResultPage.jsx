@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import apiService from "./apiService";
+import apiService from "../api/apiService.js";
 
 const PaymentResultPage = () => {
   const [result, setResult] = useState(null);
@@ -27,8 +27,8 @@ const PaymentResultPage = () => {
           setResult({
             status: "failed",
             transactionId: txnRef,
-            message: error === "checksum" 
-              ? "Xác thực giao dịch không thành công" 
+            message: error === "checksum"
+              ? "Xác thực giao dịch không thành công"
               : "Thanh toán không thành công",
           });
           toast.error("Thanh toán thất bại!");

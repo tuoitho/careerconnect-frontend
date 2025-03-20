@@ -70,7 +70,7 @@
 //               <Routes>
 //                 <Route path="/" element={<Home />} />
 //                 <Route path="/company/:companyId" element={<CompanyPage />} />
-//                 <Route path="/job/:id" element={<JobDetail />} />  
+//                 <Route path="/job/:id" element={<JobDetail />} />
 //                 <Route path="/job/search" element={<JobSearch />} />
 //                 <Route path="/profile" element={<CandidateProfile />} />
 //                 <Route path="*" element={<NotFound />} />
@@ -121,12 +121,12 @@ import NotificationsPage from "../pages/NotificationsPage";
 // import JobsPage from "../pages/JobsPage";
 import Freelance from "../pages/Freelance";
 import CareerGuide from "../pages/CareerGuide";
-import BrowertJobPage from "../api/BrowertJobPage";
+import BrowertJobPage from "../pages/BrowertJobPage.jsx";
 import ApplicationDetail from "../pages/ApplicationDetail";
 import CandidateDetail from "../pages/CandidateDetail";
-import PaymentResultPage from "../api/PaymentResultPage";
-import TopUpPage from "../api/TopUpPage";
-import CoinManagementPage from "../api/CoinManagementPage";
+import PaymentResultPage from "../pages/PaymentResultPage.jsx";
+import TopUpPage from "../pages/TopUpPage.jsx";
+import CoinManagementPage from "../pages/CoinManagementPage.jsx";
 import AuthContext from "../context/AuthContext";
 
 
