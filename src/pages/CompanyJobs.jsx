@@ -6,13 +6,23 @@ const CompanyJobs = ({ companyId }) => {
   const [jobs, setJobs] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   // {{base_url}}/candidate/jobs?companyId=5&page=0&size=4
   const fetchJobs = async () => {
+    try{
+      setLoading(true);
     const response = await jobService.getCompanyJobs(companyId, currentPage);
     setJobs(response.result.data);
     // setCurrentPage(response.result.currentPage);
     setTotalPages(response.result.totalPages);
+    }
+    catch(error){
+    }
+    finally{
+
+      setLoading(false);
+    }
   }
 
 
