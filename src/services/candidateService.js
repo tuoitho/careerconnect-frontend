@@ -9,6 +9,11 @@ export const candidateService = {
     },
     updateCandidatProfile: async (candidateProfile) => {
         return await apiService.put(`/candidate/profile/me`, candidateProfile,
+            {
+                headers: {
+                    'Content-Type': 'application/multipart/form-data'   
+                } 
+            }
         );
     },
     uploadCV: async (formData) => {
