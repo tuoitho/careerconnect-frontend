@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import JobCard from "../components/JobCard";
 import Pagination from "../components/Pagination";
+import Loading2 from "../components/Loading2";
 import { jobService } from "../services/jobService";
 const CompanyJobs = ({ companyId }) => {
   const [jobs, setJobs] = useState([]);
@@ -36,6 +37,7 @@ const CompanyJobs = ({ companyId }) => {
 
   return (
     <div className="container mx-auto p-4">  
+    {loading && <Loading2/>}
       <h2 className="text-3xl font-bold mb-4 text-center">Posted Jobs</h2>
       
       <div className="flex flex-col gap-2">  
