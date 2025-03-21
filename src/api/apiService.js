@@ -70,7 +70,7 @@ class ApiService {
         } else if (error.request) {
           // Không nhận được phản hồi từ server
           // return Promise.reject(error);
-          return Promise.reject({ message: "Lỗi kết nối internet" });
+          return Promise.reject({ message: "Lỗi internet, vui lòng thử lại lần nữa!" });
         } else {
           // Lỗi khác
           toast.error("Unknown error occurred.");

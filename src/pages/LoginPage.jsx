@@ -16,9 +16,9 @@ function Login() {
   const [tk, setTk] = useState(null);
   const [captchaKey, setCaptchaKey] = useState(Date.now());
   const turnstileRef = useRef();
-  useEffect(() =>
-    console.log("tk", tk)
-  , [tk]);
+  // useEffect(() =>
+  //   console.log("tk", tk)
+  // , [tk]);
   const handleCaptchaSuccess = (tk) => {
     setTk(tk);
   };
@@ -48,7 +48,7 @@ function Login() {
   }, [isAuthenticated, user, navigate]);
 
   useEffect(() => {
-    // resetCaptcha();
+    resetCaptcha();
   }, [formData.password]);
 
   const handleSubmit = async (e) => {
