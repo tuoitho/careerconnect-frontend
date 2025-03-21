@@ -7,13 +7,6 @@
 ## Giới thiệu
 CareerConnect Frontend là giao diện người dùng (frontend) của ứng dụng CareerConnect, được thiết kế để giúp người dùng tìm kiếm cơ hội nghề nghiệp, kết nối với nhà tuyển dụng và quản lý hồ sơ cá nhân. Dự án này tập trung vào trải nghiệm người dùng mượt mà và giao diện thân thiện.
 
----
-
-## Tính năng
-- **Tìm kiếm công việc**: Lọc công việc theo vị trí, ngành nghề và kinh nghiệm.
-- **Hồ sơ cá nhân**: Tạo và chỉnh sửa hồ sơ để nổi bật trước nhà tuyển dụng.
-- **Kết nối mạng lưới**: Liên kết với các chuyên gia trong ngành.
-- **Giao diện responsive**: Hỗ trợ trên cả desktop và mobile.
 
 ---
 
