@@ -21,7 +21,10 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
    const login = async (userData, tk) => {
     try {
+      console.log("start login");
       const response = await authService.login(userData.username, userData.password,tk);
+      console.log(response);
+      console.log("end login");
       setUser(response.user);
       setIsAuthenticated(true);      
       localStorage.setItem("user", JSON.stringify(response.user)); 
