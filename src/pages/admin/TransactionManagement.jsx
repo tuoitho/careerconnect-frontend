@@ -14,9 +14,10 @@ const TransactionManagement = () => {
     try {
       setLoading(true);
       const response = await adminService.getAllTransactions(page);
-      setTransactions(response.result.content);
+      setTransactions(response.result.data);
       setTotalPages(response.result.totalPages);
       setTotalElements(response.result.totalElements);
+      setCurrentPage(response.result.currentPage);
     } catch (error) {
       toast.error(error.message || 'Có lỗi xảy ra khi tải danh sách giao dịch');
     } finally {
@@ -52,6 +53,13 @@ const TransactionManagement = () => {
     }
   };
 
+  const formatAmount = (amount) => {
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND'
+    }).format(amount);
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-6">Quản lý giao dịch</h1>
@@ -67,9 +75,10 @@ const TransactionManagement = () => {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Người dùng</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Số coin</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Số tiền</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phương thức</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mã giao dịch</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngày tạo</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hành động</th>
@@ -79,15 +88,24 @@ const TransactionManagement = () => {
                 {transactions.map((transaction) => (
                   <tr key={transaction.id}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{transaction.id}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{transaction.userName}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{transaction.coinAmount}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{transaction.amount.toLocaleString('vi-VN')} VND</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatAmount(transaction.amountPaid)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{transaction.paymentMethod}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{transaction.transactionCode}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${transaction.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' : transaction.status === 'COMPLETED' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                        {transaction.status === 'PENDING' ? 'Chờ xác nhận' : transaction.status === 'COMPLETED' ? 'Đã hoàn thành' : 'Đã hủy'}
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        transaction.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
+                        transaction.status === 'SUCCESS' ? 'bg-green-100 text-green-800' :
+                        'bg-red-100 text-red-800'
+                      }`}>
+                        {transaction.status === 'PENDING' ? 'Chờ xác nhận' :
+                         transaction.status === 'SUCCESS' ? 'Thành công' :
+                         'Thất bại'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{new Date(transaction.createdAt).toLocaleDateString()}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {new Date(transaction.createdAt).toLocaleString('vi-VN')}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       {transaction.status === 'PENDING' && (
                         <>
