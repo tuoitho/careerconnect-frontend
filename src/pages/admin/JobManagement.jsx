@@ -14,9 +14,11 @@ const JobManagement = () => {
     try {
       setLoading(true);
       const response = await adminService.getAllJobs(page);
+      // Updated to match the new response structure
       setJobs(response.result.data);
       setTotalPages(response.result.totalPages);
       setTotalElements(response.result.totalElements);
+      setCurrentPage(response.result.currentPage);
     } catch (error) {
       toast.error(error.message || 'Có lỗi xảy ra khi tải danh sách tin tuyển dụng');
     } finally {
@@ -52,6 +54,16 @@ const JobManagement = () => {
     }
   };
 
+  const handleShowJob = async (jobId) => {
+    try {
+      await adminService.showJob(jobId);
+      toast.success('Hiển thị tin tuyển dụng thành công');
+      fetchJobs(currentPage);
+    } catch (error) {
+      toast.error(error.message || 'Có lỗi xảy ra khi hiển thị tin tuyển dụng');
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-6">Quản lý tin tuyển dụng</h1>
@@ -80,10 +92,16 @@ const JobManagement = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{job.id}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{job.title}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{job.companyName}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{new Date(job.createdAt).toLocaleDateString()}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {new Date(job.createdAt).toLocaleDateString()}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${job.hidden ? 'bg-red-100 text-red-800' : job.approved ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
-                        {job.hidden ? 'Đã ẩn' : job.approved ? 'Đã duyệt' : 'Chờ duyệt'}
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        !job.visible ? 'bg-red-100 text-red-800' : 
+                        job.approved ? 'bg-green-100 text-green-800' : 
+                        'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {!job.visible ? 'Đã ẩn' : job.approved ? 'Đã duyệt' : 'Chờ duyệt'}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -95,12 +113,20 @@ const JobManagement = () => {
                           Phê duyệt
                         </button>
                       )}
-                      {!job.hidden && (
+                      {job.visible && (
                         <button
                           onClick={() => handleHideJob(job.id)}
-                          className="text-red-600 hover:text-red-900"
+                          className="text-red-600 hover:text-red-900 mr-4"
                         >
                           Ẩn
+                        </button>
+                      )}
+                      {!job.visible && (
+                        <button
+                          onClick={() => handleShowJob(job.id)}
+                          className="text-green-600 hover:text-green-900"
+                        >
+                          Hiển thị
                         </button>
                       )}
                     </td>

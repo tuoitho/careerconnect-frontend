@@ -48,6 +48,10 @@ export const adminService = {
     return await apiService.put(`/admin/jobs/${jobId}/hide`);
   },
 
+  async showJob(jobId) {
+    return await apiService.put(`/admin/jobs/${jobId}/show`);
+  },
+
   // Transaction management
   async getAllTransactions(page = 0, size = 10) {
     return await apiService.get(`/admin/transactions?page=${page}&size=${size}`);
