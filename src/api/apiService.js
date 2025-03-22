@@ -11,7 +11,7 @@ class ApiService {
       headers: {
         "Content-Type": "application/json",
       },
-      timeout: 7000,
+      timeout: 13000,
     });
 
     this.setupInterceptors();
