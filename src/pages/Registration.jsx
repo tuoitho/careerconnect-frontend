@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { registerUser } from "../services/userService";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { toast } from "react-toastify";
+import Loading2 from "../components/Loading2";
 
 const Registration = () => {
   const [formData, setFormData] = useState({
@@ -64,10 +65,10 @@ const Registration = () => {
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       {isLoading && (
-        <LoadingSpinner
-          message="Creating your account..."
-          color="blue"
-          size="default"
+        <Loading2
+          // message="Creating your account..."
+          // color="blue"
+          // size="default"
         />
       )}
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
