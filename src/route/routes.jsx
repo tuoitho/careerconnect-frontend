@@ -71,7 +71,7 @@ const RecruiterRoutes = () => (
   <ProtectedRoute allowedRoles={["recruiter"]}>
     <RecruiterLayout>
       <Routes>
-        <Route index element={<RecruiterHome />} />
+        <Route index element={<ManageCompany />} />
         <Route path="application/:applicationId" element={<ApplicationDetail />} />
         <Route path="profile" element={<RecruiterProfile />} />
         <Route path="company" element={<ManageCompany />} />
