@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { adminService } from '../../services/adminService';
 import { toast } from 'react-toastify';
 import Pagination from '../../components/Pagination';
+import UserDetailModal from '../../components/admin/UserDetailModal';
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -9,7 +10,8 @@ const UserManagement = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
-  console.log('Total elements:');
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const fetchUsers = async (page) => {
     try {
       setLoading(true);
@@ -32,21 +34,25 @@ const UserManagement = () => {
     setCurrentPage(page);
   };
 
-  const handleLockUser = async (userId) => {
+  const handleLockUser = async (userId, e) => {
+    e.stopPropagation();
     try {
-      await adminService.lockUser(userId);
-      toast.success('Khóa tài khoản thành công');
-      fetchUsers(currentPage);
+      const response = await adminService.lockUser(userId);
+      toast.success(response.message);
+      setIsModalOpen(false);
+      setUsers((prevUsers) => prevUsers.map((user) => (user.id === userId? { ...user, locked: true } : user)));
     } catch (error) {
       toast.error(error.message || 'Có lỗi xảy ra khi khóa tài khoản');
     }
   };
 
-  const handleUnlockUser = async (userId) => {
+  const handleUnlockUser = async (userId, e) => {
+    e.stopPropagation();
     try {
-      await adminService.unlockUser(userId);
-      toast.success('Mở khóa tài khoản thành công');
-      fetchUsers(currentPage);
+      const response = await adminService.unlockUser(userId);
+      toast.success(response.message);
+      setIsModalOpen(false);
+      setUsers((prevUsers) => prevUsers.map((user) => (user.id === userId? {...user, locked: false } : user)));
     } catch (error) {
       toast.error(error.message || 'Có lỗi xảy ra khi mở khóa tài khoản');
     }
@@ -76,7 +82,10 @@ const UserManagement = () => {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {users.map((user) => (
-                  <tr key={user.id}>
+                  <tr key={user.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => {
+                    setSelectedUser(user);
+                    setIsModalOpen(true);
+                  }}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.id}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.fullName}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.email}</td>
@@ -89,14 +98,14 @@ const UserManagement = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       {user.locked ? (
                         <button
-                          onClick={() => handleUnlockUser(user.id)}
+                          onClick={(e) => handleUnlockUser(user.id, e)}
                           className="text-indigo-600 hover:text-indigo-900 mr-4"
                         >
                           Mở khóa
                         </button>
                       ) : (
                         <button
-                          onClick={() => handleLockUser(user.id)}
+                          onClick={(e) => handleLockUser(user.id, e)}
                           className="text-red-600 hover:text-red-900 mr-4"
                         >
                           Khóa
@@ -108,6 +117,12 @@ const UserManagement = () => {
               </tbody>
             </table>
           </div>
+
+          <UserDetailModal
+            user={selectedUser}
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+          />
 
           <div className="mt-4">
             <Pagination
