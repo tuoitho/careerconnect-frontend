@@ -26,8 +26,13 @@ function Login() {
   const resetCaptcha = () => {
     setTk(null);
     setCaptchaKey(Date.now());
-    if (turnstileRef.current) {
-      turnstileRef.current.reset();
+    // if (turnstileRef.current) {
+    //   turnstileRef.current.reset();
+    // }
+    if (window.turnstile && turnstileRef.current) {
+      window.turnstile.reset(turnstileRef.current);
+    } else {
+      // console.warn('Turnstile chưa sẵn sàng để reset');
     }
   };
 
@@ -78,7 +83,15 @@ function Login() {
       [name]: value,
     }));
   };
-
+  useEffect(() => {
+    const checkTurnstile = setInterval(() => {
+      if (window.turnstile) {
+        clearInterval(checkTurnstile);
+        console.log('Turnstile đã sẵn sàng');
+      }
+    }, 100);
+    return () => clearInterval(checkTurnstile);
+  }, []);
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-6 border border-gray-100 border-x-0 border-t-0">
@@ -146,7 +159,7 @@ function Login() {
           </div>
 
           <div className="h-[50px]">
-            <div className="w-full max-w-[300px] mx-auto">
+            <div className="w-full max-w-[300px] mx-auto" >
               <Turnstile
                 ref={turnstileRef}
                 siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
@@ -154,6 +167,7 @@ function Login() {
                 onExpire={() => resetCaptcha()}
                 key={captchaKey}
                 className="w-full"
+
               />
             </div>
           </div>

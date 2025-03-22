@@ -33,6 +33,7 @@ export const AuthProvider = ({ children }) => {
     }
     catch (error) {
       //tiếp tục throw error để component gọi hàm này xử lý
+      console.log(error);
       throw error;
     }
   };
