@@ -14,7 +14,7 @@ const JobManagement = () => {
     try {
       setLoading(true);
       const response = await adminService.getAllJobs(page);
-      setJobs(response.result.content);
+      setJobs(response.result.data);
       setTotalPages(response.result.totalPages);
       setTotalElements(response.result.totalElements);
     } catch (error) {

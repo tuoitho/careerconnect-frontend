@@ -52,6 +52,16 @@ const CompanyManagement = () => {
     }
   };
 
+  const handleUnlockCompany = async (companyId) => {
+    try {
+      await adminService.unlockCompany(companyId);
+      toast.success('Mở khóa công ty thành công');
+      fetchCompanies(currentPage);
+    } catch (error) {
+      toast.error(error.message || 'Có lỗi xảy ra khi mở khóa công ty');
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-6">Quản lý công ty</h1>
@@ -101,6 +111,14 @@ const CompanyManagement = () => {
                           className="text-red-600 hover:text-red-900"
                         >
                           Khóa
+                        </button>
+                      )}
+                        {company.locked && (
+                        <button
+                          onClick={() => handleUnlockCompany(company.id)}
+                          className="text-green-600 hover:text-green-900"
+                        >
+                          Mở khóa
                         </button>
                       )}
                     </td>

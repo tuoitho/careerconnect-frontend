@@ -31,6 +31,10 @@ export const adminService = {
     return await apiService.put(`/admin/companies/${companyId}/lock`);
   },
 
+  async unlockCompany(companyId) {
+    return await apiService.put(`/admin/companies/${companyId}/unlock`);
+  },
+
   // Job management
   async getAllJobs(page = 0, size = 10) {
     return await apiService.get(`/admin/jobs?page=${page}&size=${size}`);
