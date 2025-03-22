@@ -39,7 +39,11 @@ function Login() {
     if (isAuthenticated && user) {
       if (user.role.toLowerCase() === "recruiter") {
         navigate("/recruiter");
-      } else if (user.role.toLowerCase() === "candidate") {
+      } else if (user.role.toLowerCase() === "admin") {
+        navigate("/admin");
+      }
+      
+      else if (user.role.toLowerCase() === "candidate") {
         navigate("/");
       } else {
         navigate("/");
