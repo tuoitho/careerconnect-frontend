@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
+import AdminDashboard from "../pages/admin/AdminDashboard";
 import ProtectedRoute from "../components/ProtectedRoute";
 import RecruiterLayout from "../components/recruiter/RecruiterLayout";
 import Layout from "../components/Layout";
@@ -93,7 +94,7 @@ const AdminRoutes = () => (
   <ProtectedRoute allowedRoles={["admin"]}>
     <AdminLayout>
       <Routes>
-        <Route index element={<Home />} />
+        <Route index element={<AdminDashboard />} />
         <Route path="users" element={<UserManagement />} />
         <Route path="companies" element={<CompanyManagement />} />
         <Route path="jobs" element={<JobManagement />} />
