@@ -9,7 +9,6 @@ const CompanyManagement = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
-
   const fetchCompanies = async (page) => {
     try {
       setLoading(true);
