@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { adminService } from '../../services/adminService';
 import { toast } from 'react-toastify';
+import Loading2 from '../../components/Loading2';
 import Pagination from '../../components/Pagination';
 
 const JobManagement = () => {
@@ -9,6 +10,7 @@ const JobManagement = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
+  const [loadingAction, setLoadingAction] = useState(false);
 
   const fetchJobs = async (page) => {
     try {
@@ -35,37 +37,48 @@ const JobManagement = () => {
   };
 
   const handleApproveJob = async (jobId) => {
+    setLoadingAction(true);
     try {
       await adminService.approveJob(jobId);
       toast.success('Phê duyệt tin tuyển dụng thành công');
       fetchJobs(currentPage);
     } catch (error) {
       toast.error(error.message || 'Có lỗi xảy ra khi phê duyệt tin tuyển dụng');
+    } finally {
+      setLoadingAction(false);
     }
   };
 
   const handleHideJob = async (jobId) => {
+    setLoadingAction(true);
     try {
       await adminService.hideJob(jobId);
       toast.success('Ẩn tin tuyển dụng thành công');
       fetchJobs(currentPage);
     } catch (error) {
       toast.error(error.message || 'Có lỗi xảy ra khi ẩn tin tuyển dụng');
+    } finally {
+      setLoadingAction(false);
     }
   };
 
   const handleShowJob = async (jobId) => {
+    setLoadingAction(true);
     try {
       await adminService.showJob(jobId);
       toast.success('Hiển thị tin tuyển dụng thành công');
       fetchJobs(currentPage);
     } catch (error) {
       toast.error(error.message || 'Có lỗi xảy ra khi hiển thị tin tuyển dụng');
+    } finally {
+      setLoadingAction(false);
     }
   };
 
   return (
     <div className="container mx-auto px-4 py-8">
+            {loadingAction && <Loading2 />}
+
       <h1 className="text-2xl font-bold mb-6">Quản lý tin tuyển dụng</h1>
       
       {loading ? (
@@ -105,29 +118,35 @@ const JobManagement = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      {!job.approved && (
-                        <button
-                          onClick={() => handleApproveJob(job.id)}
-                          className="text-indigo-600 hover:text-indigo-900 mr-4"
-                        >
-                          Phê duyệt
-                        </button>
-                      )}
-                      {job.visible && (
-                        <button
-                          onClick={() => handleHideJob(job.id)}
-                          className="text-red-600 hover:text-red-900 mr-4"
-                        >
-                          Ẩn
-                        </button>
-                      )}
-                      {!job.visible && (
-                        <button
-                          onClick={() => handleShowJob(job.id)}
-                          className="text-green-600 hover:text-green-900"
-                        >
-                          Hiển thị
-                        </button>
+                      {loadingAction ? (
+                        null
+                      ) : (
+                        <>
+                          {!job.approved && (
+                            <button
+                              onClick={() => handleApproveJob(job.id)}
+                              className="text-indigo-600 hover:text-indigo-900 mr-4"
+                            >
+                              Phê duyệt
+                            </button>
+                          )}
+                          {job.visible && (
+                            <button
+                              onClick={() => handleHideJob(job.id)}
+                              className="text-red-600 hover:text-red-900 mr-4"
+                            >
+                              Ẩn
+                            </button>
+                          )}
+                          {!job.visible && (
+                            <button
+                              onClick={() => handleShowJob(job.id)}
+                              className="text-green-600 hover:text-green-900"
+                            >
+                              Hiển thị
+                            </button>
+                          )}
+                        </>
                       )}
                     </td>
                   </tr>

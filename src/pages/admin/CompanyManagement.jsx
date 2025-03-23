@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { adminService } from '../../services/adminService';
 import { toast } from 'react-toastify';
+import Loading2 from '../../components/Loading2';
 import Pagination from '../../components/Pagination';
 
 const CompanyManagement = () => {
@@ -9,6 +10,7 @@ const CompanyManagement = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
+  const [loadingAction, setLoadingAction] = useState(false);
   const fetchCompanies = async (page) => {
     try {
       setLoading(true);
@@ -42,27 +44,35 @@ const CompanyManagement = () => {
   };
 
   const handleLockCompany = async (companyId) => {
+    setLoadingAction(true);
     try {
       await adminService.lockCompany(companyId);
       toast.success('Khóa công ty thành công');
       fetchCompanies(currentPage);
     } catch (error) {
       toast.error(error.message || 'Có lỗi xảy ra khi khóa công ty');
+    } finally {
+      setLoadingAction(false);
     }
   };
 
   const handleUnlockCompany = async (companyId) => {
+    setLoadingAction(true);
     try {
       await adminService.unlockCompany(companyId);
       toast.success('Mở khóa công ty thành công');
       fetchCompanies(currentPage);
     } catch (error) {
       toast.error(error.message || 'Có lỗi xảy ra khi mở khóa công ty');
+    } finally {
+      setLoadingAction(false);
     }
   };
 
   return (
     <div className="container mx-auto px-4 py-8">
+            {loadingAction && <Loading2 />}
+
       <h1 className="text-2xl font-bold mb-6">Quản lý công ty</h1>
       
       {loading ? (
@@ -104,15 +114,16 @@ const CompanyManagement = () => {
                           Phê duyệt
                         </button>
                       )}
-                      {!company.locked && (
+                      {loadingAction ? (
+                       null
+                      ) : !company.locked ? (
                         <button
                           onClick={() => handleLockCompany(company.id)}
                           className="text-red-600 hover:text-red-900"
                         >
                           Khóa
                         </button>
-                      )}
-                        {company.locked && (
+                      ) : (
                         <button
                           onClick={() => handleUnlockCompany(company.id)}
                           className="text-green-600 hover:text-green-900"

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { adminService } from '../../services/adminService';
 import { toast } from 'react-toastify';
+import Loading2 from '../../components/Loading2';
 import Pagination from '../../components/Pagination';
 
 const TransactionManagement = () => {
@@ -9,6 +10,7 @@ const TransactionManagement = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
+  const [loadingAction, setLoadingAction] = useState(false);
 
   const fetchTransactions = async (page) => {
     try {
@@ -34,22 +36,28 @@ const TransactionManagement = () => {
   };
 
   const handleConfirmTransaction = async (transactionId) => {
+    setLoadingAction(true);
     try {
       await adminService.confirmTransaction(transactionId);
       toast.success('Xác nhận giao dịch thành công');
       fetchTransactions(currentPage);
     } catch (error) {
       toast.error(error.message || 'Có lỗi xảy ra khi xác nhận giao dịch');
+    } finally {
+      setLoadingAction(false);
     }
   };
 
   const handleCancelTransaction = async (transactionId) => {
+    setLoadingAction(true);
     try {
       await adminService.cancelTransaction(transactionId);
       toast.success('Hủy giao dịch thành công');
       fetchTransactions(currentPage);
     } catch (error) {
       toast.error(error.message || 'Có lỗi xảy ra khi hủy giao dịch');
+    } finally {
+      setLoadingAction(false);
     }
   };
 
@@ -62,6 +70,8 @@ const TransactionManagement = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
+            {loadingAction && <Loading2 />}
+
       <h1 className="text-2xl font-bold mb-6">Quản lý giao dịch</h1>
       
       {loading ? (
@@ -107,7 +117,9 @@ const TransactionManagement = () => {
                       {new Date(transaction.createdAt).toLocaleString('vi-VN')}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      {transaction.status === 'PENDING' && (
+                      {loadingAction ? (
+                       null
+                      ) : transaction.status === 'PENDING' && (
                         <>
                           <button
                             onClick={() => handleConfirmTransaction(transaction.id)}

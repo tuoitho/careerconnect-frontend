@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { adminService } from '../../services/adminService';
 import { toast } from 'react-toastify';
+import Loading2 from '../../components/Loading2';
 import Pagination from '../../components/Pagination';
 import UserDetailModal from '../../components/admin/UserDetailModal';
 
@@ -12,6 +13,7 @@ const UserManagement = () => {
   const [totalElements, setTotalElements] = useState(0);
   const [selectedUser, setSelectedUser] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loadingAction, setLoadingAction] = useState(false);
   const fetchUsers = async (page) => {
     try {
       setLoading(true);
@@ -36,6 +38,7 @@ const UserManagement = () => {
 
   const handleLockUser = async (userId, e) => {
     e.stopPropagation();
+    setLoadingAction(true);
     try {
       const response = await adminService.lockUser(userId);
       toast.success(response.message);
@@ -43,11 +46,14 @@ const UserManagement = () => {
       setUsers((prevUsers) => prevUsers.map((user) => (user.id === userId? { ...user, locked: true } : user)));
     } catch (error) {
       toast.error(error.message || 'Có lỗi xảy ra khi khóa tài khoản');
+    } finally {
+      setLoadingAction(false);
     }
   };
 
   const handleUnlockUser = async (userId, e) => {
     e.stopPropagation();
+    setLoadingAction(true);
     try {
       const response = await adminService.unlockUser(userId);
       toast.success(response.message);
@@ -55,11 +61,14 @@ const UserManagement = () => {
       setUsers((prevUsers) => prevUsers.map((user) => (user.id === userId? {...user, locked: false } : user)));
     } catch (error) {
       toast.error(error.message || 'Có lỗi xảy ra khi mở khóa tài khoản');
+    } finally {
+      setLoadingAction(false);
     }
   };
 
   return (
     <div className="container mx-auto px-4 py-8">
+      {loadingAction && <Loading2 />}
       <h1 className="text-2xl font-bold mb-6">Quản lý người dùng</h1>
       
       {loading ? (
@@ -96,7 +105,10 @@ const UserManagement = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      {user.locked ? (
+                      {loadingAction ? (
+                        // <Loading2 />
+                        null
+                      ) : user.locked ? (
                         <button
                           onClick={(e) => handleUnlockUser(user.id, e)}
                           className="text-indigo-600 hover:text-indigo-900 mr-4"
