@@ -74,7 +74,7 @@ class ApiService {
             // Thử lại request đăng nhập do có thể bị chặn
             if (!originalRequest._internetRetry) {
               originalRequest._internetRetry = true;
-              toast.info("Đang thử kết nối lại...");
+              // toast.info("Đang thử kết nối lại...");
               return new Promise(resolve => {
                 setTimeout(() => {
                   resolve(this.instance(originalRequest));
