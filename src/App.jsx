@@ -7,14 +7,14 @@ import Layout from "./components/Layout";
 
 function App() {
   return (
-    // <React.StrictMode>
+    <React.StrictMode>
       <AuthProvider>
         <Router>
             <AppRoutes />
           <ToastContainer />
         </Router>
       </AuthProvider>
-    // </React.StrictMode>
+     </React.StrictMode>
   );
 }
 
