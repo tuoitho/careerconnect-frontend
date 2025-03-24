@@ -69,7 +69,19 @@ class ApiService {
           // toast.error(error.response.data.message);
         } else if (error.request) {
           // Không nhận được phản hồi từ server
-          // return Promise.reject(error);
+          // Kiểm tra nếu là request đăng nhập
+          if (originalRequest.url === "/auth/login") {
+            // Thử lại request đăng nhập do có thể bị chặn
+            if (!originalRequest._internetRetry) {
+              originalRequest._internetRetry = true;
+              toast.info("Đang thử kết nối lại...");
+              return new Promise(resolve => {
+                setTimeout(() => {
+                  resolve(this.instance(originalRequest));
+                }, 0);
+              });
+            }
+          }
           return Promise.reject({ message: "Lỗi internet, vui lòng thử lại lần nữa!" });
         } else {
           // Lỗi khác
