@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { adminService } from '../../services/adminService';
 import { toast } from 'react-toastify';
 import Loading2 from '../../components/Loading2';
-import Pagination from '../../components/Pagination';
+import Pagination from '../../components/atoms/Pagination';
 
 const TransactionManagement = () => {
   const [transactions, setTransactions] = useState([]);

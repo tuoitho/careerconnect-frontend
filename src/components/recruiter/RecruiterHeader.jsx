@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef,useContext  } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { FaBell, FaComment, FaUser, FaBuilding, FaSignOutAlt } from 'react-icons/fa';
-import AuthContext from '../../context/AuthContext'; // Import AuthContext
+import { useDispatch } from 'react-redux';
+import { logout } from '../../features/auth/authSlice';
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,9 +21,8 @@ const Header = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Xử lý logout
   const handleLogout = () => {
-    logout(); // Gọi hàm logout từ context
+    dispatch(logout());
   };
   return (
     <header className="bg-white shadow-sm fixed inset-x-0 top-0 z-50">

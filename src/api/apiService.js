@@ -24,7 +24,7 @@ class ApiService {
         config.metadata = { startTime: new Date() };
 
         // Kiểm tra nếu endpoint không yêu cầu Authorization
-        const excludedEndpoints = ["/auth/login"];
+        const excludedEndpoints = ["/auth/login", "/auth/refresh-token"];
         if (!excludedEndpoints.includes(config.url)) {
           const token = localStorage.getItem("authToken");
           if (token) {
@@ -49,15 +49,25 @@ class ApiService {
           originalRequest._retry = true;
           
           try {
-            //lấy từ cookie ở backend rồi
-            const response = await this.refreshAuthToken();
-            localStorage.setItem("authToken", response.accessToken);
-            originalRequest.headers.Authorization = `Bearer ${response.token}`;
+            const data = await this.refreshAuthToken();
+            
+            // Kiểm tra accessToken hợp lệ
+            if (!data?.accessToken) {
+              throw new Error('Invalid refresh token response');
+            }
 
-            return this.instance(originalRequest);
+            localStorage.setItem("authToken", data.accessToken);
+            originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
+            
+            // Tạo config mới để tránh tham chiếu cũ
+            const newConfig = { ...originalRequest };
+            return this.instance(newConfig);
           } catch (refreshError) {
-            this.clearAuthToken();
-            window.location.href = "/login";
+            // Xử lý trường hợp refresh token hết hạn
+            if (refreshError.response?.status === 401) {
+              this.clearAuthToken();
+              window.location.href = "/login?session_expired=true";
+            }
             return Promise.reject(refreshError);
           }
         }
@@ -92,21 +102,7 @@ class ApiService {
   
     );
   }
-  // handleError(error) {
-  //   console.error("Request failed:", error.response.data);
-  //   let errorMessage = "Có lỗi xảy ra. Vui lòng thử lại sau.";
 
-  //   if (error.response) {
-  //     const { status, data } = error.response;
-  //     errorMessage = data.message || `HTTP Error ${status}`;
-  //   } else if (error.request) {
-  //     errorMessage = "Network error: Please check your internet connection.";
-  //   } else {
-  //     errorMessage = error.message || "Unknown error occurred.";
-  //   }
-  //   // Hiển thị thông báo lỗi (nếu dùng thư viện như toast)
-  //   toast.error(errorMessage);
-  // }
 
   // Auth methods
   setAuthToken(token) {

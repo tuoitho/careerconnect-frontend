@@ -1,20 +1,13 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext";
 import { ToastContainer } from "react-toastify";
 import AppRoutes from "./route/routes";
-import Layout from "./components/Layout";
 
 function App() {
   return (
     <React.StrictMode>
-      <AuthProvider>
-        <Router>
-            <AppRoutes />
-          <ToastContainer />
-        </Router>
-      </AuthProvider>
-     </React.StrictMode>
+      <AppRoutes />
+      <ToastContainer />
+    </React.StrictMode>
   );
 }
 

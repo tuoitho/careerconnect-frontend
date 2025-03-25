@@ -1,13 +1,13 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Bookmark, Trash2, ExternalLink } from 'lucide-react';
 import apiService from '../api/apiService';
-import AuthContext from '../context/AuthContext';
+import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 
 const SavedJobsPage = () => {
   const [savedJobs, setSavedJobs] = useState([]);
-  const { user, isAuthenticated } = useContext(AuthContext);
+  const { user, isAuthenticated } = useSelector(state => state.auth);
   const navigate = useNavigate();
 
   useEffect(() => {

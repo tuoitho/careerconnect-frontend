@@ -1,5 +1,5 @@
-import { useState, useEffect, useContext } from "react";
-import { Link } from "react-router-dom"; // Using react-router-dom's Link
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { Link } from "react-router-dom";
 import {
   Bell,
   User,
@@ -9,10 +9,11 @@ import {
   MessageSquare,
   ChevronRight,
   DollarSign,
-} from "lucide-react"; // Import DollarSign icon
+} from "lucide-react";
 import NotificationDetailModal from "./NotificationDetailModal";
 import apiService from "../api/apiService";
-import AuthContext from "../context/AuthContext";
+import { useDispatch, useSelector } from 'react-redux';
+import { logout, selectUser, selectIsAuthenticated } from '../features/auth/authSlice';
 
 export default function Header() {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -21,37 +22,50 @@ export default function Header() {
   const [loading, setLoading] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [hasFetchedData, setHasFetchedData] = useState(false);
 
   // Mock auth state from context
-  const { user, isAuthenticated, logout } = useContext(AuthContext);
-  const fetchNotifications = async () => {
-    if (isAuthenticated) {
-      try {
-        setLoading(true);
-        const response = await apiService.get("/notifications", {
-          params: { page: 0, size: 3 },
-        });
-        setNotifications(response.result.data || []);
-      } catch (error) {
-        console.error("Failed to fetch notifications:", error);
-      } finally {
-        setLoading(false);
-      }
+  const dispatch = useDispatch();
+  const user = useSelector(selectUser);
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const fetchNotifications = useCallback(async () => {
+    if (!isAuthenticated) return;
+    try {
+      setLoading(true);
+      const response = await apiService.get("/notifications", {
+        params: { page: 0, size: 3 },
+      });
+      setNotifications(response.result.data || []);
+    } catch (error) {
+      console.error("Failed to fetch notifications:", error);
+    } finally {
+      setLoading(false);
     }
-  };
-  // Fetch notifications from API
-  useEffect(() => {
-    fetchNotifications();
   }, [isAuthenticated]);
-  // useEffect(() => {
-  //   console.log("showNotifications", showNotifications);
-  //   if (showNotifications && notifications.length === 0 ) {
-  //     fetchNotifications();
-  //   }
-  // }, [showNotifications]);
 
-  const unreadCount = notifications.filter((notification) => !notification.read).length;
+  const memoizedNotifications = useMemo(() => notifications, [notifications]);
+  const unreadCount = useMemo(
+    () => memoizedNotifications.filter((notification) => !notification.read).length,
+    [memoizedNotifications]
+  );
+  useEffect(() => {
+    let isMounted = true;
+    
+    if (isAuthenticated && !hasFetchedData) {
+      (async () => {
+        await fetchNotifications();
+        if (isMounted) {
+          setHasFetchedData(true);
+        }
+      })();
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isAuthenticated, hasFetchedData, fetchNotifications]);
+
+
 
   const handleNotificationClick = (e, notification) => {
     e.stopPropagation();
@@ -91,6 +105,9 @@ export default function Header() {
     setShowNotifications(!showNotifications);
     if (showDropdown) {
       setShowDropdown(false);
+    }
+    if (!hasFetchedData && isAuthenticated) {
+      fetchNotifications();
     }
   };
 
@@ -228,7 +245,7 @@ export default function Header() {
                 )}
               </div>
 
-              <button onClick={logout} className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg">
+              <button onClick={() => dispatch(logout())} className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg">
                 Đăng xuất
               </button>
             </div>

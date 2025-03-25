@@ -1,18 +1,21 @@
 import { useState, useRef, useEffect } from "react";
 import { FiMail, FiLock, FiUser, FiX, FiShield } from "react-icons/fi";
-import AuthContext from "../context/AuthContext";
-import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import Loading2 from "../components/Loading2";
 import { toast } from "react-toastify";
 import { Turnstile } from "@marsidev/react-turnstile";
+import { useDispatch, useSelector } from 'react-redux';
+import { login, selectUser, selectIsAuthenticated, selectLoading } from '../features/auth/authSlice';
 
 function Login() {
   const [formData, setFormData] = useState({
     username: "",
     password: "",
   });
-  const { user, isAuthenticated, logout } = useContext(AuthContext);
+  const dispatch = useDispatch();
+  const user = useSelector(selectUser);
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const isLoading = useSelector(selectLoading);
   const [tk, setTk] = useState(null);
   const [captchaKey, setCaptchaKey] = useState(Date.now());
   const turnstileRef = useRef();
@@ -41,8 +44,6 @@ function Login() {
   };
 
   const navigate = useNavigate();
-  const { login, error } = useContext(AuthContext);
-  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated && user) {
@@ -61,21 +62,14 @@ function Login() {
   }, [isAuthenticated, user, navigate]);
 
   const performLogin = (tk) => {
-    setIsLoading(true);
-    console.log(tk);
-    login(
-      formData,
-      tk // token is now passed in the payload
-    )
-      .then((response) => {
+    dispatch(login(formData, tk))
+      .unwrap()
+      .then(() => {
         toast.success("Login successful");
       })
       .catch((error) => {
         toast.error(error.message);
         resetCaptcha();
-      })
-      .finally(() => {
-        setIsLoading(false);
       });
   };
 

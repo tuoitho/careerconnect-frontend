@@ -1,35 +1,37 @@
-import { useContext, useCallback } from 'react';
-import AuthContext from '../../../context/AuthContext';
+import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { login as loginAction, logout as logoutAction } from '../authSlice';
 
 /**
  * Custom hook để xử lý authentication
  * @returns {Object} - Các phương thức và state liên quan đến authentication
  */
 export const useAuth = () => {
-  const { user, isAuthenticated, login, logout } = useContext(AuthContext);
+  const { user, isAuthenticated } = useSelector(state => state.auth);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   // Hàm đăng nhập và điều hướng
   const loginWithRedirect = useCallback(async (userData, tk, redirectPath = '/') => {
     try {
-      const response = await login(userData, tk);
+      const response = await dispatch(loginAction({ userData, tk })).unwrap();
       navigate(redirectPath);
       return response;
     } catch (error) {
       throw error;
     }
-  }, [login, navigate]);
+  }, [dispatch, navigate]);
 
   // Hàm đăng xuất và điều hướng
   const logoutWithRedirect = useCallback(async (redirectPath = '/login') => {
     try {
-      await logout();
+      await dispatch(logoutAction()).unwrap();
       navigate(redirectPath);
     } catch (error) {
       console.error('Logout error:', error);
     }
-  }, [logout, navigate]);
+  }, [dispatch, navigate]);
 
   return {
     user,

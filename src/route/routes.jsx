@@ -1,5 +1,7 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { selectUser, selectIsAuthenticated } from "../features/auth/authSlice";
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import ProtectedRoute from "../components/ProtectedRoute";
 import RecruiterLayout from "../components/recruiter/RecruiterLayout";
@@ -36,7 +38,6 @@ import CandidateDetail from "../pages/CandidateDetail";
 import PaymentResultPage from "../pages/PaymentResultPage.jsx";
 import TopUpPage from "../pages/TopUpPage.jsx";
 import CoinManagementPage from "../pages/CoinManagementPage.jsx";
-import AuthContext from "../context/AuthContext";
 import AdminLayout from "../components/admin/AdminLayout";
 import UserManagement from "../pages/admin/UserManagement";
 import CompanyManagement from "../pages/admin/CompanyManagement";
@@ -125,8 +126,9 @@ const CandidateRoutes = () => (
 );
 
 const AppRoutes = () => {
-  const { user, isAuthenticated } = useContext(AuthContext);
-  const role = user?.role.toLowerCase();
+  const user = useSelector(selectUser);
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const role = user?.role?.toLowerCase();
 
 
   return (

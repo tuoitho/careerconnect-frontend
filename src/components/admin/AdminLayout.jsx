@@ -1,12 +1,14 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import AdminSidebar from './AdminSidebar';
-import AuthContext from '../../context/AuthContext';
 import { FaSignOutAlt, FaBell, FaUser, FaSearch } from 'react-icons/fa';
+import { useDispatch, useSelector } from 'react-redux';
+import { logout, selectUser } from '../../features/auth/authSlice';
 
 const AdminLayout = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
-  const { logout, user } = useContext(AuthContext);
+  const dispatch = useDispatch();
+  const user = useSelector(selectUser);
   const location = useLocation();
 
   const toggleSidebar = () => {
@@ -14,7 +16,7 @@ const AdminLayout = ({ children }) => {
   };
 
   const handleLogout = () => {
-    logout();
+    dispatch(logout());
   };
 
   // Generate breadcrumb from current path

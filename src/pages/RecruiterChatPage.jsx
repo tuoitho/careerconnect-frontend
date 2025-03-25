@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useRef, useContext } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { MessageSquare, Send, ChevronLeft } from 'lucide-react';
 import SockJS from 'sockjs-client';
 import Stomp from 'stompjs';
 import apiService from '../api/apiService';
 import { toast } from 'react-toastify';
-import AuthContext from '../context/AuthContext';
+import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 
 const RecruiterChatPage = () => {
@@ -19,7 +19,7 @@ const RecruiterChatPage = () => {
   const [typing, setTyping] = useState(false);
   const stompClient = useRef(null);
   const messageAreaRef = useRef(null);
-  const { user, isAuthenticated } = useContext(AuthContext);
+  const { user, isAuthenticated } = useSelector(state => state.auth);
 
   useEffect(() => {
     selectedCandidateRef.current = selectedCandidate;
