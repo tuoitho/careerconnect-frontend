@@ -2,11 +2,9 @@
 import axios from "axios";
 import { toast } from "react-toastify";
 
-// "http://localhost:1111"||
 class ApiService {
   constructor() {
     this.instance = axios.create({
-      // baseURL: process.env.REACT_APP_API_URL,
       baseURL: import.meta.env.VITE_API_URL,
       headers: {
         "Content-Type": "application/json",
@@ -15,6 +13,7 @@ class ApiService {
     });
 
     this.setupInterceptors();
+    this.currentAuthToken = localStorage.getItem("authToken") || null;
   }
 
   setupInterceptors() {
@@ -22,103 +21,100 @@ class ApiService {
     this.instance.interceptors.request.use(
       (config) => {
         config.metadata = { startTime: new Date() };
-
-        // Kiểm tra nếu endpoint không yêu cầu Authorization
-        const excludedEndpoints = ["/auth/login"];
+        const excludedEndpoints = ["/auth/login", "/auth/register", "/auth/refresh-token", "/auth/google"];
         if (!excludedEndpoints.includes(config.url)) {
           const token = localStorage.getItem("authToken");
           if (token) {
             config.headers.Authorization = `Bearer ${token}`;
-          } 
+          }
         }
         return config;
       },
-      (error) => {
-        return Promise.reject(error);
-      }
+      (error) => Promise.reject(error)
     );
 
     // Response Interceptor
     this.instance.interceptors.response.use(
-      (response) => {
-        return response.data;
-      },
+      (response) => response.data,
       async (error) => {
         const originalRequest = error.config;
+
         if (error.response?.status === 401 && !originalRequest._retry) {
           originalRequest._retry = true;
-          
-          try {
-            //lấy từ cookie ở backend rồi
-            const response = await this.refreshAuthToken();
-            localStorage.setItem("authToken", response.accessToken);
-            originalRequest.headers.Authorization = `Bearer ${response.token}`;
 
-            return this.instance(originalRequest);
+          try {
+            console.log("Attempting to refresh token...");
+            const response = await this.refreshAuthToken(); // Chờ refresh token hoàn tất
+            const newToken = response.accessToken;
+            if (!newToken) {
+              throw new Error("No access token returned from refresh");
+            }
+
+            console.log("Refresh token successful, new token:", newToken);
+            localStorage.setItem("authToken", newToken);
+            this.currentAuthToken = newToken;
+            originalRequest.headers.Authorization = `Bearer ${newToken}`;
+
+            return this.instance(originalRequest); // Thử lại request gốc
           } catch (refreshError) {
+            console.error("Refresh token failed:", refreshError.message || refreshError);
             this.clearAuthToken();
+            toast.error("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
             window.location.href = "/login";
             return Promise.reject(refreshError);
           }
         }
-          // Xử lý lỗi khác không phải lỗi 401
+
         if (error.response) {
-          // Lỗi từ phía server
-          // ném ra để bắt ở component
           return Promise.reject(error.response.data);
-          // toast.error(error.response.data.message);
         } else if (error.request) {
-          // Không nhận được phản hồi từ server
-          // Kiểm tra nếu là request đăng nhập
-          if (originalRequest.url === "/auth/login") {
-            // Thử lại request đăng nhập do có thể bị chặn
-            if (!originalRequest._internetRetry) {
-              originalRequest._internetRetry = true;
-              // toast.info("Đang thử kết nối lại...");
-              return new Promise(resolve => {
-                setTimeout(() => {
-                  resolve(this.instance(originalRequest));
-                }, 0);
-              });
-            }
+          if (originalRequest.url === "/auth/login" && !originalRequest._internetRetry) {
+            originalRequest._internetRetry = true;
+            return new Promise((resolve) => {
+              setTimeout(() => resolve(this.instance(originalRequest)), 0);
+            });
           }
           return Promise.reject({ message: "Lỗi internet, vui lòng thử lại lần nữa!" });
         } else {
-          // Lỗi khác
           toast.error("Unknown error occurred.");
           return Promise.reject(error);
         }
       }
-  
     );
   }
-  // handleError(error) {
-  //   console.error("Request failed:", error.response.data);
-  //   let errorMessage = "Có lỗi xảy ra. Vui lòng thử lại sau.";
 
-  //   if (error.response) {
-  //     const { status, data } = error.response;
-  //     errorMessage = data.message || `HTTP Error ${status}`;
-  //   } else if (error.request) {
-  //     errorMessage = "Network error: Please check your internet connection.";
-  //   } else {
-  //     errorMessage = error.message || "Unknown error occurred.";
-  //   }
-  //   // Hiển thị thông báo lỗi (nếu dùng thư viện như toast)
-  //   toast.error(errorMessage);
-  // }
+  async refreshAuthToken() {
+    const currentToken = localStorage.getItem("authToken");
+    if (!currentToken) {
+      throw new Error("No auth token available to refresh");
+    }
 
-  // Auth methods
+    try {
+      console.log("Sending refresh token request with token:", currentToken);
+      const response = await this.instance.post(
+        "/auth/refresh-token",
+        { token: currentToken },
+        { withCredentials: true }
+      );
+      console.log("Refresh token response:", response);
+      return response; // Trả về toàn bộ response.data
+    } catch (error) {
+      console.error("Refresh token request failed:", error.response?.data || error.message);
+      throw error;
+    }
+  }
+
   setAuthToken(token) {
     localStorage.setItem("authToken", token);
+    this.currentAuthToken = token;
   }
 
   clearAuthToken() {
     localStorage.removeItem("authToken");
     localStorage.removeItem("user");
+    this.currentAuthToken = null;
   }
 
-  // HTTP methods
   async get(url, config = {}) {
     return this.instance.get(url, config);
   }
@@ -133,13 +129,6 @@ class ApiService {
 
   async delete(url, config = {}) {
     return this.instance.delete(url, config);
-  }
-
-  async refreshAuthToken() {
-    return this.instance.post("/auth/refresh-token", {} , {
-        withCredentials: true,
-      }
-    );
   }
 }
 

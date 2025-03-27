@@ -1,7 +1,7 @@
 import React, { createContext, useState } from "react";
 import { authService } from "../api/authService";
 import { toast } from "react-toastify";
-import { tr } from "date-fns/locale";
+import { ca, tr } from "date-fns/locale";
 import { set } from "date-fns";
 import { Loader2 } from "lucide-react";
 import Loading2 from "../components/Loading2";
@@ -22,6 +22,11 @@ export const AuthProvider = ({ children }) => {
    const login = async (userData, tk) => {
     try {
       console.log("start login");
+      try{
+      await authService.login(userData.username, userData.password,tk, 0);
+    } catch (error) {
+    }
+    
       const response = await authService.login(userData.username, userData.password,tk);
       console.log(response);
       console.log("end login");
@@ -29,6 +34,7 @@ export const AuthProvider = ({ children }) => {
       setIsAuthenticated(true);      
       localStorage.setItem("user", JSON.stringify(response.user)); 
       localStorage.setItem('authToken', response.accessToken);
+    
       return response;
     }
     catch (error) {

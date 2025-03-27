@@ -4,17 +4,20 @@ import { AuthProvider } from "./context/AuthContext";
 import { ToastContainer } from "react-toastify";
 import AppRoutes from "./route/routes";
 import Layout from "./components/Layout";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 function App() {
   return (
-    <React.StrictMode>
+    // <React.StrictMode>
+      <>
       <AuthProvider>
         <Router>
             <AppRoutes />
           <ToastContainer />
         </Router>
       </AuthProvider>
-     </React.StrictMode>
+     {/* </React.StrictMode> */}
+     </>
   );
 }
 

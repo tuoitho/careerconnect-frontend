@@ -1,35 +1,36 @@
-import { useState, useRef, useEffect } from "react";
-import { FiMail, FiLock, FiUser, FiX, FiShield } from "react-icons/fi";
+import { useState, useRef, useEffect, useContext } from "react";
+import { FiMail, FiLock, FiUser, FiX } from "react-icons/fi";
 import AuthContext from "../context/AuthContext";
-import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import Loading2 from "../components/Loading2";
 import { toast } from "react-toastify";
 import { Turnstile } from "@marsidev/react-turnstile";
+import axios from "axios";
+import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
+import apiService from "../api/apiService";
 
 function Login() {
   const [formData, setFormData] = useState({
     username: "",
     password: "",
   });
-  const { user, isAuthenticated, logout } = useContext(AuthContext);
+  const { user, isAuthenticated, login, logout } = useContext(AuthContext);
   const [tk, setTk] = useState(null);
   const [captchaKey, setCaptchaKey] = useState(Date.now());
   const turnstileRef = useRef();
   const [showCaptchaModal, setShowCaptchaModal] = useState(false);
-  
+  const [isLoading, setIsLoading] = useState(false);
+
+  const navigate = useNavigate();
+
   const handleCaptchaSuccess = (tk) => {
     setTk(tk);
-
-    // Delay hiding the modal to allow users to see the Turnstile's success checkmark
     setTimeout(() => {
       setShowCaptchaModal(false);
-      // After captcha verification succeeds, proceed with login
       if (tk) {
         console.log("Captcha verification succeeded, tk:", tk);
         performLogin(tk);
       }
-    }, 1000); // Show Turnstile's success indicator for 1 second before proceeding
+    }, 1000);
   };
 
   const resetCaptcha = () => {
@@ -40,19 +41,13 @@ function Login() {
     }
   };
 
-  const navigate = useNavigate();
-  const { login, error } = useContext(AuthContext);
-  const [isLoading, setIsLoading] = useState(false);
-
   useEffect(() => {
-    if (isAuthenticated && user) {
+    if (isAuthenticated && user && user.role) {
       if (user.role.toLowerCase() === "recruiter") {
         navigate("/recruiter");
       } else if (user.role.toLowerCase() === "admin") {
         navigate("/admin");
-      }
-      
-      else if (user.role.toLowerCase() === "candidate") {
+      } else if (user.role.toLowerCase() === "candidate") {
         navigate("/");
       } else {
         navigate("/");
@@ -62,16 +57,12 @@ function Login() {
 
   const performLogin = (tk) => {
     setIsLoading(true);
-    console.log(tk);
-    login(
-      formData,
-      tk // token is now passed in the payload
-    )
+    login(formData, tk)
       .then((response) => {
         toast.success("Login successful");
       })
       .catch((error) => {
-        toast.error(error.message);
+        toast.error(error.message || "Login failed");
         resetCaptcha();
       })
       .finally(() => {
@@ -81,7 +72,6 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Show captcha modal instead of immediately logging in
     setShowCaptchaModal(true);
   };
 
@@ -97,24 +87,61 @@ function Login() {
     const checkTurnstile = setInterval(() => {
       if (window.turnstile) {
         clearInterval(checkTurnstile);
-        console.log('Turnstile đã sẵn sàng');
+        console.log("Turnstile đã sẵn sàng");
       }
     }, 100);
     return () => clearInterval(checkTurnstile);
   }, []);
 
+  // Xử lý Google Login từ frontend
+  const handleGoogleLoginSuccess = async (credentialResponse) => {
+    setIsLoading(true);
+    try {
+      const idToken = credentialResponse.credential; // Lấy id_token từ Google
+      console.log("Google ID Token:", idToken);
+
+      // Gửi idToken đến backend để xác minh
+      // gửi 1 lần trc xong tự cancel với timeout=0
+
+    
+      const res = await apiService.post("/auth/google", {
+        idToken,
+      }, {
+       withCredentials: true, 
+      }
+      );
+      
+
+      localStorage.setItem("authToken", res.accessToken);
+      localStorage.setItem("user", JSON.stringify(res.user));
+      // toast.success("Google login successful");
+      //cập nhật auth context
+      window.location.reload();
+      navigate("/");
+    } catch (error) {
+      console.error("Google login error:", error);
+      toast.error(error.response?.data?.message || "Google login failed");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleLoginFailure = () => {
+    toast.error("Google login failed");
+    setIsLoading(false);
+  };
+
   return (
+    <GoogleOAuthProvider clientId="952720183712-fiqpqldbvcm0goorgu3okv85chlgrp59.apps.googleusercontent.com">
+
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
-      {/* <Loading2/> */}
       <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-6 border border-gray-100 border-x-0 border-t-0">
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary-100 mb-4">
             <FiUser className="h-8 w-8 text-primary-600" />
           </div>
           <h2 className="text-3xl font-bold text-gray-900">Welcome Back</h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Please sign in to your account
-          </p>
+          <p className="mt-2 text-sm text-gray-600">Please sign in to your account</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -163,9 +190,9 @@ function Login() {
           </div>
 
           <div className="flex items-center justify-between mb-2">
-            <div></div> {/* Empty div to push button to center and link to right */}
-            <a 
-              onClick={() => toast.info("Tinh năng này đang được phát triển")}
+            <div></div>
+            <a
+              onClick={() => toast.info("Tính năng này đang được phát triển")}
               href="#"
               className="text-sm font-medium text-primary-600 hover:text-primary-500"
             >
@@ -194,52 +221,67 @@ function Login() {
             )}
           </button>
 
-          <div className="text-center text-sm">
-            <span className="text-gray-600">Don't have an account? </span>
-            <a href="/register" className="font-medium text-black hover:text-gray-700">
-              Sign up
-            </a>
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white text-gray-500">Or continue with</span>
+            </div>
           </div>
-        </form>
-      </div>
 
-      {/* Captcha Modal */}
-      {showCaptchaModal && (
-  <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm z-50 p-4">
-    <div className="bg-white rounded-xl p-6 w-[320px] sm:w-[400px] max-w-[95%] relative shadow-lg border border-gray-100">
-      <button
-        onClick={() => setShowCaptuaModal(false)}
-        className="absolute top-4 right-4 p-1.5 rounded-lg hover:bg-gray-50 transition-colors"
-        aria-label="Close verification"
-      >
-        <FiX className="w-5 h-5 text-gray-500 hover:text-gray-700" />
-      </button>
-
-      <div className="space-y-5 text-center">
-
-        <div className="space-y-2">
-          <h3 className="text-xl font-semibold text-gray-900">Security Check</h3>
-          <p className="text-sm text-gray-600 px-2 leading-relaxed">
-            Verify you're human to continue
-          </p>
-        </div>
-
-        <div className="min-h-[78px] flex items-center justify-center py-2">
-          <Turnstile
-            ref={turnstileRef}
-           siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
-            onSuccess={handleCaptchaSuccess}
-            onExpire={resetCaptcha}
-            key={captchaKey}
-            className="w-full scale-[0.95] hover:scale-100 transition-transform"
+          <GoogleLogin
+            onSuccess={handleGoogleLoginSuccess}
+            onError={handleGoogleLoginFailure}
+            clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}
+            buttonText="Login with Google"
+            disabled={isLoading}
           />
+        </form>
+
+        <div className="text-center text-sm mt-4">
+          <span className="text-gray-600">Don't have an account? </span>
+          <a href="/register" className="font-medium text-black hover:text-gray-700">
+            Sign up
+          </a>
         </div>
       </div>
-    </div>
-  </div>
-)}
 
+      {showCaptchaModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm z-50 p-4">
+          <div className="bg-white rounded-xl p-6 w-[320px] sm:w-[400px] max-w-[95%] relative shadow-lg border border-gray-100">
+            <button
+              onClick={() => setShowCaptchaModal(false)}
+              className="absolute top-4 right-4 p-1.5 rounded-lg hover:bg-gray-50 transition-colors"
+              aria-label="Close verification"
+            >
+              <FiX className="w-5 h-5 text-gray-500 hover:text-gray-700" />
+            </button>
+
+            <div className="space-y-5 text-center">
+              <div className="space-y-2">
+                <h3 className="text-xl font-semibold text-gray-900">Security Check</h3>
+                <p className="text-sm text-gray-600 px-2 leading-relaxed">
+                  Verify you're human to continue
+                </p>
+              </div>
+
+              <div className="min-h-[78px] flex items-center justify-center py-2">
+                <Turnstile
+                  ref={turnstileRef}
+                  siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
+                  onSuccess={handleCaptchaSuccess}
+                  onExpire={resetCaptcha}
+                  key={captchaKey}
+                  className="w-full scale-[0.95] hover:scale-100 transition-transform"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
+    </GoogleOAuthProvider>
   );
 }
 
