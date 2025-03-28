@@ -7,7 +7,7 @@ import apiService from '../api/apiService';
 import { toast } from 'react-toastify';
 // import AuthContext from '../context/AuthContext'; // Removed AuthContext
 import { selectIsAuthenticated, selectCurrentUser } from '../store/slices/authSlice'; // Import Redux selectors
-
+import Loading2 from '../components/Loading2'; // Import Loading2 component
 const ChatPage = () => {
   const [selectedRecruiter, setSelectedRecruiter] = useState(null);
   const selectedRecruiterRef = useRef(null);
@@ -22,7 +22,7 @@ const ChatPage = () => {
   // const { user, isAuthenticated } = useContext(AuthContext); // Removed context usage
   const isAuthenticated = useSelector(selectIsAuthenticated); // Get auth state from Redux
   const currentUser = useSelector(selectCurrentUser); // Get user from Redux
-
+  const [loading, setLoading] = useState(true); // Loading state for initial fetch
   useEffect(() => {
     selectedRecruiterRef.current = selectedRecruiter;
   }, [selectedRecruiter]);
@@ -136,6 +136,7 @@ const ChatPage = () => {
       console.error('Error fetching recruiters:', error);
       toast.error("Failed to load recruiter contacts.");
     }
+    setLoading(false); // Set loading to false after fetching
   };
 
   const onMessageReceived = (payload) => {
@@ -356,6 +357,7 @@ const ChatPage = () => {
 
   return (
     <div className="max-w-7xl mx-auto py-10 px-4 h-screen">
+      {loading && <Loading2/>}
       <h1 className="text-2xl font-bold mb-6 flex items-center gap-2">
         <MessageSquare className="text-blue-500" />
         Trò chuyện với Nhà tuyển dụng
