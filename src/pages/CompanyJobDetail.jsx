@@ -88,6 +88,7 @@ const JobDetail = () => {
 
   const handleSaveJob = async () => {
     try {
+      setLoading(true);
       if (jobDetails.saved) {
         const resp = await apiService.delete(`/saved-jobs/${id}`);
         setJobDetails((prev) => ({ ...prev, saved: false }));
@@ -99,6 +100,8 @@ const JobDetail = () => {
       }
     } catch (error) {
       toast.error(error.message || "Không thể lưu tin tuyển dụng");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -108,6 +111,7 @@ const JobDetail = () => {
 
   const confirmViewApplicants = async () => {
     try {
+      setLoading(true);
       const countResponse = await apiService.post(`/company/jobs/${id}/view-applicants`);
       toast.success("Đã trừ 1 xu. Xem số lượng ứng viên trong giao diện.");
       setApplicantCount(countResponse.result); // Giả sử API trả về số lượng trực tiếp
@@ -116,6 +120,7 @@ const JobDetail = () => {
       toast.error(error.message || "Không thể xem danh sách ứng viên");
     } finally {
       setIsConfirmModalOpen(false); // Đóng modal sau khi xử lý
+      setLoading(false);
     }
   };
 
