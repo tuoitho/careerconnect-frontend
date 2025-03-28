@@ -8,7 +8,7 @@ import { toast } from 'react-toastify';
 // import AuthContext from '../context/AuthContext'; // Removed AuthContext
 import { selectIsAuthenticated, selectCurrentUser } from '../store/slices/authSlice'; // Import Redux selectors
 import { useParams } from 'react-router-dom';
-
+import Loading2 from '../components/Loading2';
 const RecruiterChatPage = () => {
   const { candidateId } = useParams();
   const [selectedCandidate, setSelectedCandidate] = useState(null);
@@ -21,6 +21,7 @@ const RecruiterChatPage = () => {
   const [typing, setTyping] = useState(false);
   const stompClient = useRef(null);
   const messageAreaRef = useRef(null);
+  const [loading, setLoading] = useState(true); // Added loading state
   // const { user, isAuthenticated } = useContext(AuthContext); // Removed context usage
   const isAuthenticated = useSelector(selectIsAuthenticated); // Get auth state from Redux
   const currentUser = useSelector(selectCurrentUser); // Get user from Redux
@@ -144,6 +145,8 @@ const RecruiterChatPage = () => {
     } catch (error) {
       console.error('Error fetching candidates:', error);
       toast.error('Không thể tải danh sách ứng viên.');
+    } finally {
+      setLoading(false); // Set loading to false after fetching candidates
     }
   };
 

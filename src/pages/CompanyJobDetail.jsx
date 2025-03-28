@@ -138,7 +138,6 @@ const JobDetail = () => {
     });
   };
 
-  if (loading) return <Loading2 />;
   if (error) {
     return (
       <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg">
@@ -151,6 +150,7 @@ const JobDetail = () => {
 
   return (
     <div className="max-w-7xl mx-auto p-6">
+      {loading && <Loading2 />}
       {/* Apply Modal */}
       {isApplyModalOpen && (
         <div
@@ -305,15 +305,15 @@ const JobDetail = () => {
             <div className="flex justify-between items-start mb-6">
               <div>
                 <h1 className="text-3xl font-bold text-green-600 mb-2">
-                  {jobDetails.title}
+                  {jobDetails?.title}
                 </h1>
                 <div className="flex items-center text-gray-600 mb-2">
                   <MapPin className="w-5 h-5 mr-2 text-green-500" />
-                  <p>{jobDetails.location}</p>
+                  <p>{jobDetails?.location}</p>
                 </div>
               </div>
               <span className="bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-semibold">
-                {jobDetails.type}
+                {jobDetails?.type}
               </span>
             </div>
 
@@ -322,28 +322,28 @@ const JobDetail = () => {
                 <DollarSign className="w-6 h-6 mr-2 text-green-500" />
                 <p className="text-gray-700">
                   <span className="font-medium text-green-700">Salary:</span>{" "}
-                  {formatSalary(jobDetails.minSalary, jobDetails.maxSalary)}
+                  {formatSalary(jobDetails?.minSalary, jobDetails?.maxSalary)}
                 </p>
               </div>
               <div className="flex items-center">
                 <Tag className="w-6 h-6 mr-2 text-green-500" />
                 <p className="text-gray-700">
                   <span className="font-medium text-green-700">Category:</span>{" "}
-                  {jobDetails.category}
+                  {jobDetails?.category}
                 </p>
               </div>
               <div className="flex items-center">
                 <CalendarDays className="w-6 h-6 mr-2 text-green-500" />
                 <p className="text-gray*Math.floor(gray-700">
                   <span className="font-medium text-green-700">Deadline:</span>{" "}
-                  {formatDate(jobDetails.deadline)}
+                  {formatDate(jobDetails?.deadline)}
                 </p>
               </div>
               <div className="flex items-center">
                 <Clock className="w-6 h-6 mr-2 text-green-500" />
                 <p className="text-gray-700">
                   <span className="font-medium text-green-700">Posted:</span>{" "}
-                  {formatDate(jobDetails.created)}
+                  {formatDate(jobDetails?.created)}
                 </p>
               </div>
             </div>
@@ -353,7 +353,7 @@ const JobDetail = () => {
                 Job Description
               </h2>
               <p className="text-gray-700 whitespace-pre-line">
-                {jobDetails.description}
+                {jobDetails?.description}
               </p>
             </div>
 
@@ -417,39 +417,39 @@ const JobDetail = () => {
               </h2>
               <div className="flex flex-col items-center">
                 <img
-                  src={companyInfo.logo}
+                  src={companyInfo?.logo}
                   alt="Company logo"
                   className="w-32 h-32 rounded-full object-cover mb-4 border-4 border-green-100 cursor-pointer hover:opacity-90 transition-opacity duration-300"
                   onClick={() =>
                     companyInfo?.companyId &&
-                    navigate(`/candidate/company/${companyInfo.companyId}`)
+                    navigate(`/candidate/company/${companyInfo?.companyId}`)
                   }
                 />
                 <h3
                   className="text-lg font-semibold text-gray-800 mb-2 cursor-pointer hover:text-green-600 transition-colors duration-300"
                   onClick={() =>
                     companyInfo?.companyId &&
-                    navigate(`/candidate/company/${companyInfo.companyId}`)
+                    navigate(`/candidate/company/${companyInfo?.companyId}`)
                   }
                 >
-                  {companyInfo.name}
+                  {companyInfo?.name}
                 </h3>
                 <p className="text-gray-600 text-sm mb-2 text-center">
                   <MapPin className="inline w-4 h-4 mr-1 text-green-500" />
-                  {companyInfo.address}
+                  {companyInfo?.address}
                 </p>
                 <a
-                  href={companyInfo.website}
+                  href={companyInfo?.website}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-green-600 hover:text-green-700 text-sm mb-4"
                 >
-                  {companyInfo.website.replace(/^https?:\/\//, "")}
+                  {companyInfo?.website.replace(/^https?:\/\//, "")}
                 </a>
                 <div className="w-full">
                   <h4 className="font-semibold text-gray-700 mb-2">About Us</h4>
                   <p className="text-gray-600 text-sm leading-relaxed">
-                    {companyInfo.description}
+                    {companyInfo?.description}
                   </p>
                 </div>
               </div>
