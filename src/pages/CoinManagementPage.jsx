@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import apiService from "../services/apiService.js";
 import { toast } from "react-toastify";
+import Loading2 from "../components/Loading2.jsx";
 
 const CoinManagementPage = () => {
   const [balance, setBalance] = useState(0);
@@ -57,6 +58,7 @@ const CoinManagementPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 py-8">
+      {loading && <Loading2 />}
       <div className="max-w-4xl mx-auto px-4">
         <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
           <h1 className="text-2xl font-bold text-gray-800 mb-4">Quản lý xu</h1>
