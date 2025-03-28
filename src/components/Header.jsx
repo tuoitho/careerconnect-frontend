@@ -179,7 +179,7 @@ export default function Header() {
             <div className="flex items-center gap-4">
               <div className="relative">
                 <button className="text-white hover:text-green-400" onClick={handleUserDropdownClick}>
-                  <span className="text-green-400 mr-2">Xin chào, {user.username}</span>
+                  <span className="text-green-400 mr-2">Xin chào, {user?.username}</span>
                   <User className="inline" size={18} />
                 </button>
 
