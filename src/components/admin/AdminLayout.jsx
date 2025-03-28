@@ -1,14 +1,18 @@
-import React from 'react';
+import React from 'react'; // Removed useContext
 import { Outlet, useLocation } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux'; // Added Redux hooks
 import AdminSidebar from './AdminSidebar';
+// import AuthContext from '../../context/AuthContext'; // Removed AuthContext
+import { selectCurrentUser, logout as logoutAction } from '../../store/slices/authSlice'; // Import Redux state and action
 import { FaSignOutAlt, FaBell, FaUser, FaSearch } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, selectUser } from '../../features/auth/authSlice';
 
 const AdminLayout = ({ children }) => {
+  const dispatch = useDispatch(); // Get dispatch function
+  const currentUser = useSelector(selectCurrentUser); // Get user from Redux
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
-  const dispatch = useDispatch();
-  const user = useSelector(selectUser);
+  // const { logout, user } = useContext(AuthContext); // Removed context usage
   const location = useLocation();
 
   const toggleSidebar = () => {
@@ -16,7 +20,8 @@ const AdminLayout = ({ children }) => {
   };
 
   const handleLogout = () => {
-    dispatch(logout());
+    // logout(); // Removed context usage
+    dispatch(logoutAction()); // Dispatch Redux logout action
   };
 
   // Generate breadcrumb from current path
@@ -64,7 +69,8 @@ const AdminLayout = ({ children }) => {
                       <FaUser className="w-4 h-4" />
                     </div>
                     <div className="hidden md:block">
-                      <div className="text-sm font-medium text-gray-700">{user?.fullName || user?.username}</div>
+                      {/* Use currentUser from Redux */}
+                      <div className="text-sm font-medium text-gray-700">{currentUser?.fullName || currentUser?.username}</div>
                       <div className="text-xs text-gray-500">Administrator</div>
                     </div>
                     <button

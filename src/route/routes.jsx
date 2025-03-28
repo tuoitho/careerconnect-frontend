@@ -38,6 +38,9 @@ import CandidateDetail from "../pages/CandidateDetail";
 import PaymentResultPage from "../pages/PaymentResultPage.jsx";
 import TopUpPage from "../pages/TopUpPage.jsx";
 import CoinManagementPage from "../pages/CoinManagementPage.jsx";
+// import AuthContext from "../context/AuthContext"; // Removed AuthContext
+import { useSelector } from 'react-redux'; // Added useSelector
+import { selectIsAuthenticated, selectCurrentUser } from '../store/slices/authSlice'; // Import Redux selectors
 import AdminLayout from "../components/admin/AdminLayout";
 import UserManagement from "../pages/admin/UserManagement";
 import CompanyManagement from "../pages/admin/CompanyManagement";
@@ -126,9 +129,10 @@ const CandidateRoutes = () => (
 );
 
 const AppRoutes = () => {
-  const user = useSelector(selectUser);
+  // const { user, isAuthenticated } = useContext(AuthContext); // Removed context usage
   const isAuthenticated = useSelector(selectIsAuthenticated);
-  const role = user?.role?.toLowerCase();
+  const user = useSelector(selectCurrentUser);
+  const role = user?.role?.toLowerCase(); // Use user from Redux store
 
 
   return (
@@ -152,13 +156,13 @@ const AppRoutes = () => {
       <Route
           path="/"
           element={
-            role
-                  ? role === 'recruiter'
-                      ? <Navigate to="/recruiter" />
-                      : role === 'admin'
-                      ? <Navigate to="/admin" />
-                      :<Layout><Home /></Layout>
-                      :<Layout><Home /></Layout>
+            isAuthenticated && role // Check if authenticated and role exists
+              ? role === 'recruiter'
+                ? <Navigate to="/recruiter" replace />
+                : role === 'admin'
+                ? <Navigate to="/admin" replace />
+                : <Layout><Home /></Layout> // Default to Home for authenticated candidate/other
+              : <Layout><Home /></Layout> // Default to Home if not authenticated
           }
       />
 

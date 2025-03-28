@@ -1,13 +1,15 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react'; // Removed useContext
+import { useDispatch } from 'react-redux'; // Added useDispatch
 import { Link } from 'react-router-dom';
 import { FaBell, FaComment, FaUser, FaBuilding, FaSignOutAlt } from 'react-icons/fa';
-import { useDispatch } from 'react-redux';
-import { logout } from '../../features/auth/authSlice';
+// import AuthContext from '../../context/AuthContext'; // Removed AuthContext
+import { logout as logoutAction } from '../../store/slices/authSlice'; // Import Redux logout action
 
 const Header = () => {
+  const dispatch = useDispatch(); // Get dispatch function
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
-  const { logout } = useContext(AuthContext); // Lấy hàm logout từ context
+  // const { logout } = useContext(AuthContext); // Removed context usage
 
   // Handle click outside dropdown
   useEffect(() => {
@@ -22,7 +24,8 @@ const Header = () => {
   }, []);
 
   const handleLogout = () => {
-    dispatch(logout());
+    // logout(); // Removed context usage
+    dispatch(logoutAction()); // Dispatch Redux logout action
   };
   return (
     <header className="bg-white shadow-sm fixed inset-x-0 top-0 z-50">

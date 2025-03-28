@@ -1,19 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'; // Removed useContext
+import { useSelector } from 'react-redux'; // Added useSelector
 import { Bookmark, Trash2, ExternalLink } from 'lucide-react';
 import apiService from '../api/apiService';
-import { useSelector } from 'react-redux';
+// import AuthContext from '../context/AuthContext'; // Removed AuthContext
+import { selectIsAuthenticated, selectCurrentUser } from '../store/slices/authSlice'; // Import Redux selectors
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 
 const SavedJobsPage = () => {
   const [savedJobs, setSavedJobs] = useState([]);
-  const { user, isAuthenticated } = useSelector(state => state.auth);
+  // const { user, isAuthenticated } = useContext(AuthContext); // Removed context usage
+  const isAuthenticated = useSelector(selectIsAuthenticated); // Get auth state from Redux
+  const user = useSelector(selectCurrentUser); // Get user from Redux (though not directly used in fetch condition, good practice to have if needed later)
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!isAuthenticated || !user) return;
+    // Use isAuthenticated from Redux
+    if (!isAuthenticated) return;
     fetchSavedJobs();
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated]); // Dependency is now only isAuthenticated
 
   const fetchSavedJobs = async () => {
     try {

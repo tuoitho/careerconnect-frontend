@@ -5,7 +5,7 @@ import JobCategories from '../components/JobCategories';
 import HowItWorks from '../components/HowItWorks';  
 import { Link, useNavigate } from 'react-router-dom';  
 import { UserPlus } from 'lucide-react';  
-import { useSelector } from 'react-redux';
+// import AuthContext from '../context/AuthContext'; // Removed unused import
 import { toast } from 'react-toastify';
 
 const Home = () => {  

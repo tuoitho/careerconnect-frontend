@@ -1,10 +1,16 @@
 import { configureStore } from '@reduxjs/toolkit';
-import authReducer from '../features/auth/authSlice';
+import authReducer from './slices/authSlice';
+// Import other reducers here as they are created
+// import jobReducer from './slices/jobSlice';
 
-export const store = configureStore({
+const store = configureStore({
   reducer: {
     auth: authReducer,
+    // Add other reducers here
+    // jobs: jobReducer,
   },
+  // Middleware can be added here if needed
+  // devTools integration is enabled by default in development mode
 });
 
 export default store;

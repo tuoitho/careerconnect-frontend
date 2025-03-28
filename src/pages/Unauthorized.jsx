@@ -1,13 +1,18 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { DEFAULT_ROUTES } from '../route/defaultroutes';
-import { useSelector } from 'react-redux';
-import { selectUser } from '../features/auth/authSlice';
+// import AuthContext from '../context/AuthContext'; // Removed AuthContext
+// import { useContext } from 'react'; // Removed useContext
+import { useSelector } from 'react-redux'; // Added useSelector
+import { selectCurrentUser } from '../store/slices/authSlice'; // Import Redux selector
+
 const Unauthorized = () => {
-  const user = useSelector(selectUser);
+  // const { user } = useContext(AuthContext); // Removed context usage
+  const user = useSelector(selectCurrentUser); // Get user from Redux
   const navigate = useNavigate();
   const location = useLocation();
-  const role = user?.role?.toLowerCase();
+  const role = user?.role?.toLowerCase(); // Use user from Redux store
+
   const handleHomeClick = () => {
     // Điều hướng về trang mặc định theo role
     if (role && DEFAULT_ROUTES[role]) {

@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect, useContext } from "react";
+import { Link } from "react-router-dom"; // Using react-router-dom's Link
 import {
   Bell,
   User,
@@ -12,10 +12,13 @@ import {
 } from "lucide-react";
 import NotificationDetailModal from "./NotificationDetailModal";
 import apiService from "../api/apiService";
-import { useDispatch, useSelector } from 'react-redux';
-import { logout, selectUser, selectIsAuthenticated } from '../features/auth/authSlice';
+import AuthContext from "../context/AuthContext";
 
 export default function Header() {
+  const dispatch = useDispatch(); // Get dispatch function
+  const isAuthenticated = useSelector(selectIsAuthenticated); // Get auth state from Redux
+  const user = useSelector(selectCurrentUser); // Get user from Redux
+
   const [showDropdown, setShowDropdown] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState([]);
@@ -25,22 +28,25 @@ export default function Header() {
   const [hasFetchedData, setHasFetchedData] = useState(false);
 
   // Mock auth state from context
-  const dispatch = useDispatch();
-  const user = useSelector(selectUser);
-  const isAuthenticated = useSelector(selectIsAuthenticated);
-  const fetchNotifications = useCallback(async () => {
-    if (!isAuthenticated) return;
-    try {
-      setLoading(true);
-      const response = await apiService.get("/notifications", {
-        params: { page: 0, size: 3 },
-      });
-      setNotifications(response.result.data || []);
-    } catch (error) {
-      console.error("Failed to fetch notifications:", error);
-    } finally {
-      setLoading(false);
+  const { user, isAuthenticated, logout } = useContext(AuthContext);
+  const fetchNotifications = async () => {
+    if (isAuthenticated) {
+      try {
+        setLoading(true);
+        const response = await apiService.get("/notifications", {
+          params: { page: 0, size: 3 },
+        });
+        setNotifications(response.result.data || []);
+      } catch (error) {
+        console.error("Failed to fetch notifications:", error);
+      } finally {
+        setLoading(false);
+      }
     }
+  };
+  // Fetch notifications from API
+  useEffect(() => {
+    fetchNotifications();
   }, [isAuthenticated]);
 
   const memoizedNotifications = useMemo(() => notifications, [notifications]);
@@ -123,6 +129,11 @@ export default function Header() {
       document.removeEventListener("click", handleClickOutside);
     };
   }, []);
+
+  const handleLogout = () => {
+    dispatch(logout()); // Dispatch the logout action
+    // Optionally add toast notification or redirect if needed, though logout action handles state reset
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 bg-black text-white py-2 z-50 shadow-md">
@@ -245,7 +256,7 @@ export default function Header() {
                 )}
               </div>
 
-              <button onClick={() => dispatch(logout())} className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg">
+              <button onClick={logout} className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg">
                 Đăng xuất
               </button>
             </div>

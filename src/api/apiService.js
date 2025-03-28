@@ -15,6 +15,7 @@ class ApiService {
     });
 
     this.setupInterceptors();
+    this.currentAuthToken = localStorage.getItem("access_token") || null;
   }
 
   setupInterceptors() {
@@ -26,7 +27,7 @@ class ApiService {
         // Kiểm tra nếu endpoint không yêu cầu Authorization
         const excludedEndpoints = ["/auth/login", "/auth/refresh-token"];
         if (!excludedEndpoints.includes(config.url)) {
-          const token = localStorage.getItem("authToken");
+          const token = localStorage.getItem("access_token");
           if (token) {
             config.headers.Authorization = `Bearer ${token}`;
           } 
@@ -56,12 +57,12 @@ class ApiService {
               throw new Error('Invalid refresh token response');
             }
 
-            localStorage.setItem("authToken", data.accessToken);
-            originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
-            
-            // Tạo config mới để tránh tham chiếu cũ
-            const newConfig = { ...originalRequest };
-            return this.instance(newConfig);
+            console.log("Refresh token successful, new token:", newToken);
+            localStorage.setItem("access_token", newToken);
+            this.currentAuthToken = newToken;
+            originalRequest.headers.Authorization = `Bearer ${newToken}`;
+
+            return this.instance(originalRequest); // Thử lại request gốc
           } catch (refreshError) {
             // Xử lý trường hợp refresh token hết hạn
             if (refreshError.response?.status === 401) {
@@ -106,11 +107,12 @@ class ApiService {
 
   // Auth methods
   setAuthToken(token) {
-    localStorage.setItem("authToken", token);
+    localStorage.setItem("access_token", token);
+    this.currentAuthToken = token;
   }
 
   clearAuthToken() {
-    localStorage.removeItem("authToken");
+    localStorage.removeItem("access_token");
     localStorage.removeItem("user");
   }
 
