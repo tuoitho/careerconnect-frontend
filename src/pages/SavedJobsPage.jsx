@@ -6,8 +6,9 @@ import apiService from '../api/apiService';
 import { selectIsAuthenticated, selectCurrentUser } from '../store/slices/authSlice'; // Import Redux selectors
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
-
+import Loading2 from '../components/Loading2';
 const SavedJobsPage = () => {
+  const [loading, setLoading] = useState(true);
   const [savedJobs, setSavedJobs] = useState([]);
   // const { user, isAuthenticated } = useContext(AuthContext); // Removed context usage
   const isAuthenticated = useSelector(selectIsAuthenticated); // Get auth state from Redux
@@ -22,16 +23,21 @@ const SavedJobsPage = () => {
 
   const fetchSavedJobs = async () => {
     try {
+      setLoading(true);
       const response = await apiService.get('/saved-jobs');
       setSavedJobs(response.result || []);
     } catch (error) {
       console.error('Error fetching saved jobs:', error);
       toast.error('Không thể tải danh sách job đã lưu');
+    } finally {
+      setLoading(false);
     }
+    
   };
 
   const handleUnsaveJob = async (jobId) => {
     try {
+      
       await apiService.delete(`/saved-jobs/${jobId}`);
       setSavedJobs(prev => prev.filter(job => job.jobId !== jobId));
       toast.success('Đã bỏ lưu tin tuyển dụng');
