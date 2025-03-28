@@ -76,6 +76,7 @@ function Login() {
   const performLogin = async (captchaToken) => {
     dispatch(setLoading());
     try {
+      console.log("start login")
       // Assuming authService.login returns { user: ..., accessToken: ... } on success
       const response = await authService.login(formData.username, formData.password, captchaToken);
 

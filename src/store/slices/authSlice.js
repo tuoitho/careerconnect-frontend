@@ -71,8 +71,13 @@ const authSlice = createSlice({
     updateUser(state, action) {
         state.user = { ...state.user, ...action.payload };
         // Optionally update localStorage here if needed
-    }
+    },
     // Add other reducers like registrationSuccess, registrationFailed etc. if needed
+    setLoading(state) {
+      state.status = 'loading';
+      state.error = null; // Clear previous errors on new attempt},
+    },
+
   },
   extraReducers: (builder) => {
     builder
@@ -95,8 +100,10 @@ const authSlice = createSlice({
         // state.isAuthenticated = false;
         // state.user = null;
         // state.token = null;
-      });
+      })
+    
     // Add other extraReducers for login/register thunks if needed
+
   },
 });
 
