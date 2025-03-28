@@ -1,77 +1,71 @@
-# CareerConnect Frontend
+# CareerConnect Frontend  
+*A modern career connection platform for users.*  
 
-*Một nền tảng kết nối nghề nghiệp dành cho người dùng hiện đại.*
+---  
 
----
+## Introduction  
+CareerConnect Frontend is the user interface (frontend) of the CareerConnect application, designed to help users search for job opportunities, connect with employers, and manage personal profiles. This project focuses on a smooth user experience and a user-friendly interface.  
 
-## Giới thiệu
-CareerConnect Frontend là giao diện người dùng (frontend) của ứng dụng CareerConnect, được thiết kế để giúp người dùng tìm kiếm cơ hội nghề nghiệp, kết nối với nhà tuyển dụng và quản lý hồ sơ cá nhân. Dự án này tập trung vào trải nghiệm người dùng mượt mà và giao diện thân thiện.
+---  
 
+## Technologies Used  
+- **Frontend**: React.js, Redux, Tailwind CSS  
+- **API**: Connects to the backend via RESTful API  
+- **Tools**: Vite, ESLint, Prettier  
+- **Version Control**: Git, GitHub  
 
----
+---  
 
-## Công nghệ sử dụng
-- **Frontend**: React.js, Redux, Tailwind CSS
-- **API**: Kết nối với backend qua RESTful API
-- **Công cụ**: Vite, ESLint, Prettier
-- **Quản lý phiên bản**: Git, GitHub
+## Installation and Running the Project  
 
----
+### Requirements  
+- Node.js (v16 or higher)  
+- npm or yarn  
 
-## Cài đặt và chạy dự án
-### Yêu cầu
-- Node.js (v16 trở lên)
-- npm hoặc yarn
+### Instructions  
+1. **Clone the repository**:  
+   ```bash  
+   git clone https://github.com/tuoitho/careerconnect-frontend.git  
+   cd careerconnect-frontend  
+   ```  
 
-### Hướng dẫn
-1. **Clone repository**:
-   ```bash
-   git clone https://github.com/tuoitho/careerconnect-frontend.git
-   cd careerconnect-frontend
-   ```
+2. **Install dependencies**:  
+   ```bash  
+   npm install  
+   ```  
+   or  
+   ```bash  
+   yarn install  
+   ```  
 
-2. **Cài đặt dependencies**:
-   ```bash
-   npm install
-   ```
-   hoặc
-   ```bash
-   yarn install
-   ```
+3. **Run the project**:  
+   ```bash  
+   npm run dev  
+   ```  
+   or  
+   ```bash  
+   yarn dev  
+   ```  
+   - Open a browser and visit `http://localhost:5173` (or Vite's default port).  
 
-3. **Chạy dự án**:
-   ```bash
-   npm run dev
-   ```
-   hoặc
-   ```bash
-   yarn dev
-   ```
-   - Mở trình duyệt và truy cập `http://localhost:5173` (hoặc cổng mặc định của Vite).
+4. **Build the project**:  
+   ```bash  
+   npm run build  
+   ```  
 
-4. **Build sản phẩm**:
-   ```bash
-   npm run build
-   ```
+---  
 
----
+## Contribution Guide  
+We welcome contributions from the community! To participate:  
+1. Fork this repository.  
+2. Create a new branch: `git checkout -b feature/feature-name`.  
+3. Commit your changes: `git commit -m "Add feature XYZ"`.  
+4. Push to your branch: `git push origin feature/feature-name`.  
+5. Create a Pull Request on GitHub.  
 
-## Cách đóng góp
-Chúng tôi hoan nghênh mọi đóng góp từ cộng đồng! Để tham gia:
-1. Fork repository này.
-2. Tạo branch mới: `git checkout -b feature/ten-tinh-nang`.
-3. Commit thay đổi: `git commit -m "Thêm tính năng XYZ"`.
-4. Push lên branch: `git push origin feature/ten-tinh-nang`.
-5. Tạo Pull Request trên GitHub.
+---  
 
----
-
-## Liên hệ
-- **Tác giả**: [tuoitho](https://github.com/tuoitho)
-- **Email**: tuoitho@example.com
-- **Issues**: [Báo lỗi tại đây](https://github.com/tuoitho/careerconnect-frontend/issues)
-
----
-
-## Giấy phép
-Dự án được phân phối dưới [MIT License](LICENSE).
+## Contact  
+- **Author**: [tuoitho](https://github.com/tuoitho)  
+- **Email**: tuoitho@example.com  
+- **Issues**: [Report issues here](https://github.com/tuoitho/careerconnect-frontend/issues)
