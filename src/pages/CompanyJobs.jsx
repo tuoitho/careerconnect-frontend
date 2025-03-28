@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import JobCard from "../components/JobCard";
-import Pagination from "../components/Pagination";
+import Pagination from "../components/atoms/Pagination";
 import Loading2 from "../components/Loading2";
 import { jobService } from "../services/jobService";
 const CompanyJobs = ({ companyId }) => {

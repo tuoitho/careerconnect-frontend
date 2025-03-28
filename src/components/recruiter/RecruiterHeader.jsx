@@ -1,12 +1,16 @@
-import { useState, useEffect, useRef,useContext  } from 'react';
+import { useState, useEffect, useRef } from 'react'; // Removed useContext
+import { useDispatch } from 'react-redux'; // Added useDispatch
 import { Link } from 'react-router-dom';
 import { FaBell, FaComment, FaUser, FaBuilding, FaSignOutAlt } from 'react-icons/fa';
-import AuthContext from '../../context/AuthContext'; // Import AuthContext
+// import AuthContext from '../../context/AuthContext'; // Removed AuthContext
+// Import the async thunk instead of the old action
+import { logoutUser } from '../../store/slices/authSlice';
 
 const Header = () => {
+  const dispatch = useDispatch(); // Get dispatch function
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
-  const { logout } = useContext(AuthContext); // Lấy hàm logout từ context
+  // const { logout } = useContext(AuthContext); // Removed context usage
 
   // Handle click outside dropdown
   useEffect(() => {
@@ -20,9 +24,10 @@ const Header = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Xử lý logout
   const handleLogout = () => {
-    logout(); // Gọi hàm logout từ context
+    // logout(); // Removed context usage
+    // Dispatch the logoutUser thunk
+    dispatch(logoutUser());
   };
   return (
     <header className="bg-white shadow-sm fixed inset-x-0 top-0 z-50">

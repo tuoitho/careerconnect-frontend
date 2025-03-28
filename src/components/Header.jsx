@@ -1,4 +1,5 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useMemo } from "react"; // Removed useContext, added useMemo
+import { useSelector, useDispatch } from 'react-redux'; // Added Redux hooks
 import { Link } from "react-router-dom"; // Using react-router-dom's Link
 import {
   Bell,
@@ -9,56 +10,77 @@ import {
   MessageSquare,
   ChevronRight,
   DollarSign,
-} from "lucide-react"; // Import DollarSign icon
+} from "lucide-react";
 import NotificationDetailModal from "./NotificationDetailModal";
 import apiService from "../api/apiService";
-import AuthContext from "../context/AuthContext";
+// import AuthContext from "../context/AuthContext"; // Removed AuthContext
+// Import the async thunk instead of the old action
+import { selectIsAuthenticated, selectCurrentUser, logoutUser } from '../store/slices/authSlice';
 
 export default function Header() {
+  const dispatch = useDispatch(); // Get dispatch function
+  const isAuthenticated = useSelector(selectIsAuthenticated); // Get auth state from Redux
+  const user = useSelector(selectCurrentUser); // Get user from Redux
+
   const [showDropdown, setShowDropdown] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [hasFetchedData, setHasFetchedData] = useState(false); // Track initial fetch
 
-
-  // Mock auth state from context
-  const { user, isAuthenticated, logout } = useContext(AuthContext);
+  // Fetch notifications function (memoized with useCallback if dependencies get complex)
   const fetchNotifications = async () => {
-    if (isAuthenticated) {
+    if (isAuthenticated) { // Check Redux state
       try {
         setLoading(true);
         const response = await apiService.get("/notifications", {
-          params: { page: 0, size: 3 },
+          params: { page: 0, size: 3 }, // Fetch slightly more initially
         });
         setNotifications(response.result.data || []);
+        setHasFetchedData(true); // Mark as fetched
       } catch (error) {
         console.error("Failed to fetch notifications:", error);
+        // Optionally show a toast error
       } finally {
         setLoading(false);
       }
+    } else {
+      // Clear notifications if user logs out
+      setNotifications([]);
+      setHasFetchedData(false);
     }
   };
-  // Fetch notifications from API
-  useEffect(() => {
-    fetchNotifications();
-  }, [isAuthenticated]);
-  // useEffect(() => {
-  //   console.log("showNotifications", showNotifications);
-  //   if (showNotifications && notifications.length === 0 ) {
-  //     fetchNotifications();
-  //   }
-  // }, [showNotifications]);
 
-  const unreadCount = notifications.filter((notification) => !notification.read).length;
+  // Use useMemo for derived state like unreadCount
+  const unreadCount = useMemo(
+    () => notifications.filter((notification) => !notification.read).length,
+    [notifications]
+  );
+
+  // Effect to fetch notifications on mount if authenticated
+  useEffect(() => {
+    if (isAuthenticated && !hasFetchedData) {
+      fetchNotifications();
+    }
+    // If user logs out, clear state
+    if (!isAuthenticated) {
+        setNotifications([]);
+        setHasFetchedData(false);
+        setShowNotifications(false); // Close dropdown on logout
+        setShowDropdown(false);
+    }
+    // Intentionally not including fetchNotifications in deps if it doesn't change
+  }, [isAuthenticated, hasFetchedData]);
+
 
   const handleNotificationClick = (e, notification) => {
     e.stopPropagation();
     e.preventDefault();
     setSelectedNotification(notification);
     setIsModalOpen(true);
-    setShowNotifications(false);
+    setShowNotifications(false); // Close dropdown after clicking
 
     if (!notification.read) {
       markAsRead(notification.id);
@@ -67,45 +89,65 @@ export default function Header() {
 
   const markAsRead = async (id) => {
     try {
-      await apiService.put(`/notifications/${id}/read`);
-      setNotifications(notifications.map((n) => (n.id === id ? { ...n, read: true } : n)));
+      // Optimistically update UI
+      const updatedNotifications = notifications.map((n) =>
+        n.id === id ? { ...n, read: true } : n
+      );
+      setNotifications(updatedNotifications);
 
       if (selectedNotification && selectedNotification.id === id) {
         setSelectedNotification({ ...selectedNotification, read: true });
       }
+
+      // Send request to backend
+      await apiService.put(`/notifications/${id}/read`);
+      // No need to re-fetch, UI is already updated
     } catch (error) {
       console.error("Error marking as read:", error);
+      // Optionally revert UI update on error
+      // fetchNotifications(); // Or revert state manually
     }
   };
 
   const handleUserDropdownClick = (e) => {
     e.stopPropagation();
-    setShowDropdown(!showDropdown);
+    setShowDropdown(prev => !prev); // Toggle state
     if (showNotifications) {
-      setShowNotifications(false);
+      setShowNotifications(false); // Close other dropdown
     }
   };
 
   const handleNotificationsToggle = (e) => {
     e.stopPropagation();
-    setShowNotifications(!showNotifications);
+    setShowNotifications(prev => !prev); // Toggle state
     if (showDropdown) {
-      setShowDropdown(false);
+      setShowDropdown(false); // Close other dropdown
+    }
+    // Fetch only if opening and not fetched yet
+    if (!showNotifications && !hasFetchedData && isAuthenticated) {
+      fetchNotifications();
     }
   };
 
+  // Effect to handle clicks outside dropdowns
   useEffect(() => {
-    const handleClickOutside = () => {
+    const handleClickOutside = () => { // Removed event param as it wasn't used effectively
+      // Check if the click is outside the dropdown areas
+      // This part needs refinement if dropdowns are complex
       setShowNotifications(false);
       setShowDropdown(false);
     };
 
     document.addEventListener("click", handleClickOutside);
-
     return () => {
       document.removeEventListener("click", handleClickOutside);
     };
-  }, []);
+  }, []); // Empty dependency array means this runs once on mount
+
+  const handleLogout = () => {
+    dispatch(logoutUser()); // Dispatch the async thunk
+    // State resets (like notifications) are handled by the useEffect watching isAuthenticated
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 bg-black text-white py-2 z-50 shadow-md">
@@ -228,7 +270,7 @@ export default function Header() {
                 )}
               </div>
 
-              <button onClick={logout} className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg">
+              <button onClick={handleLogout} className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg">
                 Đăng xuất
               </button>
             </div>

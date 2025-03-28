@@ -1,10 +1,12 @@
-import React, { useState, useEffect, useRef, useContext } from 'react';
 import { MessageSquare, Send, ChevronLeft } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react'; // Removed useContext
+import { useSelector } from 'react-redux'; // Added useSelector
 import SockJS from 'sockjs-client';
 import Stomp from 'stompjs';
 import apiService from '../api/apiService';
 import { toast } from 'react-toastify';
-import AuthContext from '../context/AuthContext';
+// import AuthContext from '../context/AuthContext'; // Removed AuthContext
+import { selectIsAuthenticated, selectCurrentUser } from '../store/slices/authSlice'; // Import Redux selectors
 import { useParams } from 'react-router-dom';
 
 const RecruiterChatPage = () => {
@@ -19,14 +21,17 @@ const RecruiterChatPage = () => {
   const [typing, setTyping] = useState(false);
   const stompClient = useRef(null);
   const messageAreaRef = useRef(null);
-  const { user, isAuthenticated } = useContext(AuthContext);
+  // const { user, isAuthenticated } = useContext(AuthContext); // Removed context usage
+  const isAuthenticated = useSelector(selectIsAuthenticated); // Get auth state from Redux
+  const currentUser = useSelector(selectCurrentUser); // Get user from Redux
 
   useEffect(() => {
     selectedCandidateRef.current = selectedCandidate;
   }, [selectedCandidate]);
 
   useEffect(() => {
-    if (!isAuthenticated || !user) return;
+    // Use isAuthenticated and currentUser from Redux
+    if (!isAuthenticated || !currentUser) return;
 
     const connectWebSocket = () => {
       // const socket = new SockJS('http://localhost:8088/ws-chat');
@@ -39,7 +44,8 @@ const RecruiterChatPage = () => {
     };
 
     connectWebSocket();
-  }, [isAuthenticated, user]);
+    // Dependency is now currentUser as well, in case user info changes
+  }, [isAuthenticated, currentUser]);
 
   const onConnected = () => {
     setConnected(true);
@@ -99,19 +105,27 @@ const RecruiterChatPage = () => {
       for (const candidate of formattedCandidates) {
         const response = await apiService.get(`/chat/history?userId2=${candidate.id}`);
         const chatHistory = response.result || [];
-        const formattedMessages = chatHistory.map(msg => ({
-          id: msg.id,
-          text: msg.content,
-          sender: msg.senderId === user.userId ? 'recruiter' : 'candidate',
-          timestamp: msg.timestamp || new Date().toLocaleTimeString(),
-          status: msg.status,
-        }));
+      const formattedMessages = chatHistory.map(msg => ({
+        id: msg.id,
+        text: msg.content,
+        // Use currentUser.userId from Redux
+        sender: msg.senderId === currentUser?.userId ? 'recruiter' : 'candidate',
+        timestamp: msg.timestamp || new Date().toLocaleTimeString(),
+        status: msg.status,
+      }));
         allMessages[candidate.id] = formattedMessages;
         unreadCounts[candidate.id] = chatHistory.filter(
           msg => msg.status !== 'READ' && msg.senderId !== user.userId
         ).length;
       }
       setCandidateMessages(allMessages);
+      // Calculate unread counts based on currentUser.userId
+      for (const candidate of formattedCandidates) {
+        const chatHistory = allMessages[candidate.id] || [];
+        unreadCounts[candidate.id] = chatHistory.filter(
+          msg => msg.status !== 'READ' && msg.senderId !== currentUser?.userId
+        ).length;
+      }
       setCandidates(prev =>
         prev.map(can => ({
           ...can,
@@ -139,7 +153,8 @@ const RecruiterChatPage = () => {
     const messageData = {
       id: receivedMessage.tempId || Date.now(),
       text: receivedMessage.content,
-      sender: senderId === user.userId ? 'recruiter' : 'candidate',
+      // Use currentUser.userId from Redux
+      sender: senderId === currentUser?.userId ? 'recruiter' : 'candidate',
       timestamp: receivedMessage.timestamp || new Date().toLocaleTimeString(),
       status: receivedMessage.status || 'SENT',
     };
@@ -151,7 +166,8 @@ const RecruiterChatPage = () => {
 
     if (selectedCandidateRef.current && selectedCandidateRef.current.id === senderId) {
       setMessages(prev => [...prev, messageData]);
-      if (senderId !== user.userId) {
+      // Use currentUser.userId from Redux
+      if (senderId !== currentUser?.userId) {
         stompClient.current.send(
           '/app/chat.markAsRead',
           {},
@@ -173,7 +189,8 @@ const RecruiterChatPage = () => {
     const messageData = {
       id,
       text: content,
-      sender: senderId === user.userId ? 'recruiter' : 'candidate',
+      // Use currentUser.userId from Redux
+      sender: senderId === currentUser?.userId ? 'recruiter' : 'candidate',
       timestamp: new Date().toLocaleTimeString(),
       status: status || 'SENT',
     };
@@ -190,7 +207,8 @@ const RecruiterChatPage = () => {
         prev.map(msg => (msg.id === tempId ? messageData : msg))
           .concat(prev.some(msg => msg.id === tempId) ? [] : [messageData])
       );
-      if (senderId !== user.userId) {
+      // Use currentUser.userId from Redux
+      if (senderId !== currentUser?.userId) {
         stompClient.current.send(
           '/app/chat.markAsRead',
           {},
@@ -215,10 +233,11 @@ const RecruiterChatPage = () => {
 
   const handleSendMessage = (e) => {
     e.preventDefault();
-    if (newMessage.trim() && selectedCandidate && connected) {
+    // Use currentUser.userId from Redux
+    if (newMessage.trim() && selectedCandidate && connected && currentUser?.userId) {
       const chatMessage = {
         tempId: Date.now(),
-        senderId: user.userId,
+        senderId: currentUser.userId,
         recipientId: selectedCandidate.id,
         content: newMessage,
         type: 'CHAT',
@@ -253,7 +272,8 @@ const RecruiterChatPage = () => {
       const formattedMessages = chatHistory.map(msg => ({
         id: msg.id,
         text: msg.content,
-        sender: msg.senderId === user.userId ? 'recruiter' : 'candidate',
+        // Use currentUser.userId from Redux
+        sender: msg.senderId === currentUser?.userId ? 'recruiter' : 'candidate',
         timestamp: msg.timestamp || new Date().toLocaleTimeString(),
         status: msg.status,
       }));
@@ -263,21 +283,27 @@ const RecruiterChatPage = () => {
         [candidate.id]: formattedMessages,
       }));
 
+      // Use currentUser.userId from Redux
       const unreadMessages = chatHistory.filter(
-        msg => msg.status !== 'READ' && msg.senderId !== user.userId
+        msg => msg.status !== 'READ' && msg.senderId !== currentUser?.userId
       );
       unreadMessages.forEach(msg => {
-        stompClient.current.send(
-          '/app/chat.markAsRead',
-          {},
-          JSON.stringify({ messageId: msg.id })
-        );
+        if (stompClient.current && stompClient.current.connected) { // Check connection before sending
+          stompClient.current.send(
+            '/app/chat.markAsRead',
+            {},
+            JSON.stringify({ messageId: msg.id })
+          );
+        }
       });
+      // Correctly place setCandidates after the loop
       setCandidates(prev =>
         prev.map(c => (c.id === candidate.id ? { ...c, unread: 0 } : c))
       );
     } catch (error) {
       console.error('Error fetching chat history:', error);
+      // Optionally add toast notification for fetch error
+      toast.error("Failed to load chat history.");
     }
   };
 

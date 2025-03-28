@@ -1,12 +1,16 @@
-import React, { useContext } from 'react';
+import React from 'react'; // Removed useContext
 import { Outlet, useLocation } from 'react-router-dom';
 import AdminSidebar from './AdminSidebar';
-import AuthContext from '../../context/AuthContext';
+// Import the async thunk instead of the old action
+import { selectCurrentUser, logoutUser } from '../../store/slices/authSlice';
 import { FaSignOutAlt, FaBell, FaUser, FaSearch } from 'react-icons/fa';
+import { useDispatch, useSelector } from 'react-redux';
 
 const AdminLayout = ({ children }) => {
+  const dispatch = useDispatch(); // Get dispatch function
+  const currentUser = useSelector(selectCurrentUser); // Get user from Redux
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
-  const { logout, user } = useContext(AuthContext);
+  // const { logout, user } = useContext(AuthContext); // Removed context usage
   const location = useLocation();
 
   const toggleSidebar = () => {
@@ -14,7 +18,9 @@ const AdminLayout = ({ children }) => {
   };
 
   const handleLogout = () => {
-    logout();
+    // logout(); // Removed context usage
+    // Dispatch the logoutUser thunk
+    dispatch(logoutUser());
   };
 
   // Generate breadcrumb from current path
@@ -62,7 +68,8 @@ const AdminLayout = ({ children }) => {
                       <FaUser className="w-4 h-4" />
                     </div>
                     <div className="hidden md:block">
-                      <div className="text-sm font-medium text-gray-700">{user?.fullName || user?.username}</div>
+                      {/* Use currentUser from Redux */}
+                      <div className="text-sm font-medium text-gray-700">{currentUser?.fullName || currentUser?.username}</div>
                       <div className="text-xs text-gray-500">Administrator</div>
                     </div>
                     <button

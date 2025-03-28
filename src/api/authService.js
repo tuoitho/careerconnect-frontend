@@ -1,6 +1,5 @@
 import axios from "axios";
 import apiService from "./apiService";
-import { toast } from "react-toastify";
 
 export const authService = {
   // Đăng nhập
