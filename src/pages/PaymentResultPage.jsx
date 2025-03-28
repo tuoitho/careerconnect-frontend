@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import apiService from "../api/apiService.js";
+import apiService from "../services/apiService.js";
 
 const PaymentResultPage = () => {
   const [result, setResult] = useState(null);

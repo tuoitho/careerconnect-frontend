@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux'; // Added useSelector
 import { MessageSquare, Send, ChevronLeft } from 'lucide-react';
 import SockJS from 'sockjs-client';
 import Stomp from 'stompjs';
-import apiService from '../api/apiService';
+import apiService from '../services/apiService.js';
 import { toast } from 'react-toastify';
 // import AuthContext from '../context/AuthContext'; // Removed AuthContext
 import { selectIsAuthenticated, selectCurrentUser } from '../store/slices/authSlice'; // Import Redux selectors

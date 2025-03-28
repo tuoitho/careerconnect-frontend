@@ -1,4 +1,4 @@
-import apiService from "../api/apiService";
+import apiService from "./apiService.js";
 
 export const candidateService = {
     getCandidatrProfile: async () => {
@@ -11,8 +11,8 @@ export const candidateService = {
         return await apiService.put(`/candidate/profile/me`, candidateProfile,
             {
                 headers: {
-                    'Content-Type': 'application/multipart/form-data'   
-                } 
+                    'Content-Type': 'application/multipart/form-data'
+                }
             }
         );
     },

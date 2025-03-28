@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import JobFilter from '../api/JobFilter.jsx';
-import JobList from '../api/JobList.jsx';
-import apiService from '../api/apiService.js';
+import JobFilter from '../components/JobFilter.jsx';
+import JobList from '../components/JobList.jsx';
+import apiService from '../services/apiService.js';
 import { ChevronLeft, ChevronRight, Search } from 'lucide-react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 

@@ -15,7 +15,7 @@ import { useParams } from "react-router-dom";
 import { jobService } from "../services/jobService";
 import { companyService } from "../services/companyService";
 import { cvService } from "../services/cvService";
-import apiService from "../api/apiService";
+import apiService from "../services/apiService.js";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 

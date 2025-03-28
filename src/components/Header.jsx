@@ -12,7 +12,7 @@ import {
   DollarSign,
 } from "lucide-react";
 import NotificationDetailModal from "./NotificationDetailModal";
-import apiService from "../api/apiService";
+import apiService from "../services/apiService.js";
 // import AuthContext from "../context/AuthContext"; // Removed AuthContext
 // Import the async thunk instead of the old action
 import { selectIsAuthenticated, selectCurrentUser, logoutUser } from '../store/slices/authSlice';

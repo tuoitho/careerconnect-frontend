@@ -6,8 +6,8 @@ import Loading2 from "../components/Loading2";
 import { toast } from "react-toastify";
 import { Turnstile } from "@marsidev/react-turnstile";
 import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
-import apiService from "../api/apiService"; // Keep for Google Login API call
-import { authService } from "../api/authService"; // Import authService directly
+import apiService from "../services/apiService.js"; // Keep for Google Login API call
+import { authService } from "../services/authService.js"; // Import authService directly
 import {
   loginSuccess,
   loginFailed,
@@ -63,7 +63,7 @@ function Login() {
       } else if (user.role.toLowerCase() === "admin") {
         navigate("/admin");
       }
-      
+
       else if (user.role.toLowerCase() === "candidate") {
         navigate("/");
       } else {

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Bell, Check, CheckCheck, Briefcase, Calendar, ThumbsUp, Eye, UserCheck } from "lucide-react";
-import apiService from "../api/apiService";
+import apiService from "../services/apiService.js";
 import { toast } from "react-toastify";
 import NotificationDetailModal from "../components/NotificationDetailModal";
 

@@ -4,13 +4,13 @@ import { useNavigate } from "react-router-dom";
 import { formatDistanceToNow, isPast, parseISO, format, differenceInDays } from 'date-fns';
 import { vi } from 'date-fns/locale';
 
-const JobCard = ({ job }) => {
+const JobCardSearch = ({ job }) => {
   const navigate = useNavigate();
-  
-  const formatSalary = (min, max) => {  
-    return `${min && min !== "0" ? `$${min}` : ""} ${max && max !== "0" ? `- $${max}` : ""}`.trim() || "Thỏa thuận"  
+
+  const formatSalary = (min, max) => {
+    return `${min && min !== "0" ? `$${min}` : ""} ${max && max !== "0" ? `- $${max}` : ""}`.trim() || "Thỏa thuận"
   }
-  
+
   const handleJobClick = () => {
     navigate(`/job/${job.jobId}`);
   }
@@ -23,31 +23,31 @@ const JobCard = ({ job }) => {
       const deadlineDate = parseISO(job.deadline);
       const today = new Date();
       const daysRemaining = differenceInDays(deadlineDate, today);
-      
+
       if (isPast(deadlineDate)) {
-        return { 
-          text: "Đã hết hạn", 
+        return {
+          text: "Đã hết hạn",
           color: "text-red-500",
           days: 0
         };
-      } 
+      }
       else if (daysRemaining <= 3) {
-        return { 
-          text: `Còn ${daysRemaining} ngày`, 
+        return {
+          text: `Còn ${daysRemaining} ngày`,
           color: "text-red-500",
           days: daysRemaining
         };
       }
       else if (daysRemaining <= 7) {
-        return { 
-          text: `Còn ${daysRemaining} ngày`, 
+        return {
+          text: `Còn ${daysRemaining} ngày`,
           color: "text-orange-500",
           days: daysRemaining
         };
       }
       else {
-        return { 
-          text: `Còn ${daysRemaining} ngày`, 
+        return {
+          text: `Còn ${daysRemaining} ngày`,
           color: "text-green-500",
           days: daysRemaining
         };
@@ -59,16 +59,16 @@ const JobCard = ({ job }) => {
   }, [job.deadline]);
 
   return (
-    <div 
+    <div
       className="bg-white rounded-lg shadow-md p-4 mb-4 hover:shadow-green-400 transition-shadow duration-300 border border-green-200 cursor-pointer"
       onClick={handleJobClick}
     >
       <div className="flex items-start justify-between">
         <div className="flex items-start">
           <div className="mr-4">
-            <img 
-              src={job.companyLogo || "/placeholder-logo.png"} 
-              alt={job.companyName} 
+            <img
+              src={job.companyLogo || "/placeholder-logo.png"}
+              alt={job.companyName}
               className="w-12 h-12 rounded-full object-cover border border-gray-200"
             />
           </div>
@@ -95,19 +95,19 @@ const JobCard = ({ job }) => {
             </div>
           </div>
         </div>
-        
+
         {/* Deadline Badge */}
         <div className={`flex items-center text-sm font-medium ${deadlineInfo.color}`}>
           <Clock className={`w-4 h-4 mr-1 ${deadlineInfo.color}`} />
           {deadlineInfo.text}
         </div>
       </div>
-      
+
       {/* Additional deadline visualization for urgent jobs */}
       {deadlineInfo.days !== undefined && deadlineInfo.days <= 7 && (
         <div className="mt-3 pt-3 border-t border-gray-100">
           <div className="w-full bg-gray-200 rounded-full h-1.5">
-            <div 
+            <div
               className={`h-1.5 rounded-full ${
                 deadlineInfo.days <= 3 ? 'bg-red-500' : 'bg-orange-500'
               }`}
@@ -120,4 +120,4 @@ const JobCard = ({ job }) => {
   );
 };
 
-export default JobCard;
+export default JobCardSearch;

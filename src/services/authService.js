@@ -1,5 +1,5 @@
 import axios from "axios";
-import apiService from "./apiService";
+import apiService from "./apiService.js";
 
 export const authService = {
   // Đăng nhập
@@ -9,7 +9,7 @@ export const authService = {
       if (config===0)
       {
         console.log("vào đây");
-        
+
         const a = axios.create({
           baseURL: import.meta.env.VITE_API_URL,
           headers: {
@@ -44,7 +44,7 @@ export const authService = {
           },
           withCredentials: true,
         },
-        
+
       );}
     } catch (error) {
       //tiếp tục throw error để component gọi hàm này xử lý

@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react"
 import axios from "axios"
 import { toast } from "react-toastify"
-import apiService from "../api/apiService"
+import apiService from "../services/apiService.js"
 // Assuming you have these icons in your project
 import { FaPlus, FaTrash, FaBell } from "react-icons/fa"
 import Loading2 from "../components/Loading2"

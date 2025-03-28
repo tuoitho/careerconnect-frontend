@@ -1,37 +1,37 @@
-import apiService from "../api/apiService";
+import apiService from "./apiService.js";
 import { toast } from "react-toastify";
 
 export const companyService = {
-    createCompany: async (companyData) => 
+    createCompany: async (companyData) =>
         await apiService.post(`/company/register`, companyData, {
             headers: { 'Content-Type': 'multipart/form-data' }
         }),
 
-    getCompany: async () => 
+    getCompany: async () =>
         await apiService.get(`/company/mycompany`),
 
-    updateCompany: async (companyData) => 
+    updateCompany: async (companyData) =>
         await apiService.put(`/company/mycompany`, companyData, {
             headers: { 'Content-Type': 'multipart/form-data' }
         }),
 
-    getInvitation: async (token) => 
+    getInvitation: async (token) =>
         await apiService.get(`/invitation/${token}`),
 
-    getInvitations: async (page = 0, size = 2) => 
+    getInvitations: async (page = 0, size = 2) =>
         await apiService.get(`/invitation?page=${page}&size=${size}`),
 
-    acceptInvitation: async (token) => 
+    acceptInvitation: async (token) =>
         await apiService.post(`/invitation/join`, null, {
             params: { token: token }
         }),
 
-    getCompanyMembers: async (page, size) => 
+    getCompanyMembers: async (page, size) =>
         await apiService.get(`/company/mycompany/members?page=${page}&size=${size}`),
 
-    inviteMember: async (email) => 
+    inviteMember: async (email) =>
         await apiService.post(`/invitation/invite`, { email }),
-    getCompanyById: async (id) => 
+    getCompanyById: async (id) =>
         await apiService.get(`/company/${id}`),
 
 };

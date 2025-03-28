@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'; // Removed useContext
 import { useSelector } from 'react-redux'; // Added useSelector
 import { Bookmark, Trash2, ExternalLink } from 'lucide-react';
-import apiService from '../api/apiService';
+import apiService from '../services/apiService.js';
 // import AuthContext from '../context/AuthContext'; // Removed AuthContext
 import { selectIsAuthenticated, selectCurrentUser } from '../store/slices/authSlice'; // Import Redux selectors
 import { toast } from 'react-toastify';
@@ -32,12 +32,12 @@ const SavedJobsPage = () => {
     } finally {
       setLoading(false);
     }
-    
+
   };
 
   const handleUnsaveJob = async (jobId) => {
     try {
-      
+
       await apiService.delete(`/saved-jobs/${jobId}`);
       setSavedJobs(prev => prev.filter(job => job.jobId !== jobId));
       toast.success('Đã bỏ lưu tin tuyển dụng');

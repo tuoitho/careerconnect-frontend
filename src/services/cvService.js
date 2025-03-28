@@ -1,7 +1,7 @@
 
-import apiService from "../api/apiService";
+import apiService from "./apiService.js";
 
 export const cvService = {
-    getUserCVs: async () => 
+    getUserCVs: async () =>
         await apiService.get(`/candidate/profile/cv`),
 }

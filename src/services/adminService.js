@@ -1,4 +1,4 @@
-import apiService from "../api/apiService";
+import apiService from "./apiService.js";
 
 export const adminService = {
   // User management
@@ -18,7 +18,7 @@ export const adminService = {
     return await apiService.put(`/admin/users/${userId}/unlock`);
   },
 
-  // Company management 
+  // Company management
   async getAllCompanies(page = 0, size = 10) {
     return await apiService.get(`/admin/companies?page=${page}&size=${size}`);
   },

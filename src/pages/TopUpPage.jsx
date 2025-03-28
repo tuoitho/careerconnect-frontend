@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import apiService from "../api/apiService.js";
+import apiService from "../services/apiService.js";
 import { toast } from "react-toastify";
 import { CreditCard, DollarSign, ArrowLeft } from "lucide-react";
 

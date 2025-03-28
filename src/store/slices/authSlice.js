@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { localStorageUtils } from '../../utils/localStorage';
-import { authService } from '../../api/authService'; // Assuming this path is correct
+import { authService } from '../../services/authService.js'; // Assuming this path is correct
 import { toast } from 'react-toastify'; // Assuming react-toastify
 
 // Define the async thunk for logout
@@ -103,7 +103,7 @@ const authSlice = createSlice({
         // state.user = null;
         // state.token = null;
       })
-    
+
     // Add other extraReducers for login/register thunks if needed
 
   },

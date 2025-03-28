@@ -4,11 +4,11 @@ import { companyService } from "../services/companyService";
 import { toast } from "react-toastify";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { FaTrash, FaUserPlus, FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import apiService from "../api/apiService";
+import apiService from "../services/apiService.js";
 
 const CompanyMembers = () => {
   const [members, setMembers] = useState([]);
-  const [currentPage, setCurrentPage] = useState(0); 
+  const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [totalMembers, setTotalMembers] = useState(0);
 
@@ -44,7 +44,7 @@ const CompanyMembers = () => {
   const fetchMembers = async () => {
     try {
       const response = await companyService.getCompanyMembers(currentPage, 2);
-      
+
       if (response && response.result) {
         setMembers(response.result.data || []);
         setCurrentPage(response.result.currentPage || 0);
@@ -61,7 +61,7 @@ const CompanyMembers = () => {
   const fetchInvitations = async () => {
     try {
       const response = await companyService.getInvitations(invitationCurrentPage, 2);
-      
+
       if (response && response.result) {
         setInvitations(response.result.data || []);
         setInvitationCurrentPage(response.result.currentPage || 0);
@@ -145,7 +145,7 @@ const CompanyMembers = () => {
                 Showing {members.length} of {totalMembers} total members
               </p>
             </div>
-            
+
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-gray-50">
@@ -242,7 +242,7 @@ const CompanyMembers = () => {
         <div className="px-6 py-4 border-b border-gray-200">
           <h2 className="text-lg font-semibold text-gray-800">Pending Invitations</h2>
         </div>
-        
+
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">

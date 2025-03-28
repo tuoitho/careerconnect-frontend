@@ -1,4 +1,4 @@
-import apiService from "../api/apiService";
+import apiService from "./apiService.js";
 
 export const recruiterService = {
     getRecruiterProfile: async () => {

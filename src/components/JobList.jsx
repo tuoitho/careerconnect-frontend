@@ -1,5 +1,5 @@
 import React from 'react';
-import JobCard from './JobCard';
+import JobCardSearch from './JobCardSearch.jsx';
 
 const JobList = ({ jobs, totalPages, currentPage, onPageChange }) => {
   // Generate an array of page numbers
@@ -16,16 +16,16 @@ const JobList = ({ jobs, totalPages, currentPage, onPageChange }) => {
         <>
           <div className="space-y-4">
             {jobs.map((job) => (
-              <JobCard key={job.jobId} job={job} />
+              <JobCardSearch key={job.jobId} job={job} />
             ))}
           </div>
-          
+
           {/* Custom Pagination */}
           {totalPages > 1 && (
             <div className="flex justify-center mt-6">
               <nav className="flex items-center">
                 {/* Previous button */}
-                <button 
+                <button
                   onClick={() => onPageChange(Math.max(0, currentPage - 1))}
                   disabled={currentPage === 0}
                   className={`mx-1 px-3 py-1 rounded-md ${
@@ -36,7 +36,7 @@ const JobList = ({ jobs, totalPages, currentPage, onPageChange }) => {
                 >
                   &laquo;
                 </button>
-                
+
                 {/* Page numbers */}
                 {pageNumbers.map(page => (
                   <button
@@ -51,9 +51,9 @@ const JobList = ({ jobs, totalPages, currentPage, onPageChange }) => {
                     {page + 1}
                   </button>
                 ))}
-                
+
                 {/* Next button */}
-                <button 
+                <button
                   onClick={() => onPageChange(Math.min(totalPages - 1, currentPage + 1))}
                   disabled={currentPage === totalPages - 1}
                   className={`mx-1 px-3 py-1 rounded-md ${

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart3, Users, Building2, Briefcase, CreditCard, Activity, Calendar } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import apiService from '../../api/apiService';
+import apiService from '../../services/apiService.js';
 import { toast } from 'react-toastify';
 import { set } from 'date-fns';
 import Loading2 from '../../components/Loading2';
@@ -62,7 +62,7 @@ const AdminDashboard = () => {
     }
   };
   useEffect(() => {
-    
+
     fetchDashboardStats();
   }, [timeRange, groupBy]);
 
@@ -174,7 +174,7 @@ const AdminDashboard = () => {
           </div>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={formatTrendData(stats.userRegistrationTrend, groupBy)}>                
+              <LineChart data={formatTrendData(stats.userRegistrationTrend, groupBy)}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="date" />
                 <YAxis />
@@ -194,7 +194,7 @@ const AdminDashboard = () => {
           </div>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={formatTrendData(stats.jobPostingTrend, groupBy)}>                
+              <LineChart data={formatTrendData(stats.jobPostingTrend, groupBy)}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="date" />
                 <YAxis />
@@ -214,7 +214,7 @@ const AdminDashboard = () => {
           </div>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={formatTrendData(stats.revenueTrend, groupBy).map(({ date, value }) => ({ date, value: value / 1000000 }))}>                
+              <LineChart data={formatTrendData(stats.revenueTrend, groupBy).map(({ date, value }) => ({ date, value: value / 1000000 }))}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="date" />
                 <YAxis />
@@ -266,20 +266,20 @@ const getWeekDateRange = (year, week) => {
   const firstDayOfYear = new Date(year, 0, 1);
   const firstWeekday = firstDayOfYear.getDay();
   const offsetDays = firstWeekday <= 4 ? firstWeekday - 1 : firstWeekday - 8;
-  
+
   const firstWeekStart = new Date(year, 0, 1 - offsetDays);
   const weekStart = new Date(firstWeekStart);
   weekStart.setDate(weekStart.getDate() + (week - 1) * 7);
-  
+
   const weekEnd = new Date(weekStart);
   weekEnd.setDate(weekEnd.getDate() + 6);
-  
+
   return `${weekStart.toLocaleDateString('vi-VN')} - ${weekEnd.toLocaleDateString('vi-VN')}`;
 };
 
 const formatTrendData = (trendData, groupBy) => {
   if (!trendData) return [];
-  
+
   return Object.entries(trendData).map(([date, value]) => {
     if (groupBy === 'week') {
       const [year, week] = date.split('-').map(Number);

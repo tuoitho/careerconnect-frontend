@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react'; // Removed useContex
 import { useSelector } from 'react-redux'; // Added useSelector
 import SockJS from 'sockjs-client';
 import Stomp from 'stompjs';
-import apiService from '../api/apiService';
+import apiService from '../services/apiService.js';
 import { toast } from 'react-toastify';
 // import AuthContext from '../context/AuthContext'; // Removed AuthContext
 import { selectIsAuthenticated, selectCurrentUser } from '../store/slices/authSlice'; // Import Redux selectors
