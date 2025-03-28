@@ -65,10 +65,11 @@ class ApiService {
             return this.instance(originalRequest); // Thử lại request gốc
           } catch (refreshError) {
             // Xử lý trường hợp refresh token hết hạn
-            if (refreshError.response?.status === 401) {
+            // if (refreshError.response?.status === 401) {
+              console.error("Refresh token failed:", refreshError.message || refreshError);
               this.clearAuthToken();
-              window.location.href = "/login?session_expired=true";
-            }
+              window.location.href = "/login";
+            // }
             return Promise.reject(refreshError);
           }
         }
@@ -114,6 +115,7 @@ class ApiService {
   clearAuthToken() {
     localStorage.removeItem("access_token");
     localStorage.removeItem("user");
+    // remove cookie
   }
 
   // HTTP methods
