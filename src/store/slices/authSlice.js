@@ -17,7 +17,9 @@ export const logoutUser = createAsyncThunk(
       // No need to return data, state updates handled in extraReducers
     } catch (error) {
       const message = error.response?.data?.message || error.message || 'Logout failed';
-      toast.error(message);
+      localStorageUtils.removeToken();
+      localStorageUtils.removeUser();
+      // toast.error(message);
       // Even on failure, potentially clear local storage depending on desired behavior
       // localStorageUtils.removeToken();
       // localStorageUtils.removeUser();
