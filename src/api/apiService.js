@@ -56,7 +56,7 @@ class ApiService {
             if (!data?.accessToken) {
               throw new Error('Invalid refresh token response');
             }
-
+            const newToken = data?.accessToken;
             console.log("Refresh token successful, new token:", newToken);
             localStorage.setItem("access_token", newToken);
             this.currentAuthToken = newToken;

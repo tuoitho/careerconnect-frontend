@@ -1,7 +1,8 @@
 import React from 'react'; // Removed useContext
 import { Outlet, useLocation } from 'react-router-dom';
 import AdminSidebar from './AdminSidebar';
-import { selectCurrentUser, logout as logoutAction } from '../../store/slices/authSlice'; // Import Redux state and action
+// Import the async thunk instead of the old action
+import { selectCurrentUser, logoutUser } from '../../store/slices/authSlice';
 import { FaSignOutAlt, FaBell, FaUser, FaSearch } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -18,7 +19,8 @@ const AdminLayout = ({ children }) => {
 
   const handleLogout = () => {
     // logout(); // Removed context usage
-    dispatch(logoutAction()); // Dispatch Redux logout action
+    // Dispatch the logoutUser thunk
+    dispatch(logoutUser());
   };
 
   // Generate breadcrumb from current path

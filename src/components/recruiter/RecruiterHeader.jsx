@@ -3,7 +3,8 @@ import { useDispatch } from 'react-redux'; // Added useDispatch
 import { Link } from 'react-router-dom';
 import { FaBell, FaComment, FaUser, FaBuilding, FaSignOutAlt } from 'react-icons/fa';
 // import AuthContext from '../../context/AuthContext'; // Removed AuthContext
-import { logout as logoutAction } from '../../store/slices/authSlice'; // Import Redux logout action
+// Import the async thunk instead of the old action
+import { logoutUser } from '../../store/slices/authSlice';
 
 const Header = () => {
   const dispatch = useDispatch(); // Get dispatch function
@@ -25,7 +26,8 @@ const Header = () => {
 
   const handleLogout = () => {
     // logout(); // Removed context usage
-    dispatch(logoutAction()); // Dispatch Redux logout action
+    // Dispatch the logoutUser thunk
+    dispatch(logoutUser());
   };
   return (
     <header className="bg-white shadow-sm fixed inset-x-0 top-0 z-50">

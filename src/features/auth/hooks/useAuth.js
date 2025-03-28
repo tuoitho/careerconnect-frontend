@@ -1,7 +1,8 @@
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { login as loginAction, logout as logoutAction } from '../authSlice';
+// Import the async thunk for logout
+import { loginSuccess, logoutUser } from '../../store/slices/authSlice'; // Adjusted path assuming store is two levels up
 
 /**
  * Custom hook để xử lý authentication
@@ -23,10 +24,11 @@ export const useAuth = () => {
     }
   }, [dispatch, navigate]);
 
-  // Hàm đăng xuất và điều hướng
+  // Hàm đăng xuất và điều hướng using the async thunk
   const logoutWithRedirect = useCallback(async (redirectPath = '/login') => {
     try {
-      await dispatch(logoutAction()).unwrap();
+      // Dispatch the logoutUser thunk
+      await dispatch(logoutUser()).unwrap(); // Use unwrap to handle potential promise rejection
       navigate(redirectPath);
     } catch (error) {
       console.error('Logout error:', error);
