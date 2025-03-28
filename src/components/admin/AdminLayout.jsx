@@ -1,12 +1,9 @@
 import React from 'react'; // Removed useContext
 import { Outlet, useLocation } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux'; // Added Redux hooks
 import AdminSidebar from './AdminSidebar';
-// import AuthContext from '../../context/AuthContext'; // Removed AuthContext
 import { selectCurrentUser, logout as logoutAction } from '../../store/slices/authSlice'; // Import Redux state and action
 import { FaSignOutAlt, FaBell, FaUser, FaSearch } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
-import { logout, selectUser } from '../../features/auth/authSlice';
 
 const AdminLayout = ({ children }) => {
   const dispatch = useDispatch(); // Get dispatch function

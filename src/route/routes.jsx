@@ -1,7 +1,5 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { selectUser, selectIsAuthenticated } from "../features/auth/authSlice";
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import ProtectedRoute from "../components/ProtectedRoute";
 import RecruiterLayout from "../components/recruiter/RecruiterLayout";

@@ -1,5 +1,31 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { localStorageUtils } from '../../utils/localStorage';
+import { authService } from '../../api/authService'; // Assuming this path is correct
+import { toast } from 'react-toastify'; // Assuming react-toastify
+
+// Define the async thunk for logout
+export const logoutUser = createAsyncThunk(
+  'auth/logoutUser',
+  async (_, { rejectWithValue }) => {
+    try {
+      // No need for setLoading(true) here, handled by .pending
+      const response = await authService.logout();
+      toast.success(response.message || 'Logged out successfully!'); // Use response message or default
+      // Clear local storage here after successful API call
+      localStorageUtils.removeToken();
+      localStorageUtils.removeUser();
+      // No need to return data, state updates handled in extraReducers
+    } catch (error) {
+      const message = error.response?.data?.message || error.message || 'Logout failed';
+      toast.error(message);
+      // Even on failure, potentially clear local storage depending on desired behavior
+      // localStorageUtils.removeToken();
+      // localStorageUtils.removeUser();
+      return rejectWithValue(message); // Pass error message to rejected action
+    }
+    // No need for finally setLoading(false), handled by .fulfilled/.rejected
+  }
+);
 
 const initialState = {
   isAuthenticated: !!localStorageUtils.getToken(),
@@ -37,21 +63,48 @@ const authSlice = createSlice({
       state.status = 'idle';
       state.error = null;
       localStorageUtils.removeToken(); // Updated to use localStorageUtils
-      localStorageUtils.removeUser(); // Updated to use removeUser
+      // This synchronous reducer is removed, logic moved to extraReducers
     },
-    setLoading(state) {
-        state.status = 'loading';
-    },
+    // setLoading(state) { // This can be handled by the thunk's pending state
+    //     state.status = 'loading';
+    // },
     updateUser(state, action) {
         state.user = { ...state.user, ...action.payload };
         // Optionally update localStorage here if needed
     }
     // Add other reducers like registrationSuccess, registrationFailed etc. if needed
   },
-  // Add extraReducers here later for handling async thunks if using createAsyncThunk
+  extraReducers: (builder) => {
+    builder
+      .addCase(logoutUser.pending, (state) => {
+        state.status = 'loading';
+        state.error = null; // Clear previous errors on new attempt
+      })
+      .addCase(logoutUser.fulfilled, (state) => {
+        state.isAuthenticated = false;
+        state.user = null;
+        state.token = null;
+        state.status = 'idle'; // Reset status after success
+        state.error = null;
+        // localStorage is cleared within the thunk itself upon success
+      })
+      .addCase(logoutUser.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload; // Store the error message from rejectWithValue
+        // Decide if you want to clear auth state even on failed logout API call
+        // state.isAuthenticated = false;
+        // state.user = null;
+        // state.token = null;
+      });
+    // Add other extraReducers for login/register thunks if needed
+  },
 });
 
-export const { loginSuccess, loginFailed, logout, setLoading, updateUser } = authSlice.actions;
+// Export the thunk if needed elsewhere, but primarily used via dispatch
+// export { logoutUser };
+
+// Update exported actions - remove old logout, keep others
+export const { loginSuccess, loginFailed, setLoading, updateUser } = authSlice.actions;
 
 export default authSlice.reducer;
 

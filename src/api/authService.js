@@ -1,5 +1,4 @@
 import apiService from "./apiService";
-import { toast } from "react-toastify";
 
 export const authService = {
   // Đăng nhập
