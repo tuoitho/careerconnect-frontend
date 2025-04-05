@@ -69,8 +69,6 @@ const Home = () => {
 
     return (  
         <div className="min-h-screen bg-white">  
-            <Header />  
-
             {/* Recruitment Buttons */}  
             <div className="bg-gradient-to-r from-black via-gray-900 to-black py-6">  
                 <div className="container mx-auto px-4 max-w-4xl flex justify-center gap-6">  
