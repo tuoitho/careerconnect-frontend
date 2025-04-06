@@ -23,6 +23,7 @@ import JobDetail from "../pages/CompanyJobDetail";
 import JobSearch from "../pages/JobSearch";
 import AppliedJobsList from "../pages/AppliedJob";
 import ChatPage from "../pages/ChatPage";
+import ChatbotPage from "../pages/ChatbotPage";
 import RecruiterChatPage from "../pages/RecruiterChatPage";
 import SavedJobsPage from "../pages/SavedJobsPage";
 import JobAlertSubscription from "../pages/JobAlertSubscription";
@@ -117,6 +118,7 @@ const CandidateRoutes = () => (
         <Route path="profile" element={<CandidateProfile />} />
         <Route path="applied" element={<AppliedJobsList />} />
         <Route path="chat" element={<ChatPage />} /> {/* Thêm route cho Chat */}
+        <Route path="chatbot" element={<ChatbotPage />} /> {/* Thêm route cho AI Chatbot */}
         <Route path="saved" element={<SavedJobsPage />} /> {/* Thêm route cho Saved Jobs */}
         <Route path="job-alerts" element={<JobAlertSubscription />} /> {/* Thêm route cho Job Alert Subscriptions */}
         <Route path="notifications" element={<NotificationsPage />} /> {/* Thêm route cho Notifications */}
