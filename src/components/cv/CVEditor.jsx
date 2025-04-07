@@ -1,7 +1,7 @@
 import React from 'react';
 import { Disclosure } from '@headlessui/react';
 import { ChevronUpIcon } from '@heroicons/react/24/solid';
-import { defaultCV } from '../../data/defaultCV';
+import { defaultCV } from '../../features/feature-cv/defaultCV';
 
 const CVEditor = ({ onCVChange, templates, selectedTemplate, onTemplateChange }) => {
   const handlePersonalInfoChange = (field, value) => {

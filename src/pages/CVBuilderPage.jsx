@@ -7,7 +7,7 @@ import { CVBuilder, cvService, cvTemplatesWithRenderers } from '../features/feat
 import LoadingSpinner from '../components/LoadingSpinner';
 
 // Default CV structure
-import { defaultCV } from '../data/defaultCV';
+import { defaultCV, exampleCV } from '../features/feature-cv/defaultCV';
 
 const CVBuilderPage = () => {
   const { cvId } = useParams();
@@ -24,21 +24,15 @@ const CVBuilderPage = () => {
         
         if (cvId === 'new') {
           // Create a new CV with default structure
-          cvData = { ...defaultCV };
+          cvData = { ...exampleCV };
         } else if (cvId) {
           // Load existing CV by ID
           cvData = await cvService.fetchCV(cvId);
         } else {
-          // Try to load the default CV or create a new one
-          try {
-            cvData = await cvService.fetchDefaultCV();
-          } catch (error) {
-            // If no default CV, use the default structure
-            cvData = { ...defaultCV };
-          }
+
         }
         
-        setCV(cvData);
+        setCV(exampleCV);
         
         // Load templates
         try {

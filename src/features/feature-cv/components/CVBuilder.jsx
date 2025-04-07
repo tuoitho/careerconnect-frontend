@@ -18,7 +18,7 @@ const CVBuilder = ({ initialCV, templates, existingCVId }) => {
   const [downloading, setDownloading] = useState(false);
   const [cvName, setCvName] = useState(initialCV.name || 'My CV');
   const navigate = useNavigate();
-
+  console.log('CVBuilderPage - initialCV:', initialCV);
   const handleSave = async (makeDefault = false) => {
     try {
       setSaving(true);
