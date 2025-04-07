@@ -1,67 +1,123 @@
-import apiService from "./apiService";
+import axios from 'axios';
+import apiService from './apiService';
 
-const BASE_URL = "/cv";
+const CV_API_URL = `/cv`;
+const CV_TEMPLATES_API_URL = `${CV_API_URL}/api/cv-templates`;
 
-const cvService = {
-  // Get all CVs for the current user
-  getAllCVs: async () => {
-    const response = await apiService.get(`${BASE_URL}`);
-    return response;
+const cvService ={
+  fetchUserCVs: async () => {
+    try {
+      const response = await apiService.get(CV_API_URL, {
+        withCredentials: true
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching user CVs:', error);
+      throw error;
+    }
   },
 
-  // Get a specific CV by ID
-  getCV: async (cvId) => {
-    const response = await apiService.get(`${BASE_URL}/${cvId}`);
-    return response;
+  fetchCV: async (cvId) => {
+    try {
+      const response = await axios.get(`${CV_API_URL}/${cvId}`, {
+        withCredentials: true
+      });
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching CV with ID ${cvId}:`, error);
+      throw error;
+    }
   },
 
-  // Get the current CV
-  getCurrentCV: async () => {
-    const response = await apiService.get(`${BASE_URL}/current`);
-    return response;
+  fetchDefaultCV : async () => {
+    try {
+      const response = await axios.get(`${CV_API_URL}/default`, {
+        withCredentials: true
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching default CV:', error);
+      throw error;
+    }
   },
 
-  // Create a new CV
-  createCV: async (cvData) => {
-    const response = await apiService.post(`${BASE_URL}`, cvData);
-    return response;
+  createCV : async (cvData) => {
+    try {
+      const response = await axios.post(CV_API_URL, cvData, {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error creating CV:', error);
+      throw error;
+    }
   },
 
-  // Update an existing CV
-  updateCV: async (cvId, cvData) => {
-    const response = await apiService.put(`${BASE_URL}/${cvId}`, cvData);
-    return response;
+  updateCV : async (cvId, cvData) => {
+    try {
+      const response = await axios.put(`${CV_API_URL}/${cvId}`, cvData, {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error(`Error updating CV with ID ${cvId}:`, error);
+      throw error;
+    }
   },
 
-  // Delete a CV
-  deleteCV: async (cvId) => {
-    const response = await apiService.delete(`${BASE_URL}/${cvId}`);
-    return response;
+  deleteCV : async (cvId) => {
+    try {
+      await axios.delete(`${CV_API_URL}/${cvId}`, {
+        withCredentials: true
+      });
+      return true;
+    } catch (error) {
+      console.error(`Error deleting CV with ID ${cvId}:`, error);
+      throw error;
+    }
   },
 
-  // Get all CV templates
-  getAllTemplates: async () => {
-    console.log("Fetching all CV templates...");
-    const response = await apiService.get(`${BASE_URL}/templates`);
-    return response;
+  fetchCVTemplates : async () => {
+    try {
+      const response = await axios.get(CV_TEMPLATES_API_URL, {
+        withCredentials: true
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching CV templates:', error);
+      throw error;
+    }
   },
 
-  // Get a specific CV template by ID
-  getTemplateById: async (templateId) => {
-    const response = await apiService.get(`${BASE_URL}/templates/${templateId}`);
-    return response;
+  fetchCVTemplatesByCategory : async (category) => {
+    try {
+      const response = await axios.get(`${CV_TEMPLATES_API_URL}/category/${category}`, {
+        withCredentials: true
+      });
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching CV templates for category ${category}:`, error);
+      throw error;
+    }
   },
 
-  // Get CV templates by category
-  getTemplatesByCategory: async (category) => {
-    const response = await apiService.get(`${BASE_URL}/templates/category/${category}`);
-    return response;
-  },
-
-  // Download CV as PDF (returns a URL to be used for downloading)
-  downloadCVAsPdf: (cvId) => {
-    return `${apiService.getBaseUrl()}${BASE_URL}/${cvId}/pdf`;
+  fetchCVTemplate : async (templateId) => {
+    try {
+      const response = await axios.get(`${CV_TEMPLATES_API_URL}/${templateId}`, {
+        withCredentials: true
+      });
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching CV template with ID ${templateId}:`, error);
+      throw error;
+    }
   }
-};
+}
 
 export default cvService;

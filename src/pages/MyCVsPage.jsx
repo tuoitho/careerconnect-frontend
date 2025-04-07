@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import cvService from "../services/cvService";
 import { toast } from "react-toastify";
 import LoadingSpinner from "../components/LoadingSpinner";
+import defaultCVTemplates from "../data/defaultCVTemplates";
 
 const MyCVsPage = () => {
   const [cvs, setCvs] = useState([]);
@@ -15,12 +16,13 @@ const MyCVsPage = () => {
     const fetchCVs = async () => {
       try {
         setLoading(true);
-        const cvsData = await cvService.getAllCVs();
-        setCvs(cvsData.result);
+        // const cvsData = await cvService.fetchUserCVs();
+        // setCvs(cvsData.result);
         
         // Load templates for "Create New CV" section
-        const templatesData = await cvService.getAllTemplates();
-        setTemplates(templatesData.result);
+        // const templatesData = await cvService.getAllTemplates();
+        // setTemplates(templatesData.result);
+        setTemplates(defaultCVTemplates)
       } catch (error) {
         console.error("Error fetching CVs:", error);
         toast.error("Failed to load your CVs");
@@ -112,9 +114,9 @@ const MyCVsPage = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {templates.map(template => (
               <div
-                key={template.templateId}
+                key={template.id}
                 className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
-                onClick={() => navigate(`/candidate/cv-builder/template/${template.templateId}`)}
+                onClick={() => navigate(`/candidate/cv-builder/template/${template.id}`)}
               >
                 <div className="h-36 bg-gray-100 flex items-center justify-center">
                   {template.thumbnailUrl ? (

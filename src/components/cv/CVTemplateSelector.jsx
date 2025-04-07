@@ -1,15 +1,20 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
+import DEFAULT_CV_TEMPLATES from "../../data/defaultCVTemplates";
 
 const CVTemplateSelector = ({ templates, onSelect }) => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  
+  // Use provided templates or fallback to default templates if none are available
+  // const availableTemplates = templates && templates.length > 0 ? templates : DEFAULT_CV_TEMPLATES;
+  const availableTemplates =DEFAULT_CV_TEMPLATES;
 
   // Extract unique categories from templates
-  const categories = ["all", ...new Set(templates.map(template => template.category))];
+  const categories = ["all", ...new Set(availableTemplates.map(template => template.category))];
 
   // Filter templates based on selected category and search query
-  const filteredTemplates = templates.filter(template => {
+  const filteredTemplates = availableTemplates.filter(template => {
     const categoryMatch = selectedCategory === "all" || template.category === selectedCategory;
     const searchMatch = template.name.toLowerCase().includes(searchQuery.toLowerCase());
     return categoryMatch && searchMatch;

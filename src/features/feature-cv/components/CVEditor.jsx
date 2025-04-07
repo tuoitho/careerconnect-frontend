@@ -1,9 +1,9 @@
 import React from 'react';
 import { Disclosure } from '@headlessui/react';
 import { ChevronUpIcon } from '@heroicons/react/24/solid';
-import { defaultCV } from '../../data/defaultCV';
+import { defaultCV } from '../../../data/defaultCV';
 
-const CVEditor = ({ onCVChange, templates, selectedTemplate, onTemplateChange }) => {
+const CVEditor = ({ cv, onCVChange, templates, selectedTemplate, onTemplateChange }) => {
   const handlePersonalInfoChange = (field, value) => {
     const updatedCV = {
       ...cv,
@@ -14,7 +14,6 @@ const CVEditor = ({ onCVChange, templates, selectedTemplate, onTemplateChange })
     };
     onCVChange(updatedCV);
   };
-  const cv=defaultCV;
 
   const handleAddExperience = () => {
     const newExperience = {
