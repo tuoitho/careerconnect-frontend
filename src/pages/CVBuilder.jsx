@@ -94,7 +94,7 @@ const CVBuilder = () => {
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <div className="lg:col-span-4">
-            <CVEditor cv={cv} onUpdate={handleCVUpdate} cvId={cvId} />
+            <CVEditor cv={cv} onUpdate={handleCVUpdate} cvId={cvId} templateId={selectedTemplate} />
           </div>
           <div className="lg:col-span-8">
             <div className="mb-6">

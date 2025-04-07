@@ -3,7 +3,7 @@ import cvService from '../../services/cvService';
 import { toast } from 'react-toastify';
 import { defaultCV } from '../../data/defaultCV';
 
-const CVEditor = ({ cv, onUpdate, cvId }) => {
+const CVEditor = ({ cv, onUpdate, cvId, templateId = "modern" }) => {
   // Ensure we have a valid CV object with all required sections
   useEffect(() => {
     if (!cv || !cv.personalInfo) {
@@ -19,7 +19,7 @@ const CVEditor = ({ cv, onUpdate, cvId }) => {
       // Convert the CV object to a string before saving
       const cvData = {
         name: safeCV.personalInfo?.fullName || "Untitled CV",
-        templateId: "modern", // Default template or use a prop if available
+        templateId: templateId, // Use the templateId from props
         content: JSON.stringify(safeCV)
       };
 
