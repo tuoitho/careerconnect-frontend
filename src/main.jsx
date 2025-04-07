@@ -4,6 +4,7 @@ import { Provider } from 'react-redux'; // Import Provider
 import store from './store/store'; // Import the store
 // import { AuthProvider } from "./context/AuthContext"; // Removed AuthProvider import
 import "./index.css";
+import "./styles/print.css"; // Import print styles for PDF export
 import App from "./App";
 import { BrowserRouter } from "react-router-dom";
 
