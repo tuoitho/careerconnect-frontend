@@ -17,16 +17,6 @@ const cvService = {
   fetchCV: async (cvId) => {
     try {
       const response = await apiService.get(`/cvs/${cvId}`);
-      
-      // Parse content if it's a string
-      if (response.data && typeof response.data.content === 'string') {
-        try {
-          response.result.content = JSON.parse(response.result.content);
-        } catch (e) {
-          console.error('Error parsing CV content:', e);
-        }
-      }
-      
       return response;
     } catch (error) {
       console.error('Error fetching CV:', error);
@@ -59,7 +49,7 @@ const cvService = {
   // Delete a CV
   deleteCV: async (cvId) => {
     try {
-      const resp=await apiService.delete(`/cvs/${cvId}`, );
+      const resp = await apiService.delete(`/cvs/${cvId}`);
       return resp;
     } catch (error) {
       console.error('Error deleting CV:', error);
@@ -82,16 +72,6 @@ const cvService = {
   fetchDefaultCV: async () => {
     try {
       const response = await apiService.get(`/cvs/default`);
-      
-      // Parse content if it's a string
-      if (response.data && typeof response.data.content === 'string') {
-        try {
-          response.result.content = JSON.parse(response.result.content);
-        } catch (e) {
-          console.error('Error parsing CV content:', e);
-        }
-      }
-      
       return response;
     } catch (error) {
       console.error('Error fetching default CV:', error);

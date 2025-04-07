@@ -38,8 +38,8 @@ import PaymentResultPage from "../pages/PaymentResultPage.jsx";
 import TopUpPage from "../pages/TopUpPage.jsx";
 import CoinManagementPage from "../pages/CoinManagementPage.jsx";
 // CV Builder pages
-import MyCVsPage from "../pages/MyCVsPage";
-import CVBuilderPage from "../pages/CVBuilderPage";
+import CVBuilder from "../pages/CVBuilder";
+import CVManagement from "../pages/CVManagement";
 // import AuthContext from "../context/AuthContext"; // Removed AuthContext
 import { useSelector } from 'react-redux'; // Added useSelector
 import { selectIsAuthenticated, selectCurrentUser } from '../store/slices/authSlice'; // Import Redux selectors
@@ -125,13 +125,9 @@ const CandidateRoutes = () => (
         <Route path="saved" element={<SavedJobsPage />} /> {/* Thêm route cho Saved Jobs */}
         <Route path="job-alerts" element={<JobAlertSubscription />} /> {/* Thêm route cho Job Alert Subscriptions */}
         <Route path="notifications" element={<NotificationsPage />} /> {/* Thêm route cho Notifications */}
-        
-        {/* CV Builder Routes */}
-        <Route path="cvs" element={<MyCVsPage />} /> {/* List all CVs */}
-        <Route path="cv-builder" element={<CVBuilderPage />} /> {/* Create new CV */}
-        <Route path="cv-builder/:cvId" element={<CVBuilderPage />} /> {/* Edit existing CV */}
-        <Route path="cv-builder/template/:templateId" element={<CVBuilderPage />} /> {/* Create from template */}
-        
+        <Route path="cvs" element={<CVManagement />} /> {/* Trang quản lý CV */}
+        <Route path="cv-builder" element={<CVBuilder />} /> {/* Tạo CV mới */}
+        <Route path="cv-builder/:cvId" element={<CVBuilder />} /> {/* Chỉnh sửa CV hiện có */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Layout>
