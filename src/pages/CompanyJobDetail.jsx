@@ -14,7 +14,7 @@ import Loading2 from "../components/Loading2";
 import { useParams } from "react-router-dom";
 import { jobService } from "../services/jobService";
 import { companyService } from "../services/companyService";
-import { cvService } from "../services/cvService";
+import  cvService from "../services/cvService";
 import apiService from "../services/apiService.js";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
@@ -45,7 +45,8 @@ const JobDetail = () => {
         );
         setCompanyInfo(companyResponse.result);
       }
-      const cvResponse = await cvService.getUserCVs();
+      // const cvResponse = await cvService.getUserCVs();
+      const cvResponse = null; // Chưa có API lấy CV của người dùng
       setUserCVs(cvResponse.result);
     } catch (err) {
       setError(err.message);

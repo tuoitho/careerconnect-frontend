@@ -179,6 +179,10 @@ export default function Header() {
                       <FileText className="inline mr-2" size={16} />
                       Việc làm đã lưu
                     </Link>
+                    <Link to="/candidate/cvs" className="block px-4 py-2 text-gray-800 hover:bg-green-50">
+                      <FileText className="inline mr-2" size={16} />
+                      Quản lý CV
+                    </Link>
                     <Link to="/coin-management" className="block px-4 py-2 text-gray-800 hover:bg-green-50">
                       <DollarSign className="inline mr-2" size={16} />
                       Quản lý xu
