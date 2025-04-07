@@ -183,28 +183,10 @@ const CVManagement = () => {
                     title="Chỉnh sửa CV"
                   >
                     <Edit size={16} />
-                    <span>Chỉnh sửa</span>
-                  </button>
-                  <button
-                    onClick={() => handleGeneratePDF(cv.id)}
-                    className="flex-1 bg-green-50 hover:bg-green-100 text-green-600 px-3 py-2 rounded flex items-center justify-center gap-1 transition-colors"
-                    title="Tải xuống PDF"
-                  >
-                    <Download size={16} />
-                    <span>PDF</span>
+                    <span>Xem/Chỉnh sửa/Export PDF</span>
                   </button>
                 </div>
                 <div className="flex flex-wrap gap-2 mt-2">
-                  {!cv.isDefault && (
-                    <button
-                      onClick={() => handleSetDefaultCV(cv.id)}
-                      className="flex-1 bg-yellow-50 hover:bg-yellow-100 text-yellow-600 px-3 py-2 rounded flex items-center justify-center gap-1 transition-colors"
-                      title="Đặt làm mặc định"
-                    >
-                      <Star size={16} />
-                      <span>Mặc định</span>
-                    </button>
-                  )}
                   <button
                     onClick={() => handleDeleteCV(cv.id)}
                     className="flex-1 bg-red-50 hover:bg-red-100 text-red-600 px-3 py-2 rounded flex items-center justify-center gap-1 transition-colors"
