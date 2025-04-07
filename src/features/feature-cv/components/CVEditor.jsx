@@ -14,7 +14,6 @@ const CVEditor = ({ cv, onCVChange, templates, selectedTemplate, onTemplateChang
     };
     onCVChange(updatedCV);
   };
-  console.log("day là",cv)
   const handleAddExperience = () => {
     const newExperience = {
       id: Date.now().toString(), // Unique ID

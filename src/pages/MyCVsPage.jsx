@@ -16,8 +16,8 @@ const MyCVsPage = () => {
     const fetchCVs = async () => {
       try {
         setLoading(true);
-        // const cvsData = await cvService.fetchUserCVs();
-        // setCvs(cvsData.result);
+        const cvsData = await cvService.fetchCVs();
+        setCvs(cvsData.result);
         
         // Load templates for "Create New CV" section
         // const templatesData = await cvService.getAllTemplates();
@@ -166,10 +166,10 @@ const MyCVsPage = () => {
           <h2 className="text-xl font-semibold">Your Existing CVs</h2>
         </div>
         
-        {cvs.length > 0 ? (
+        {cvs?.length > 0 ? (
           <div className="divide-y">
             {cvs.map(cv => (
-              <div key={cv.cvId} className="p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center">
+              <div key={cv.id} className="p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center">
                 <div className="mb-4 sm:mb-0">
                   <div className="flex items-center">
                     <h3 className="text-lg font-medium">{cv.name || "Untitled CV"}</h3>
@@ -191,7 +191,7 @@ const MyCVsPage = () => {
                 
                 <div className="flex flex-wrap gap-2">
                   <Link
-                    to={`/candidate/cv-builder/${cv.cvId}`}
+                    to={`/candidate/cv-builder/${cv.id}`}
                     className="px-3 py-1.5 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
                   >
                     Edit

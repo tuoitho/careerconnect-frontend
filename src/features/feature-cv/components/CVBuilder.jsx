@@ -25,7 +25,6 @@ const CVBuilder = ({ initialCV, templates, existingCVId }) => {
       const cvData = {
         name: cvName,
         content: JSON.stringify(cv),
-        setAsDefault: makeDefault
       };
 
       if (existingCVId) {
@@ -43,7 +42,7 @@ const CVBuilder = ({ initialCV, templates, existingCVId }) => {
         const result = await cvService.createCV(newCVData);
         toast.success('CV created successfully');
         // Redirect to the edit page for the new CV
-        navigate(`/cv/${result.id}`);
+        navigate(`/candidate/cv-builder/${result.id}`);
       }
     } catch (error) {
       console.error('Error saving CV:', error);
@@ -110,14 +109,7 @@ const CVBuilder = ({ initialCV, templates, existingCVId }) => {
             {saving ? <LoadingSpinner size="sm" className="mr-2" /> : null}
             {saving ? 'Saving...' : 'Save'}
           </button>
-          <button
-            onClick={() => handleSave(true)}
-            disabled={saving}
-            className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded flex items-center"
-          >
-            {saving ? <LoadingSpinner size="sm" className="mr-2" /> : null}
-            {saving ? 'Saving...' : 'Save as Default'}
-          </button>
+         
           <button
             onClick={handleDownloadPDF}
             disabled={downloading}
