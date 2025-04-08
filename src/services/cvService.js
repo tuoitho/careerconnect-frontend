@@ -3,6 +3,8 @@ import apiService from './apiService';
 // CV Service functions
 const cvService = {
   // Fetch all CVs for the current user
+  getUserCVs: async () =>
+    await apiService.get(`/candidate/profile/cv`),
   fetchCVs: async () => {
     try {
       const response = await apiService.get(`/cvs`)

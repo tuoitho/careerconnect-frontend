@@ -45,8 +45,8 @@ const JobDetail = () => {
         );
         setCompanyInfo(companyResponse.result);
       }
-      // const cvResponse = await cvService.getUserCVs();
-      const cvResponse = null; // Chưa có API lấy CV của người dùng
+      const cvResponse = await cvService.getUserCVs();
+      // const cvResponse = null; // Chưa có API lấy CV của người dùng
       setUserCVs(cvResponse.result);
     } catch (err) {
       setError(err.message);
@@ -200,8 +200,7 @@ const JobDetail = () => {
                 <option value="">-- Select your CV --</option>
                 {userCVs.map((cv) => (
                   <option key={cv.cvId} value={cv.cvId}>
-                    {cv.name} - Updated:{" "}
-                    {new Date(cv.updatedAt).toLocaleDateString()}
+                    {cv.name}
                   </option>
                 ))}
               </select>
