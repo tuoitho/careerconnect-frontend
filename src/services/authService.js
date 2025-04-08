@@ -39,9 +39,9 @@ export const authService = {
           password,
         },
         {
-          params: {
-            tk: tk, // Add as URL parameter
-          },
+          // params: {
+          //   tk: tk, // Add as URL parameter
+          // },
           withCredentials: true,
         },
 

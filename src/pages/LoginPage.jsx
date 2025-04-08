@@ -113,7 +113,8 @@ function Login() {
         toast.warn("Please enter username and password.");
         return;
     }
-    setShowCaptchaModal(true);
+    // setShowCaptchaModal(true);
+    performLogin(null); // Directly call performLogin with null token for initial login attempt
   };
 
   const handleChange = (e) => {
