@@ -4,6 +4,9 @@ export const jobService = {
     getApplicationDetail: async (applicationId) => {
         return await apiService.get(`/application/${applicationId}`);
     },
+    getApplicationInterviews: async (applicationId) => {
+        return await apiService.get(`/interview/application/${applicationId}`);
+    },
     createJob: async (jobData) => {
         return await apiService.post(`/recruiter/jobs`, jobData);
     },

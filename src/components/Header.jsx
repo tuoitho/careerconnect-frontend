@@ -10,6 +10,7 @@ import {
   MessageSquare,
   ChevronRight,
   DollarSign,
+  Video,
 } from "lucide-react";
 import NotificationDetailModal from "./NotificationDetailModal";
 import apiService from "../services/apiService.js";
@@ -170,6 +171,10 @@ export default function Header() {
                     <Link to="/candidate/applied" className="block px-4 py-2 text-gray-800 hover:bg-green-50">
                       <Briefcase className="inline mr-2" size={16} />
                       Ứng tuyển
+                    </Link>
+                    <Link to="/candidate/interviews" className="block px-4 py-2 text-gray-800 hover:bg-green-50">
+                      <Video className="inline mr-2" size={16} />
+                      Phỏng vấn
                     </Link>
                     <Link to="/candidate/job-alerts" className="block px-4 py-2 text-gray-800 hover:bg-green-50">
                       <Bell className="inline mr-2" size={16} />

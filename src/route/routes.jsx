@@ -37,6 +37,9 @@ import CandidateDetail from "../pages/CandidateDetail";
 import PaymentResultPage from "../pages/PaymentResultPage.jsx";
 import TopUpPage from "../pages/TopUpPage.jsx";
 import CoinManagementPage from "../pages/CoinManagementPage.jsx";
+import InterviewPage from "../pages/InterviewPage";
+import InterviewsPage from "../pages/InterviewsPage";
+import ScheduleInterview from "../pages/ScheduleInterview";
 // CV Builder pages
 import CVBuilder from "../pages/CVBuilder";
 import CVManagement from "../pages/CVManagement";
@@ -89,6 +92,10 @@ const RecruiterRoutes = () => (
         <Route path="candidate/:candidateId" element={<CandidateDetail />} />
         <Route path="/chat" element={<RecruiterChatPage />} />
         <Route path="/chat/:candidateId" element={<RecruiterChatPage />} />
+        <Route path="interviews" element={<InterviewsPage />} /> {/* Route cho danh sách phỏng vấn */}
+        <Route path="interview/schedule/:applicationId" element={<ScheduleInterview />} /> {/* Route cho lên lịch phỏng vấn */}
+        <Route path="interview/reschedule/:interviewId" element={<ScheduleInterview />} /> {/* Route cho lên lịch lại phỏng vấn */}
+        <Route path="interview/:interviewId" element={<InterviewPage />} /> {/* Route cho phòng phỏng vấn */}
 
         <Route path="*" element={<NotFound />} />
       </Routes>
@@ -128,6 +135,8 @@ const CandidateRoutes = () => (
         <Route path="cvs" element={<CVManagement />} /> {/* Trang quản lý CV */}
         <Route path="cv-builder" element={<CVBuilder />} /> {/* Tạo CV mới */}
         <Route path="cv-builder/:cvId" element={<CVBuilder />} /> {/* Chỉnh sửa CV hiện có */}
+        <Route path="interviews" element={<InterviewsPage />} /> {/* Route cho danh sách phỏng vấn */}
+        <Route path="interview/:interviewId" element={<InterviewPage />} /> {/* Route cho phòng phỏng vấn */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Layout>

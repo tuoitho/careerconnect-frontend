@@ -34,7 +34,7 @@ const ChatPage = () => {
     const connectWebSocket = () => {
       const socket = new SockJS(import.meta.env.VITE_BACKEND_URL + '/ws-chat');
       stompClient.current = Stomp.over(socket);
-      const token = localStorage.getItem('authToken') || 'abc'; // Consider getting token from Redux state if stored there
+      const token = localStorage.getItem('access_token') || 'abc'; // Consider getting token from Redux state if stored there
       const headers = { Authorization: `Bearer ${token}` };
       stompClient.current.connect(headers, onConnected, onError);
     };
@@ -289,7 +289,7 @@ const ChatPage = () => {
       // Send message via WebSocket
       stompClient.current.send(
         '/app/chat.send',
-        { Authorization: `Bearer ${localStorage.getItem('authToken') || 'abc'}` },
+        { },
         JSON.stringify(chatMessage)
       );
 

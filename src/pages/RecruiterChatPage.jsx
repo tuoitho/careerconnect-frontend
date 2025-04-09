@@ -39,7 +39,7 @@ const RecruiterChatPage = () => {
       // from env
       const socket = new SockJS(import.meta.env.VITE_BACKEND_URL + '/ws-chat');
       stompClient.current = Stomp.over(socket);
-      const token = localStorage.getItem('authToken') || 'abc';
+      const token = localStorage.getItem('access_token') || 'abc';
       const headers = { Authorization: `Bearer ${token}` };
       stompClient.current.connect(headers, onConnected, onError);
     };
@@ -116,7 +116,7 @@ const RecruiterChatPage = () => {
       }));
         allMessages[candidate.id] = formattedMessages;
         unreadCounts[candidate.id] = chatHistory.filter(
-          msg => msg.status !== 'READ' && msg.senderId !== user.userId
+          msg => msg.status !== 'READ' && msg.senderId !== currentUser.userId
         ).length;
       }
       setCandidateMessages(allMessages);

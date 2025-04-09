@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { FaUser, FaEnvelope, FaFileAlt, FaCalendarAlt } from "react-icons/fa";
+import { FaUser, FaEnvelope, FaFileAlt, FaCalendarAlt, FaVideo } from "react-icons/fa";
 import { jobService } from "../services/jobService";
 import Loading2 from "../components/Loading2";
 import Sidebar from "../components/recruiter/Sidebar";
@@ -11,14 +11,19 @@ const ApplicationDetail = () => {
   const { applicationId } = useParams();
   const [application, setApplication] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [interviews, setInterviews] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchApplicationDetail = async () => {
       try {
         setLoading(true);
-        const response = await jobService.getApplicationDetail(applicationId); // New service method
+        const response = await jobService.getApplicationDetail(applicationId);
         setApplication(response.result);
+        
+        // Fetch interviews for this application
+        const interviewsResponse = await jobService.getApplicationInterviews(applicationId);
+        setInterviews(interviewsResponse.result || []);
       } catch (error) {
         toast.error("Failed to load application details.");
       } finally {
@@ -40,9 +45,37 @@ const ApplicationDetail = () => {
     window.open(`/recruiter/chat/${application.candidateId}`, "_blank");
   };
 
+  const handleScheduleInterview = () => {
+    navigate(`/recruiter/interview/schedule/${applicationId}`);
+  };
+
+  // Check if there's an upcoming interview that can be joined
+  const getUpcomingInterview = () => {
+    const now = new Date();
+    
+    // Sort interviews by scheduled time (most recent first)
+    const sortedInterviews = [...interviews].sort((a, b) => 
+      new Date(b.scheduledTime) - new Date(a.scheduledTime)
+    );
+    
+    // Find the first interview that is scheduled or in progress
+    return sortedInterviews.find(interview => {
+      const interviewTime = new Date(interview.scheduledTime);
+      const isUpcoming = interviewTime > now;
+      const canJoin = interview.status === 'SCHEDULED' || interview.status === 'STARTED';
+      return isUpcoming && canJoin;
+    });
+  };
+
+  const handleJoinInterview = (interviewId) => {
+    navigate(`/recruiter/interview/${interviewId}`);
+  };
+
   if (loading) return <Loading2 />;
 
   if (!application) return <div className="text-center p-8">Application not found.</div>;
+
+  const upcomingInterview = getUpcomingInterview();
 
   return (
     <div className="flex bg-gray-100 min-h-screen">
@@ -104,12 +137,74 @@ const ApplicationDetail = () => {
             </div>
           )}
 
-          <button
-            onClick={handleMessageCandidate}
-            className="flex items-center bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          >
-            <FaEnvelope className="mr-2" /> Message Candidate
-          </button>
+          {/* Interview section */}
+          <div className="mb-6 border-t pt-4">
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">Interview</h3>
+            
+            {upcomingInterview ? (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h4 className="font-medium text-green-800">Upcoming Interview</h4>
+                    <p className="text-gray-700 mt-1">
+                      <FaCalendarAlt className="inline mr-2 text-gray-500" />
+                      Scheduled for: {new Date(upcomingInterview.scheduledTime).toLocaleString()}
+                    </p>
+                    <p className="text-gray-700 mt-1">
+                      <strong>Status:</strong> {upcomingInterview.status}
+                    </p>
+                  </div>
+                  
+                  <button
+                    onClick={() => handleJoinInterview(upcomingInterview.id)}
+                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center"
+                  >
+                    <FaVideo className="mr-2" /> Join Interview
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="text-gray-700">
+                No scheduled interviews. 
+                <button
+                  onClick={handleScheduleInterview}
+                  className="ml-2 text-blue-600 hover:underline"
+                >
+                  Schedule an interview
+                </button>
+              </div>
+            )}
+            
+            {interviews.length > 0 && (
+              <div className="mt-4">
+                <a 
+                  href="/recruiter/interviews" 
+                  target="_blank" 
+                  className="text-blue-600 hover:underline flex items-center"
+                >
+                  <FaVideo className="mr-2" /> View all interviews ({interviews.length})
+                </a>
+              </div>
+            )}
+          </div>
+
+          <div className="flex gap-4">
+            <button
+              onClick={handleMessageCandidate}
+              className="flex items-center bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            >
+              <FaEnvelope className="mr-2" /> Message Candidate
+            </button>
+            
+            {!upcomingInterview && (
+              <button
+                onClick={handleScheduleInterview}
+                className="flex items-center bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+              >
+                <FaVideo className="mr-2" /> Schedule Interview
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>

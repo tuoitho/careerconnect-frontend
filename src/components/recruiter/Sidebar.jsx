@@ -1,6 +1,6 @@
 import React from "react"
 import { Link } from "react-router-dom"
-import { FaBuilding, FaUsers, FaFileAlt } from "react-icons/fa"
+import { FaBuilding, FaUsers, FaFileAlt, FaVideo } from "react-icons/fa"
 
 const Sidebar = () => {
   return (
@@ -24,6 +24,12 @@ const Sidebar = () => {
             <Link to="/recruiter/company/jobs" className="flex items-center p-2 hover:bg-gray-700 rounded">
               <FaFileAlt className="mr-2" />
               Manage Job Postings
+            </Link>
+          </li>
+          <li>
+            <Link to="/recruiter/interviews" className="flex items-center p-2 hover:bg-gray-700 rounded">
+              <FaVideo className="mr-2" />
+              Interviews
             </Link>
           </li>
         </ul>
