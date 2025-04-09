@@ -1,19 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { 
-  Video, 
-  Mic, 
-  MicOff, 
-  VideoOff, 
-  PhoneOff,
-  MessageSquare,
-  User,
-  Clock
-} from 'lucide-react';
+import { Video, Mic, MicOff, VideoOff, PhoneOff, MessageSquare, User, Clock } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { selectCurrentUser } from '../store/slices/authSlice';
-import apiService from '../services/apiService';
 import { interviewService } from '../services/interviewService';
 import Loading2 from '../components/Loading2';
 import SockJS from 'sockjs-client';
@@ -43,7 +33,6 @@ const InterviewPage = () => {
   const stompClient = useRef(null);
   const isInitiator = useRef(false);
 
-  // Fetch interview details
   useEffect(() => {
     const fetchInterview = async () => {
       try {
@@ -56,30 +45,21 @@ const InterviewPage = () => {
         setError('Không thể tải thông tin phỏng vấn. Vui lòng thử lại sau.');
         toast.error('Không thể tải thông tin phỏng vấn');
       } finally {
-        setLoading(false); // Chuyển loading thành false để render giao diện
+        setLoading(false);
       }
     };
 
-    if (interviewId) {
-      fetchInterview();
-    }
+    if (interviewId) fetchInterview();
 
     return () => {
-      if (peerConnection.current) {
-        peerConnection.current.close();
-      }
-      if (localStream) {
-        localStream.getTracks().forEach((track) => track.stop());
-      }
+      if (peerConnection.current) peerConnection.current.close();
+      if (localStream) localStream.getTracks().forEach(track => track.stop());
       if (stompClient.current && stompClient.current.connected) {
-        stompClient.current.disconnect(() => {
-          console.log('WebSocket Disconnected');
-        });
+        stompClient.current.disconnect(() => console.log('WebSocket Disconnected'));
       }
     };
   }, [interviewId, currentUser]);
 
-  // Initialize media and WebSocket after loading is false and interview is available
   useEffect(() => {
     if (!loading && interview && !localStream) {
       const initialize = async () => {
@@ -90,34 +70,61 @@ const InterviewPage = () => {
     }
   }, [loading, interview]);
 
+  const handleSignalingData = async (data) => {
+    if (!peerConnection.current) {
+      console.error('Peer connection not initialized');
+      return;
+    }
+    try {
+      console.log('Received signal:', data.type);
+      switch (data.type) {
+        case 'offer':
+          if (!isInitiator.current) {
+            await peerConnection.current.setRemoteDescription(new RTCSessionDescription(data.data));
+            const answer = await peerConnection.current.createAnswer();
+            await peerConnection.current.setLocalDescription(answer);
+            sendSignal('answer', answer);
+          }
+          break;
+        case 'answer':
+          if (isInitiator.current) {
+            await peerConnection.current.setRemoteDescription(new RTCSessionDescription(data.data));
+          }
+          break;
+        case 'ice-candidate':
+          if (data.data) {
+            await peerConnection.current.addIceCandidate(new RTCIceCandidate(data.data));
+          }
+          break;
+        default:
+          console.log('Unknown signal type:', data.type);
+      }
+    } catch (error) {
+      console.error('Error handling signaling data:', error);
+    }
+  };
+
   const connectWebSocket = async (interviewData) => {
     try {
       const token = localStorage.getItem('access_token');
       console.log('Token:', token);
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
+      if (!token) throw new Error('No authentication token found');
 
-      console.log('Connecting to WebSocket...');
-      let socket = new SockJS(`${BASE_URL}/ws-interview`);
+      const socket = new SockJS(`${BASE_URL}/ws-interview`);
       const client = Stomp.over(socket);
-
-      client.debug = function(message) {
-        console.debug('STOMP Debug:', message);
-      };
+      client.debug = message => console.debug('STOMP Debug:', message);
 
       const headers = { Authorization: `Bearer ${token}` };
-      client.connect(headers, function (frame) {
+      client.connect(headers, (frame) => {
         console.log('Connected to WebSocket: ' + frame);
-        client.subscribe(`/user/queue/interview/signal`, function (message) {
+        client.subscribe(`/user/queue/interview/signal`, (message) => {
           console.log('Received signaling message:', message.body);
           handleSignalingData(JSON.parse(message.body));
         });
-
-        client.subscribe(`/user/queue/interview/message`, function (message) {
+        client.subscribe(`/user/queue/interview/message`, (message) => {
           console.log('Received chat message:', message.body);
           const receivedMessage = JSON.parse(message.body);
-          setMessages((prev) => [
+          setMessages(prev => [
             ...prev,
             {
               id: Date.now(),
@@ -128,12 +135,12 @@ const InterviewPage = () => {
             },
           ]);
         });
-
         joinInterview();
-      }, function (error) {
+      }, (error) => {
         console.error('STOMP error', error);
-        let errorMessage = 'Lỗi kết nối đến máy chủ. ';
-        errorMessage += error.headers && error.headers.message ? error.headers.message : 'Vui lòng thử lại sau.';
+        const errorMessage = error.headers?.message 
+          ? `Lỗi kết nối: ${error.headers.message}` 
+          : 'Không thể kết nối đến máy chủ.';
         setError(errorMessage);
         toast.error(errorMessage);
       });
@@ -141,90 +148,8 @@ const InterviewPage = () => {
       stompClient.current = client;
     } catch (error) {
       console.error('WebSocket connection error:', error);
-      setError('Không thể kết nối đến máy chủ. Vui lòng thử lại sau.');
+      setError('Không thể kết nối đến máy chủ.');
       toast.error('Lỗi kết nối WebSocket: ' + error.message);
-    }
-  };
-
-  const initializeMedia = async () => {
-    try {
-      const constraints = { video: true, audio: true };
-      console.log('Requesting user media with constraints:', constraints);
-
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
-      console.log('Got media stream:', stream.getTracks().map((t) => t.kind).join(', '));
-      setLocalStream(stream);
-
-      if (localVideoRef.current) {
-        localVideoRef.current.srcObject = stream;
-        console.log('Local video srcObject set');
-        localVideoRef.current.onloadedmetadata = () => {
-          console.log('Local video metadata loaded');
-          localVideoRef.current.play().catch(e => console.error('Error playing local video:', e));
-        };
-      } else {
-        console.error('Local video ref is still null after loading');
-      }
-
-      createPeerConnection();
-      stream.getTracks().forEach((track) => {
-        console.log('Adding track to peer connection:', track.kind);
-        peerConnection.current.addTrack(track, stream);
-      });
-
-      if (isInitiator.current) {
-        setTimeout(() => createAndSendOffer(), 2000);
-      }
-
-      setConnectionStatus('Waiting for the other participant to join...');
-    } catch (error) {
-      console.error('Error accessing media devices:', error);
-      toast.error('Không thể truy cập camera hoặc microphone. Vui lòng kiểm tra lại quyền truy cập.');
-      setError('Không thể truy cập camera hoặc microphone. Vui lòng kiểm tra lại quyền truy cập.');
-    }
-  };
-
-  // Các hàm khác giữ nguyên, chỉ liệt kê để tham khảo
-  const createPeerConnection = () => {
-    const configuration = {
-      iceServers: [
-        { urls: 'stun:stun.l.google.com:19302' },
-        { urls: 'stun:stun1.l.google.com:19302' },
-        { urls: 'stun:stun2.l.google.com:19302' },
-      ],
-      iceCandidatePoolSize: 10,
-    };
-
-    peerConnection.current = new RTCPeerConnection(configuration);
-    peerConnection.current.onicecandidate = (event) => {
-      if (event.candidate) sendSignal('ice-candidate', event.candidate);
-    };
-    peerConnection.current.ontrack = (event) => {
-      if (remoteVideoRef.current && event.streams[0]) {
-        remoteVideoRef.current.srcObject = event.streams[0];
-        setRemoteStream(event.streams[0]);
-      }
-    };
-    peerConnection.current.onconnectionstatechange = () => {
-      switch (peerConnection.current.connectionState) {
-        case 'connected': setConnectionStatus('Connected'); break;
-        case 'disconnected': setConnectionStatus('Disconnected'); break;
-        case 'failed': setConnectionStatus('Connection failed'); toast.error('Kết nối thất bại.'); break;
-        case 'closed': setConnectionStatus('Connection closed'); break;
-        default: setConnectionStatus('Connecting...');
-      }
-    };
-  };
-
-  const createAndSendOffer = async () => {
-    if (!peerConnection.current) return;
-    try {
-      const offer = await peerConnection.current.createOffer({ offerToReceiveAudio: true, offerToReceiveVideo: true });
-      await peerConnection.current.setLocalDescription(offer);
-      sendSignal('offer', offer);
-    } catch (error) {
-      console.error('Error creating offer:', error);
-      toast.error('Không thể thiết lập kết nối');
     }
   };
 
@@ -239,6 +164,66 @@ const InterviewPage = () => {
       console.log('Joined interview successfully');
     } catch (error) {
       console.error('Error joining interview:', error);
+    }
+  };
+
+  const initializeMedia = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      setLocalStream(stream);
+      if (localVideoRef.current) {
+        localVideoRef.current.srcObject = stream;
+        localVideoRef.current.onloadedmetadata = () => localVideoRef.current.play().catch(e => console.error('Error playing local video:', e));
+      }
+      createPeerConnection();
+      stream.getTracks().forEach(track => peerConnection.current.addTrack(track, stream));
+      if (isInitiator.current) setTimeout(() => createAndSendOffer(), 2000);
+      setConnectionStatus('Waiting for the other participant to join...');
+    } catch (error) {
+      console.error('Error accessing media devices:', error);
+      setError('Không thể truy cập camera hoặc microphone.');
+      toast.error('Không thể truy cập camera hoặc microphone.');
+    }
+  };
+
+  const createPeerConnection = () => {
+    const configuration = {
+      iceServers: [
+        { urls: 'stun:stun.l.google.com:19302' },
+        { urls: 'stun:stun1.l.google.com:19302' },
+        { urls: 'stun:stun2.l.google.com:19302' },
+      ],
+      iceCandidatePoolSize: 10,
+    };
+    peerConnection.current = new RTCPeerConnection(configuration);
+    peerConnection.current.onicecandidate = event => event.candidate && sendSignal('ice-candidate', event.candidate);
+    peerConnection.current.ontrack = event => {
+      if (remoteVideoRef.current && event.streams[0]) {
+        remoteVideoRef.current.srcObject = event.streams[0];
+        setRemoteStream(event.streams[0]);
+      }
+    };
+    peerConnection.current.onconnectionstatechange = () => {
+      const state = peerConnection.current.connectionState;
+      if (state === 'connected') setConnectionStatus('Connected');
+      else if (state === 'disconnected') setConnectionStatus('Disconnected');
+      else if (state === 'failed') {
+        setConnectionStatus('Connection failed');
+        toast.error('Kết nối thất bại.');
+      } else if (state === 'closed') setConnectionStatus('Connection closed');
+      else setConnectionStatus('Connecting...');
+    };
+  };
+
+  const createAndSendOffer = async () => {
+    if (!peerConnection.current) return;
+    try {
+      const offer = await peerConnection.current.createOffer({ offerToReceiveAudio: true, offerToReceiveVideo: true });
+      await peerConnection.current.setLocalDescription(offer);
+      sendSignal('offer', offer);
+    } catch (error) {
+      console.error('Error creating offer:', error);
+      toast.error('Không thể thiết lập kết nối');
     }
   };
 
@@ -269,7 +254,7 @@ const InterviewPage = () => {
     }
   };
 
-  const handleSendMessage = (e) => {
+  const handleSendMessage = e => {
     e.preventDefault();
     if (!newMessage.trim() || !stompClient.current || !stompClient.current.connected) return;
     const message = { interviewId, type: 'chat', data: newMessage.trim() };
@@ -286,30 +271,24 @@ const InterviewPage = () => {
   }, [messages]);
 
   if (loading) return <Loading2 />;
-
   if (error) {
     return (
       <div className="min-h-screen bg-gray-100 p-8 flex justify-center">
         <div className="bg-white rounded-lg shadow-md p-8 max-w-2xl w-full">
           <h1 className="text-2xl font-bold text-red-600 mb-4">Lỗi</h1>
           <p className="text-gray-700">{error}</p>
-          <button onClick={() => navigate(-1)} className="mt-6 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-            Quay lại
-          </button>
+          <button onClick={() => navigate(-1)} className="mt-6 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Quay lại</button>
         </div>
       </div>
     );
   }
-
   if (!interview) {
     return (
       <div className="min-h-screen bg-gray-100 p-8 flex justify-center">
         <div className="bg-white rounded-lg shadow-md p-8 max-w-2xl w-full">
           <h1 className="text-2xl font-bold text-gray-800 mb-4">Không tìm thấy phỏng vấn</h1>
           <p className="text-gray-700">Phỏng vấn không tồn tại hoặc bạn không có quyền truy cập.</p>
-          <button onClick={() => navigate(-1)} className="mt-6 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-            Quay lại
-          </button>
+          <button onClick={() => navigate(-1)} className="mt-6 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Quay lại</button>
         </div>
       </div>
     );
@@ -329,7 +308,6 @@ const InterviewPage = () => {
           <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">{connectionStatus}</div>
         </div>
       </div>
-
       <div className="flex-1 max-w-7xl mx-auto w-full p-4 flex flex-col lg:flex-row gap-4">
         <div className="flex-1 flex flex-col gap-4">
           <div className="relative bg-black rounded-lg overflow-hidden h-96 lg:h-[calc(100vh-16rem)]">
@@ -374,7 +352,7 @@ const InterviewPage = () => {
             {messages.length === 0 ? (
               <div className="text-center text-gray-500 mt-10">Chưa có tin nhắn nào. Bắt đầu trò chuyện!</div>
             ) : (
-              messages.map((message) => (
+              messages.map(message => (
                 <div key={message.id} className={`flex ${message.sender === currentUser.userId ? 'justify-end' : 'justify-start'}`}>
                   <div className={`max-w-[90%] rounded-lg p-3 ${message.sender === currentUser.userId ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-800'}`}>
                     <div className="text-xs mb-1 font-medium">{message.sender === currentUser.userId ? 'Bạn' : message.senderName}</div>
@@ -390,7 +368,7 @@ const InterviewPage = () => {
             <input
               type="text"
               value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
+              onChange={e => setNewMessage(e.target.value)}
               placeholder="Nhập tin nhắn..."
               className="flex-1 border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
