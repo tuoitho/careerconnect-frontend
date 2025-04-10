@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { Video, Mic, MicOff, VideoOff, PhoneOff, MessageSquare, User, Clock } from 'lucide-react';
+import { Video, Mic, MicOff, VideoOff, PhoneOff, MessageSquare, User, Clock, AlertCircle } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { selectCurrentUser } from '../store/slices/authSlice';
 import { interviewService } from '../services/interviewService';
@@ -25,6 +25,8 @@ const InterviewPage = () => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [connectionStatus, setConnectionStatus] = useState('Connecting...');
+  const [participantLeft, setParticipantLeft] = useState(false);
+  const [showEndConfirmation, setShowEndConfirmation] = useState(false);
 
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
@@ -32,8 +34,28 @@ const InterviewPage = () => {
   const messagesEndRef = useRef(null);
   const stompClient = useRef(null);
   const isInitiator = useRef(false);
+  const disconnectionTimer = useRef(null);
+  const iceCandidatesQueue = useRef([]);
+
+  // Hàm gửi thông báo khi người dùng rời phỏng vấn
+  const sendParticipantLeftNotification = () => {
+    if (stompClient.current && stompClient.current.connected) {
+      const message = { 
+        interviewId, 
+        type: 'participant-left', 
+        data: `${currentUser.fullname || currentUser.username} đã rời khỏi phỏng vấn`
+      };
+      stompClient.current.send('/app/interview.message', {}, JSON.stringify(message));
+    }
+  };
 
   useEffect(() => {
+    const handleBeforeUnload = () => {
+      sendParticipantLeftNotification();
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
     const fetchInterview = async () => {
       try {
         setLoading(true);
@@ -57,6 +79,8 @@ const InterviewPage = () => {
       if (stompClient.current && stompClient.current.connected) {
         stompClient.current.disconnect(() => console.log('WebSocket Disconnected'));
       }
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      if (disconnectionTimer.current) clearTimeout(disconnectionTimer.current);
     };
   }, [interviewId, currentUser]);
 
@@ -81,6 +105,13 @@ const InterviewPage = () => {
         case 'offer':
           if (!isInitiator.current) {
             await peerConnection.current.setRemoteDescription(new RTCSessionDescription(data.data));
+            if (iceCandidatesQueue.current.length > 0) {
+              console.log(`Processing ${iceCandidatesQueue.current.length} queued ICE candidates`);
+              for (const candidate of iceCandidatesQueue.current) {
+                await peerConnection.current.addIceCandidate(new RTCIceCandidate(candidate));
+              }
+              iceCandidatesQueue.current = [];
+            }
             const answer = await peerConnection.current.createAnswer();
             await peerConnection.current.setLocalDescription(answer);
             sendSignal('answer', answer);
@@ -89,11 +120,27 @@ const InterviewPage = () => {
         case 'answer':
           if (isInitiator.current) {
             await peerConnection.current.setRemoteDescription(new RTCSessionDescription(data.data));
+            if (iceCandidatesQueue.current.length > 0) {
+              console.log(`Processing ${iceCandidatesQueue.current.length} queued ICE candidates`);
+              for (const candidate of iceCandidatesQueue.current) {
+                await peerConnection.current.addIceCandidate(new RTCIceCandidate(candidate));
+              }
+              iceCandidatesQueue.current = [];
+            }
           }
           break;
         case 'ice-candidate':
           if (data.data) {
-            await peerConnection.current.addIceCandidate(new RTCIceCandidate(data.data));
+            try {
+              if (peerConnection.current.remoteDescription && peerConnection.current.remoteDescription.type) {
+                await peerConnection.current.addIceCandidate(new RTCIceCandidate(data.data));
+              } else {
+                console.log('Queuing ICE candidate as remote description is not set yet');
+                iceCandidatesQueue.current.push(data.data);
+              }
+            } catch (err) {
+              console.error('Error adding ICE candidate:', err);
+            }
           }
           break;
         default:
@@ -107,7 +154,6 @@ const InterviewPage = () => {
   const connectWebSocket = async (interviewData) => {
     try {
       const token = localStorage.getItem('access_token');
-      console.log('Token:', token);
       if (!token) throw new Error('No authentication token found');
 
       const socket = new SockJS(`${BASE_URL}/ws-interview`);
@@ -118,31 +164,35 @@ const InterviewPage = () => {
       client.connect(headers, (frame) => {
         console.log('Connected to WebSocket: ' + frame);
         client.subscribe(`/user/queue/interview/signal`, (message) => {
-          console.log('Received signaling message:', message.body);
           handleSignalingData(JSON.parse(message.body));
         });
         client.subscribe(`/user/queue/interview/message`, (message) => {
-          console.log('Received chat message:', message.body);
           const receivedMessage = JSON.parse(message.body);
-          setMessages(prev => [
-            ...prev,
-            {
-              id: Date.now(),
-              sender: receivedMessage.senderId,
-              senderName: receivedMessage.senderName,
-              content: receivedMessage.data,
-              timestamp: new Date().toLocaleTimeString(),
-            },
-          ]);
+          console.log('Received message:', receivedMessage);          if (receivedMessage.type === 'participant-left') {
+            setParticipantLeft(true);
+            setShowEndConfirmation(true);
+            // Đã loại bỏ toast notification để chỉ hiển thị modal
+            disconnectionTimer.current = setTimeout(() => {
+              endCall();
+            }, 60000);
+          } else if (receivedMessage.type === 'chat') {
+            setMessages(prev => [
+              ...prev,
+              {
+                id: Date.now(),
+                sender: receivedMessage.senderId,
+                senderName: receivedMessage.senderName,
+                content: receivedMessage.data,
+                timestamp: new Date().toLocaleTimeString(),
+              },
+            ]);
+          }
         });
         joinInterview();
       }, (error) => {
         console.error('STOMP error', error);
-        const errorMessage = error.headers?.message 
-          ? `Lỗi kết nối: ${error.headers.message}` 
-          : 'Không thể kết nối đến máy chủ.';
-        setError(errorMessage);
-        toast.error(errorMessage);
+        setError('Không thể kết nối đến máy chủ.');
+        toast.error('Không thể kết nối đến máy chủ.');
       });
 
       stompClient.current = client;
@@ -205,13 +255,25 @@ const InterviewPage = () => {
     };
     peerConnection.current.onconnectionstatechange = () => {
       const state = peerConnection.current.connectionState;
-      if (state === 'connected') setConnectionStatus('Connected');
-      else if (state === 'disconnected') setConnectionStatus('Disconnected');
-      else if (state === 'failed') {
+      console.log('Connection state changed:', state);
+      if (state === 'connected') {
+        setConnectionStatus('Connected');
+      } else if (state === 'disconnected' || state === 'closed') {
+        setConnectionStatus('Disconnected');
+        if (remoteStream) { // Chỉ hiển thị nếu đã từng kết nối với remote
+          setParticipantLeft(true);
+          setShowEndConfirmation(true);
+          toast.warning('Người tham gia khác đã rời khỏi phỏng vấn', { autoClose: false });
+          disconnectionTimer.current = setTimeout(() => {
+            endCall();
+          }, 60000);
+        }
+      } else if (state === 'failed') {
         setConnectionStatus('Connection failed');
         toast.error('Kết nối thất bại.');
-      } else if (state === 'closed') setConnectionStatus('Connection closed');
-      else setConnectionStatus('Connecting...');
+      } else {
+        setConnectionStatus('Connecting...');
+      }
     };
   };
 
@@ -243,6 +305,8 @@ const InterviewPage = () => {
 
   const endCall = async () => {
     try {
+      sendParticipantLeftNotification();
+      await new Promise(resolve => setTimeout(resolve, 300));
       await interviewService.endInterview(interviewId);
       if (peerConnection.current) peerConnection.current.close();
       if (localStream) localStream.getTracks().forEach(track => track.stop());
@@ -296,6 +360,38 @@ const InterviewPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col">
+      {showEndConfirmation && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+          <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full mx-4">
+            <div className="flex items-start mb-4">
+              <div className="bg-orange-100 p-2 rounded-full mr-3">
+                <AlertCircle className="h-6 w-6 text-orange-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-lg">Người tham gia đã rời đi</h3>
+                <p className="text-gray-600 mt-1">
+                  Người tham gia khác đã rời khỏi cuộc phỏng vấn. Cuộc phỏng vấn sẽ tự động kết thúc sau 60 giây.
+                </p>
+              </div>
+            </div>
+            <div className="flex justify-center gap-3">
+              <button
+                onClick={() => setShowEndConfirmation(false)}
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+              >
+                Tôi đã hiểu
+              </button>
+              <button
+                onClick={endCall}
+                className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+              >
+                Kết thúc ngay
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="bg-white shadow-md p-4">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div>
