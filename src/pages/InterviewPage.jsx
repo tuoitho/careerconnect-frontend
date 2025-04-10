@@ -17,8 +17,7 @@ const InterviewPage = () => {
   const currentUser = useSelector(selectCurrentUser);
   const [loading, setLoading] = useState(true);
   const [interview, setInterview] = useState(null);
-  const [error, setError] = useState(null);
-  const [localStream, setLocalStream] = useState(null);
+  const [error, setError] = useState(null);  const [localStream, setLocalStream] = useState(null);
   const [remoteStream, setRemoteStream] = useState(null);
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
@@ -27,7 +26,7 @@ const InterviewPage = () => {
   const [connectionStatus, setConnectionStatus] = useState('Connecting...');
   const [participantLeft, setParticipantLeft] = useState(false);
   const [showEndConfirmation, setShowEndConfirmation] = useState(false);
-
+  const [reconnectionAttempts, setReconnectionAttempts] = useState(0);
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
   const peerConnection = useRef(null);
@@ -36,6 +35,8 @@ const InterviewPage = () => {
   const isInitiator = useRef(false);
   const disconnectionTimer = useRef(null);
   const iceCandidatesQueue = useRef([]);
+  const connectionCheckInterval = useRef(null);
+  const lastConnectionAttempt = useRef(0);
 
   // Hàm gửi thông báo khi người dùng rời phỏng vấn
   const sendParticipantLeftNotification = () => {
@@ -92,7 +93,46 @@ const InterviewPage = () => {
       };
       initialize();
     }
+    
+    // Clean up the connection check interval when component unmounts
+    return () => {
+      if (connectionCheckInterval.current) {
+        clearInterval(connectionCheckInterval.current);
+      }
+    };
   }, [loading, interview]);
+
+  // Periodic connection check function
+  const startConnectionCheck = () => {
+    console.log('Starting connection check interval');
+    // Clear any existing interval
+    if (connectionCheckInterval.current) {
+      clearInterval(connectionCheckInterval.current);
+    }
+    
+    connectionCheckInterval.current = setInterval(() => {
+      // If we don't have a remote connection yet, try to initiate one
+      if (!remoteStream && peerConnection.current) {
+        console.log('No remote connection detected, attempting to reconnect...');
+        
+        // Don't attempt too frequently
+        const currentTime = Date.now();
+        if (currentTime - lastConnectionAttempt.current > 5000 && reconnectionAttempts < 10) {
+          console.log(`Reconnection attempt ${reconnectionAttempts + 1}/10`);
+          lastConnectionAttempt.current = currentTime;
+          setReconnectionAttempts(prev => prev + 1);
+          
+          // Create and send a new offer to connect
+          if (isInitiator.current) {
+            createAndSendOffer();
+          } else {
+            // For non-initiators, send a ping to request an offer
+            sendSignal('ping', { timestamp: currentTime });
+          }
+        }
+      }
+    }, 8000); // Check every 8 seconds
+  };
 
   const handleSignalingData = async (data) => {
     if (!peerConnection.current) {
@@ -100,8 +140,14 @@ const InterviewPage = () => {
       return;
     }
     try {
-      console.log('Received signal:', data.type);
-      switch (data.type) {
+      console.log('Received signal:', data.type);      switch (data.type) {
+        case 'ping':
+          console.log('Received ping request, responding with connection status');
+          // If we're the initiator, respond by sending a new offer when pinged
+          if (isInitiator.current) {
+            createAndSendOffer();
+          }
+          break;
         case 'offer':
           if (!isInitiator.current) {
             await peerConnection.current.setRemoteDescription(new RTCSessionDescription(data.data));
@@ -165,16 +211,40 @@ const InterviewPage = () => {
         console.log('Connected to WebSocket: ' + frame);
         client.subscribe(`/user/queue/interview/signal`, (message) => {
           handleSignalingData(JSON.parse(message.body));
-        });
-        client.subscribe(`/user/queue/interview/message`, (message) => {
+        });        client.subscribe(`/user/queue/interview/message`, (message) => {
           const receivedMessage = JSON.parse(message.body);
-          console.log('Received message:', receivedMessage);          if (receivedMessage.type === 'participant-left') {
+          console.log('Received message:', receivedMessage);          
+          if (receivedMessage.type === 'participant-left') {
             setParticipantLeft(true);
             setShowEndConfirmation(true);
             // Đã loại bỏ toast notification để chỉ hiển thị modal
             disconnectionTimer.current = setTimeout(() => {
               endCall();
             }, 60000);
+          } else if (receivedMessage.type === 'participant-joined') {
+            // When another participant joins, try to establish connection
+            toast.info('Người tham gia khác đã vào phòng phỏng vấn', { autoClose: 3000 });
+            console.log('Remote participant joined, attempting connection');
+            
+            // Reset reconnection attempts counter
+            setReconnectionAttempts(0);
+            
+            // If we're the initiator, send a new offer immediately
+            if (isInitiator.current && peerConnection.current) {
+              setTimeout(() => createAndSendOffer(), 1000);
+            }
+            
+            // Add this message to the chat
+            setMessages(prev => [
+              ...prev,
+              {
+                id: Date.now(),
+                sender: 'system',
+                senderName: 'Hệ thống',
+                content: receivedMessage.data,
+                timestamp: new Date().toLocaleTimeString(),
+              },
+            ]);
           } else if (receivedMessage.type === 'chat') {
             setMessages(prev => [
               ...prev,
@@ -189,6 +259,7 @@ const InterviewPage = () => {
           }
         });
         joinInterview();
+        startConnectionCheck(); // Start the periodic connection check
       }, (error) => {
         console.error('STOMP error', error);
         setError('Không thể kết nối đến máy chủ.');
@@ -207,11 +278,23 @@ const InterviewPage = () => {
     if (!stompClient.current || !stompClient.current.connected) return;
     stompClient.current.send('/app/interview.signal', {}, JSON.stringify({ interviewId, type, data }));
   };
-
   const joinInterview = async () => {
     try {
       await interviewService.joinInterview(interviewId);
       console.log('Joined interview successfully');
+      
+      // Announce that the user has joined to help trigger connection
+      if (stompClient.current && stompClient.current.connected) {
+        const message = { 
+          interviewId, 
+          type: 'participant-joined', 
+          data: `${currentUser.fullname || currentUser.username} đã tham gia phỏng vấn`
+        };
+        stompClient.current.send('/app/interview.message', {}, JSON.stringify(message));
+        
+        // Also send a ping signal to initiate connection process
+        sendSignal('ping', { timestamp: Date.now() });
+      }
     } catch (error) {
       console.error('Error joining interview:', error);
     }
