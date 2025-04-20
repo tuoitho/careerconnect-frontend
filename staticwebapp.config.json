@@ -1,14 +1,14 @@
 {
   "routes": [
     {
-      "route": "/(.*)",
-      "methods": [
-        "GET"
-      ],
+      "route": "/assets/*",
+      "allowedRoles": ["anonymous"]
+    },
+    {
+      "route": "/*",
+      "methods": ["GET"],
       "rewrite": "/index.html",
-      "allowedRoles": [
-        "anonymous"
-      ]
+      "allowedRoles": ["anonymous"]
     }
   ]
 }
