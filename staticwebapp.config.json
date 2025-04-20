@@ -1,10 +1,14 @@
 {
   "routes": [
     {
-      "route": "/*",
-      "methods": ["GET"],
+      "route": "/(.*)",
+      "methods": [
+        "GET"
+      ],
       "rewrite": "/index.html",
-      "allowedRoles": ["anonymous"]
+      "allowedRoles": [
+        "anonymous"
+      ]
     }
   ]
 }
