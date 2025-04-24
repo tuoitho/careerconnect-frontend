@@ -67,5 +67,5 @@ We welcome contributions from the community! To participate:
 
 ## Contact  
 - **Author**: [tuoitho](https://github.com/tuoitho)  
-- **Email**: tuoitho@example.com  
+- **Email**: dinhtri42@example.com  
 - **Issues**: [Report issues here](https://github.com/tuoitho/careerconnect-frontend/issues)
