@@ -11,6 +11,8 @@ import {
   ChevronRight,
   DollarSign,
   Video,
+  Menu,
+  X,
 } from "lucide-react";
 import NotificationDetailModal from "./NotificationDetailModal";
 import apiService from "../services/apiService.js";
@@ -40,7 +42,8 @@ export default function Header() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
   const hasFetchedRef = useRef(false);
 
   const unreadCount = useMemo(
@@ -116,6 +119,7 @@ export default function Header() {
     const handleClickOutside = () => {
       setShowNotifications(false);
       setShowDropdown(false);
+      setMobileMenuOpen(false); // Close mobile menu when clicking outside
     };
     document.addEventListener("click", handleClickOutside);
     return () => document.removeEventListener("click", handleClickOutside);
@@ -133,7 +137,19 @@ export default function Header() {
             Career Connect
           </Link>
 
-          <nav className="flex items-center gap-4">
+          {/* Mobile menu button */}
+          <button
+            className="md:hidden text-white hover:text-green-400"
+            onClick={(e) => {
+              e.stopPropagation();
+              setMobileMenuOpen(!mobileMenuOpen);
+            }}
+          >
+            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center gap-4">
             <Link to="/" className="text-sm text-white hover:text-green-400">
               Home
             </Link>
@@ -155,7 +171,7 @@ export default function Header() {
             <div className="flex items-center gap-4">
               <div className="relative">
                 <button className="text-white hover:text-green-400" onClick={handleUserDropdownClick}>
-                  <span className="text-green-400 mr-2">Xin chào, {user?.username}</span>
+                  <span className="text-green-400 mr-2 hidden sm:inline">Xin chào, {user?.username}</span>
                   <User className="inline" size={18} />
                 </button>
 
@@ -212,7 +228,7 @@ export default function Header() {
 
                 {showNotifications && (
                   <div
-                    className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl py-2 z-50 text-gray-800"
+                    className="absolute right-0 mt-2 w-80 max-w-[90vw] bg-white rounded-lg shadow-xl py-2 z-50 text-gray-800"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <div className="px-4 py-2 border-b border-gray-100">
@@ -258,18 +274,18 @@ export default function Header() {
                 )}
               </div>
 
-              <button onClick={handleLogout} className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg">
+              <button onClick={handleLogout} className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg text-sm">
                 Đăng xuất
               </button>
             </div>
           ) : (
             <div className="flex items-center gap-2">
-              <Link to="/login" className="bg-green-500 hover:bg-green-600 px-4 py-2 rounded-lg">
+              <Link to="/login" className="bg-green-500 hover:bg-green-600 px-4 py-2 rounded-lg text-sm">
                 Đăng nhập
               </Link>
               <Link
                 to="/register"
-                className="border border-green-500 text-green-500 hover:bg-green-500 hover:text-white px-4 py-2 rounded-lg"
+                className="border border-green-500 text-green-500 hover:bg-green-500 hover:text-white px-4 py-2 rounded-lg text-sm"
               >
                 Đăng ký
               </Link>
@@ -277,6 +293,27 @@ export default function Header() {
           )}
         </div>
       </div>
+
+      {/* Mobile Navigation */}
+      {mobileMenuOpen && (
+        <div className="md:hidden bg-gray-900 py-2 px-4" onClick={(e) => e.stopPropagation()}>
+          <nav className="flex flex-col space-y-3">
+            <Link to="/" className="text-sm text-white hover:text-green-400 py-2">
+              Home
+            </Link>
+            <Link to="/job-page" className="text-sm text-white hover:text-green-400 py-2">
+              Jobs
+            </Link>
+            <Link to="/freelance" className="text-sm text-white hover:text-green-400 py-2">
+              Freelance
+            </Link>
+            <Link to="/career-guide" className="text-sm text-white hover:text-green-400 py-2">
+              <Book className="inline mr-1" size={16} />
+              Cẩm nang nghề nghiệp
+            </Link>
+          </nav>
+        </div>
+      )}
 
       <NotificationDetailModal
         notification={selectedNotification}
