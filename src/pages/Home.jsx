@@ -40,32 +40,7 @@ const Home = () => {
         }
     };
 
-    const featuredJobs = [  
-        {  
-            id: 1,  
-            title: "Senior Frontend Developer",  
-            company: "Tech Solutions Inc",  
-            location: "Hà Nội",  
-            type: "Full-time",  
-            salary: "$1500-$3000",  
-        },  
-        {  
-            id: 2,  
-            title: "UX Designer",  
-            company: "Creative Studio",  
-            location: "Hồ Chí Minh",  
-            type: "Full-time",  
-            salary: "$1000-$2000",  
-        },  
-        {  
-            id: 3,  
-            title: "Product Manager",  
-            company: "Innovation Labs",  
-            location: "Đà Nẵng",  
-            type: "Full-time",  
-            salary: "$2000-$4000",  
-        }  
-    ];  
+   
 
     return (  
         <div className="min-h-screen bg-white">  
