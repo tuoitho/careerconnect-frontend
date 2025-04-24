@@ -1,0 +1,87 @@
+/* Print and PDF export styles */
+@media print {
+  /* Hide all unnecessary elements */
+  header, footer, nav, aside, button, .no-print {
+    display: none !important;
+  }
+  
+  /* Ensure the CV takes up the full page */
+  body {
+    margin: 0;
+    padding: 0;
+    background: white;
+  }
+  
+  /* CV container styles */
+  .pdf-export, .pdf-export * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  
+  /* Ensure page breaks don't happen in the middle of sections */
+  section {
+    page-break-inside: avoid;
+  }
+  
+  /* Remove shadows and borders that might not print well */
+  .pdf-export {
+    box-shadow: none !important;
+    border: none !important;
+  }
+  
+  /* Ensure text is black for better printing */
+  .pdf-export p, .pdf-export h1, .pdf-export h2, .pdf-export h3, 
+  .pdf-export h4, .pdf-export span, .pdf-export div {
+    color: black !important;
+  }
+  
+  /* Adjust font sizes for better print readability */
+  .pdf-export h1 { font-size: 24pt !important; }
+  .pdf-export h2 { font-size: 18pt !important; }
+  .pdf-export h3 { font-size: 14pt !important; }
+  .pdf-export p, .pdf-export span, .pdf-export div { font-size: 11pt !important; }
+}
+
+/* Specific styles for PDF export */
+.pdf-export {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Ensure backgrounds and colors are preserved in PDF */
+.pdf-export .bg-blue-600 {
+  background-color: #2563eb !important;
+  color: white !important;
+}
+
+.pdf-export .text-white {
+  color: white !important;
+}
+
+.pdf-export .text-blue-600 {
+  color: #2563eb !important;
+}
+
+/* Ensure proper spacing in PDF */
+.pdf-export .p-8 {
+  padding: 2rem !important;
+}
+
+.pdf-export .mb-4 {
+  margin-bottom: 1rem !important;
+}
+
+/* Ensure proper layout in PDF */
+.pdf-export .grid {
+  display: grid !important;
+}
+
+.pdf-export .col-span-2 {
+  grid-column: span 2 / span 2 !important;
+}
+
+.pdf-export .col-span-1 {
+  grid-column: span 1 / span 1 !important;
+}
